@@ -1,0 +1,32 @@
+#if defined(UNDER_CE)
+#include <winbase.h>
+#else
+#include <winver.h>
+#endif
+IDI_ICON1    ICON  DISCARDABLE  "zcatlog.ico"
+VS_VERSION_INFO VERSIONINFO
+    FILEVERSION 0,9,0005,0
+    PRODUCTVERSION 0,9,0005,0
+    FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+    FILEFLAGS VS_FF_DEBUG
+#else
+    FILEFLAGS 0x0L
+#endif
+    FILEOS VOS__WINDOWS32
+    FILETYPE VFT_DLL
+    FILESUBTYPE 0x0L
+    BEGIN
+        BLOCK "Starfish-Win"
+        BEGIN
+            BLOCK "040904B0"
+            BEGIN
+                VALUE "CompanyName", "比特兄弟（北京）科技有限公司"
+                VALUE "FileDescription", "Starfish Windows桌面版软件"
+                VALUE "FileVersion", "0.9.5.0"
+                VALUE "LegalCopyright", "(C) 2013-2015 www.starfish.im"
+                VALUE "OriginalFilename", "Starfish.exe"
+                VALUE "ProductName", "Starfish Windows桌面版软件"
+            END
+        END
+    END

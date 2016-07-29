@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>skin/0.jpg</file>
+        <file>skin/1.jpg</file>
+        <file>skin/2.jpg</file>
+        <file>skin/3.jpg</file>
+        <file>stylesheet.css</file>
+    </qresource>
+</RCC>
