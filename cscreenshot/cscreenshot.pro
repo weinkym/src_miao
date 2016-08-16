@@ -53,7 +53,8 @@ SOURCES += ./src/cscreenshotmanager.cpp \
     ./src/cscreenselectrectitem.cpp \
     ./src/cscreenshotscene.cpp \
     ./src/cscreenshotview.cpp \
-    ./src/cscreentooltipitem.cpp
+    ./src/cscreentooltipitem.cpp \
+    src/cscreenshotutil.cpp
 
 HEADERS += ./include/cscreenshotmanager.h\
         ./include/cscreenshot_global.h \
@@ -66,7 +67,8 @@ HEADERS += ./include/cscreenshotmanager.h\
     ./include/cscreenselectrectitem.h \
     ./include/cscreenshotscene.h \
     ./include/cscreenshotview.h \
-    ./include/cscreentooltipitem.h
+    ./include/cscreentooltipitem.h \
+    include/cscreenshotutil.h
 
 RESOURCES += \
     source.qrc

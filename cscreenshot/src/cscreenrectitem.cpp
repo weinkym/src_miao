@@ -2,14 +2,16 @@
 #include <QPixmap>
 #include <QGraphicsScene>
 #include "cscreenrectitem.h"
+#include "cscreenshotutil.h"
 
-CScreenRectItem::CScreenRectItem(const QRectF &rect, const QRectF &painterRect, QGraphicsItem *parent)
+CScreenRectItem::CScreenRectItem(const QRectF &rect, const QLine &painterLine, QGraphicsItem *parent)
     :QGraphicsObject(parent)
     ,m_rect(rect)
-    ,m_painterRect(painterRect)
+    ,m_painterLine(painterLine)
     ,m_lineWidth(1)
+    ,m_type(CSCREEN_BUTTON_TYPE_UNDEFINED)
 {
-    //
+
 }
 
 CScreenRectItem::~CScreenRectItem()
@@ -28,14 +30,15 @@ void CScreenRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     Q_UNUSED(widget);
     painter->save();
     QImage image = createBackgroupdPixmap().toImage();
-    painter->drawImage(m_rect.left(),m_rect.top(),image);
+    QRectF rect = boundingRect();
+    painter->drawImage(rect.left(),rect.top(),image);
     painter->restore();
 }
 
-void CScreenRectItem::setPainterRect(const QRectF &rect)
+void CScreenRectItem::setPainterLine(const QLine &painterLine)
 {
     prepareGeometryChange();
-    m_painterRect = rect;
+    m_painterLine = painterLine;
     update();
 }
 
@@ -59,11 +62,24 @@ void CScreenRectItem::setLineColor(const QColor &color)
     update();
 }
 
+void CScreenRectItem::setType(CScreenButtonType type)
+{
+    if(m_type == type)
+    {
+        return;
+    }
+    prepareGeometryChange();
+    m_type = type;
+    update();
+}
+
 QPixmap CScreenRectItem::createBackgroupdPixmap()
 {
-    qreal x = m_painterRect.x() - m_rect.x();
-    qreal y = m_painterRect.y() - m_rect.y();
-    QPixmap pixmap(m_rect.size().toSize());
+    QRectF rect = boundingRect();
+    QRect paintRect = CScreenshotUtil::convertLineToRect(m_painterLine);
+    qreal x = paintRect.x() - rect.x();
+    qreal y = paintRect.y() - rect.y();
+    QPixmap pixmap(rect.size().toSize());
     pixmap.fill(QColor(0,0,0,0));
     QPainter painter(&pixmap);
     painter.setRenderHints(QPainter::Antialiasing);
@@ -79,7 +95,7 @@ QPixmap CScreenRectItem::createBackgroupdPixmap()
     pen.setColor(m_lineColor);
     pen.setWidth(m_lineWidth);
     painter.setPen(pen);
-    painter.drawRect(QRect(x,y,m_painterRect.width(),m_painterRect.height()));
-//    painter.drawEllipse(QRect(x,y,m_painterRect.width(),m_painterRect.height()));
+//    painter.drawRect(QRect(x,y,m_painterRect.width(),m_painterRect.height()));
+    painter.drawEllipse(QRect(x,y,paintRect.width(),paintRect.height()));
     return pixmap;
 }

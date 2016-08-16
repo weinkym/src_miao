@@ -40,7 +40,7 @@ private:
     void drawPixmap(const QPixmap &pixmap);
     QPointF getPointToSelectedItem(const QPointF &point);
     QPointF getPointFromSelectedItem(const QPointF &point);
-    QRectF getPositiveRect(const QPointF &startPoint,const QPointF &endPoint);
+//    QRectF getPositiveRect(const QPointF &startPoint,const QPointF &endPoint);
     void updateToolbarPosition();
     void updateTooltipItem();
     void updatePreviewItem(const QPoint &pos);

@@ -13,6 +13,7 @@
 #include "cscreeneditortoolbaritem.h"
 #include "cscreenrectitem.h"
 #include "cscreentooltipitem.h"
+#include "cscreenshotutil.h"
 
 CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
                                  QScreen *screen,
@@ -336,6 +337,7 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
                                .arg(event->pos().x())
                                .arg(this->mapFromGlobal(event->pos()).x()));
         QRectF toolBarItemRect(m_toolbarItem->pos(),m_toolbarItem->boundingRect().size());
+        CScreenButtonType screenButtonType = m_toolbarItem->getCurrentButtonType();
         if(m_toolbarItem->isVisible() && toolBarItemRect.contains(event->pos()))
         {
             return QGraphicsView::mousePressEvent(event);
@@ -354,7 +356,7 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
             m_toolbarItem->setVisible(false);
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_EDITED
-                && m_toolbarItem->getCurrentButtonType() == CSCREEN_BUTTON_TYPE_RECT
+                && CScreenshotUtil::isEditType(screenButtonType)
                 && isContains
                 && !m_isPressed)
         {
@@ -363,6 +365,7 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
             {
                 m_currentRectItem = createRectItem();
                 m_currentRectItem->setVisible(false);
+                m_currentRectItem->setType(screenButtonType);
                 m_screen->addItem(m_currentRectItem);
             }
         }
@@ -473,7 +476,8 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
             {
                 endPoint.setY(0);
             }
-            QRectF rect = getPositiveRect(startPoint,endPoint);
+//            QRectF rect = getPositiveRect(startPoint,endPoint);
+            QRectF rect = CScreenshotUtil::convertLineFToRectF(QLineF(startPoint,endPoint));
             m_selectRectItem->setSelectedRect(rect);
             updateTooltipItem();
         }
@@ -483,8 +487,10 @@ void CScreenShotView::mouseMoveEvent(QMouseEvent *event)
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_EDITED && m_currentRectItem)
         {
-            QRectF rect = getPositiveRect(m_startPoint,event->pos());
-            m_currentRectItem->setPainterRect(rect);
+//            QRectF rect = getPositiveRect(m_startPoint,event->pos());
+//            QRectF rect = CScreenshotUtil::convertLineFToRectF(QLineF(m_startPoint,event->pos()));
+//            m_currentRectItem->setPainterRect(rect);
+            m_currentRectItem->setPainterLine(QLine(m_startPoint,event->pos()));
             m_currentRectItem->setVisible(true);
         }
     }
@@ -576,8 +582,10 @@ CScreenRectItem *CScreenShotView::createRectItem()
 {
     QPointF topLeftPos = getPointFromSelectedItem(m_selectRect.topLeft());
     QPointF bottomRightPos = getPointFromSelectedItem(m_selectRect.bottomRight());
-    QRectF rect = getPositiveRect(topLeftPos,bottomRightPos);
-    CScreenRectItem *item = new CScreenRectItem(rect,QRectF(0,0,0,0));
+//    QRectF rect = getPositiveRect(topLeftPos,bottomRightPos);
+    QRectF rect = CScreenshotUtil::convertLineFToRectF(QLineF(topLeftPos,bottomRightPos));
+    CScreenRectItem *item = new CScreenRectItem(rect,QLine(0,0,0,0));
+//    CScreenRectItem *item = new CScreenRectItem(QLineF(topLeftPos,bottomRightPos),QRectF(0,0,0,0));
     item->setLineColor(m_toolbarItem->getColor());
     item->setLineWidth(m_toolbarItem->getLineWidth());
     return item;
@@ -602,30 +610,30 @@ QPointF CScreenShotView::getPointFromSelectedItem(const QPointF &point)
     return QPointF(point.x() * m_sx,point.y() * m_sy);
 }
 
-QRectF CScreenShotView::getPositiveRect(const QPointF &startPoint, const QPointF &endPoint)
-{
-    qreal width = endPoint.x() - startPoint.x();
-    qreal height = endPoint.y() - startPoint.y();
-    QPointF pos;
-    if(width > 0)
-    {
-        pos.setX(startPoint.x());
-    }
-    else
-    {
-        pos.setX(endPoint.x());
-    }
-    if(height > 0)
-    {
-        pos.setY(startPoint.y());
-    }
-    else
-    {
-        pos.setY(endPoint.y());
-    }
-    QSizeF size(qAbs(width),qAbs(height));
-    return QRectF(pos,size);
-}
+//QRectF CScreenShotView::getPositiveRect(const QPointF &startPoint, const QPointF &endPoint)
+//{
+//    qreal width = endPoint.x() - startPoint.x();
+//    qreal height = endPoint.y() - startPoint.y();
+//    QPointF pos;
+//    if(width > 0)
+//    {
+//        pos.setX(startPoint.x());
+//    }
+//    else
+//    {
+//        pos.setX(endPoint.x());
+//    }
+//    if(height > 0)
+//    {
+//        pos.setY(startPoint.y());
+//    }
+//    else
+//    {
+//        pos.setY(endPoint.y());
+//    }
+//    QSizeF size(qAbs(width),qAbs(height));
+//    return QRectF(pos,size);
+//}
 
 void CScreenShotView::updateToolbarPosition()
 {
@@ -635,7 +643,8 @@ void CScreenShotView::updateToolbarPosition()
     }
     QPointF topLeftPos = this->getPointFromSelectedItem(m_selectRectItem->getSelectRect().topLeft());
     QPointF bottomRightPos = this->getPointFromSelectedItem(m_selectRectItem->getSelectRect().bottomRight());
-    QRectF rect = getPositiveRect(topLeftPos,bottomRightPos);
+//    QRectF rect = getPositiveRect(topLeftPos,bottomRightPos);
+    QRectF rect = CScreenshotUtil::convertLineFToRectF(QLineF(topLeftPos,bottomRightPos));
     qreal x = rect.right() - m_toolbarItem->boundingRect().width();
     if( x < 0)
     {
@@ -658,7 +667,8 @@ void CScreenShotView::updateTooltipItem()
     }
     QPointF topLeftPos = this->getPointFromSelectedItem(m_selectRectItem->getSelectRect().topLeft());
     QPointF bottomRightPos = this->getPointFromSelectedItem(m_selectRectItem->getSelectRect().bottomRight());
-    QRectF rect = getPositiveRect(topLeftPos,bottomRightPos);
+//    QRectF rect = getPositiveRect(topLeftPos,bottomRightPos);
+    QRectF rect = CScreenshotUtil::convertLineFToRectF(QLineF(topLeftPos,bottomRightPos));
     m_tooltipSizeItem->setText(getSizeString(rect.size().toSize()));
     qreal x = rect.left();
     qreal y = rect.top() - m_tooltipSizeItem->boundingRect().height()
@@ -906,7 +916,8 @@ void CScreenShotView::updateSelectRect(const QPointF &startPoint, const QPointF 
         bottomRight.setY(maxY);
     }
 
-    QRectF rect = getPositiveRect(topLeft,bottomRight);
+//    QRectF rect = getPositiveRect(topLeft,bottomRight);
+    QRect rect = CScreenshotUtil::convertLineFToRectF(QLineF(topLeft,bottomRight)).toRect();
     m_selectRectItem->setSelectedRect(rect);
     updateTooltipItem();
 }
@@ -915,15 +926,17 @@ void CScreenShotView::onButtonClicked(CScreenButtonType type)
 {
     C_SCREENSHOTSHARED_LOG(QString("onButtonClicked type %1").arg(type));
     m_screenButtonType = type;
-    switch (type)
+    if(CScreenshotUtil::isEditType(m_screenButtonType))
     {
-    case CSCREEN_BUTTON_TYPE_RECT:
         if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
         {
             setShotStatus(CSCREEN_SHOT_STATE_EDITED);
             m_selectRectItem->setMovePointHidden(true);
         }
-        break;
+        return;
+    }
+    switch (type)
+    {
     case CSCREEN_BUTTON_TYPE_OK:
         doFinished();
         C_SCREENSHOTSHARED_LOG(QString("CSCREEN_SHOT_STATE_FINISHED type %1").arg(CSCREEN_SHOT_STATE_FINISHED));
@@ -940,7 +953,8 @@ void CScreenShotView::onFinishTimerOut()
 {
     QPointF startPos = m_selectRectItem->getSelectRect().topLeft();
     QPointF endPos = m_selectRectItem->getSelectRect().bottomRight();
-    QRect rect = getPositiveRect(startPos,endPos).toRect();
+//    QRect rect = getPositiveRect(startPos,endPos).toRect();
+    QRect rect = CScreenshotUtil::convertLineFToRectF(QLineF(startPos,endPos)).toRect();
     if(rect.width() >= 1 && rect.height() >= 1)
     {
         m_isValid = true;
