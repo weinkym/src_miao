@@ -1,0 +1,25 @@
+#config global parameter
+
+RESOURCES += $$PWD/source.qrc
+
+win32 {
+    PLATFORM_BUILD = win
+}
+mac {
+    PLATFORM_BUILD = mac
+}
+
+INCLUDE_DIR = $$PWD
+INCLUDEPATH += $$INCLUDE_DIR
+
+DEBUG_DIR = $$PWD/../../debug/$$PLATFORM_BUILD
+RELEASE_DIR = $$PWD/../../release/$$PLATFORM_BUILD
+LIB_DIR = $$PWD/../library/$$PLATFORM_BUILD
+OUTPUT_DIR = $$PWD/../../output/$$PLATFORM_BUILD
+VENDOR_DIR = $$PWD/../vendor
+
+#提供自定义的配置
+exists(custom.pri ) {
+      message( "include(custom.pri)" )
+      include(custom.pri)
+}

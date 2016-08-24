@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/4009_313.png</file>
+        <file>image/4012_7.png</file>
+        <file>image/4013_11.png</file>
+        <file>image/4013_12.png</file>
+        <file>image/4013_13.png</file>
+        <file>image/4023_18.png</file>
+        <file>image/4023_19.png</file>
+        <file>image/4023_113.png</file>
+        <file>image/4026_3.png</file>
+        <file>image/4160_135.png</file>
+        <file>image/4160_137.png</file>
+        <file>image/4160_138.png</file>
+        <file>image/4160_139.png</file>
+        <file>image/4161_2.png</file>
+    </qresource>
+</RCC>
