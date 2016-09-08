@@ -83,7 +83,16 @@ void MainWindow::testScreenShot()
     }
 }
 
+void MainWindow::testPinyin()
+{
+    QString pinyin = Mplib::MpStaticMethod::convertToPinyin(ui->textEdit->toPlainText(),false);
+    QString pinyin2 = Mplib::MpStaticMethod::convertToPinyin(ui->textEdit->toPlainText(),true);
+    ui->textEdit_2->clear();
+    ui->textEdit_2->append(pinyin);
+    ui->textEdit_2->append(pinyin2);
+}
+
 void MainWindow::on_btn_test_clicked()
 {
-    testScreenShot();
+    testPinyin();
 }

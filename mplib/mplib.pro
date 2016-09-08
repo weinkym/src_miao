@@ -3,15 +3,12 @@
 # Project created by QtCreator 2014-05-21T09:55:31
 #
 #-------------------------------------------------
+
 TARGET_NAME = mplib
 DEFINES_NAME = MPLIB_LIBRARY
-###############################################################################
 #CONFIG += static
-###############################################################################
 QT       += network
-###############################################################################
 DEFINES += $${DEFINES_NAME}
-###############################################################################
 TEMPLATE = lib
 DESTDIR  = $$PWD/lib
 
@@ -30,15 +27,12 @@ RCC_DIR     = $${OBJECTS_DIR}/rcc
 INCLUDEPATH += $${OBJECTS_DIR}/uic
 
 #VERSION########################################################################
-# VERSION>4.7 即4.8以上
 greaterThan(QT_MAJOR_VERSION, 4) {
 QT += widgets
 DEFINES += NEED_VERSION_4_8
 } else {
 greaterThan(QT_MAJOR_VERSION, 3) {
 greaterThan(QT_MINOR_VERSION, 7) {
-#4.8.4貌似不支持
-#DEFINES += NEED_VERSION_4_8
 }}}
 contains(DEFINES,NEED_VERSION_4_8){
 message(WHEEL)
@@ -79,3 +73,7 @@ FORMS += \
 
 RESOURCES += \
     source.qrc
+
+win32{
+ SOURCES += src/mplib_win.cpp
+}

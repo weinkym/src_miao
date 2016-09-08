@@ -5,15 +5,16 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    ZTextCodec codec;
-    codec.init();
+//    ZTextCodec codec;
+//    codec.init();
     MainWindow w;
-//    w.show();
+    w.show();
 //   w.testZWheelWidget();
 //    w.testPrinter();
-    w.testScreenShot();
+//    w.testScreenShot();
 //    ZSwitchButton btn;
-     w.show();
+//     w.show();
+//    return -1;
 
     return a.exec();
 }

@@ -8,5 +8,6 @@
         <file>images/off.png</file>
         <file>images/on.png</file>
         <file>images/text.png</file>
+        <file>other/hanzipinyin.txt</file>
     </qresource>
 </RCC>
