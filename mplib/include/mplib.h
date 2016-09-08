@@ -19,6 +19,7 @@ public:
     static QList<int> getListInt(int min,int max);
     static QString getSizeString(qint64 size,int precn = 6);
     static QColor getCursorPosColor();
+    static QString convertToPinyin(const QString &text,bool initial = false);
 
 #ifdef Q_CC_MSVC
     static QStringList getPrinters();

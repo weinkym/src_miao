@@ -24,6 +24,7 @@ public slots:
     void testZWheelWidget();
     void testPrinter();
     void testScreenShot();
+    void testPinyin();
 
 private slots:
     void on_btn_test_clicked();
