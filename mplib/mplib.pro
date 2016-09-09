@@ -76,10 +76,10 @@ RESOURCES += \
 
 win32{
  SOURCES += src/mplib_win.cpp
+LIBS += -lshell32
 }
 
-mac{
+mac {
 QMAKE_LFLAGS += -framework AppKit
-OBJECTIVE_SOURCES += \
-    src/mplib_mac.mm
+#OBJECTIVE_SOURCES +=   src/mplib_mac.mm
 }

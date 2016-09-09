@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QFileDialog>
+#include <QDesktopServices>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -94,7 +96,12 @@ void MainWindow::testPinyin()
 
 void MainWindow::testOpenFinder()
 {
-    Mplib::MpStaticMethod::openFinder("/Users/bitbrothers/Library/Application Support/Lecai/starfish.log");
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
+                                                     "d:",
+                                                     tr("Images (*.png *.xpm *.*)"));
+//    Mplib::MpStaticMethod::openFinder("/Users/bitbrothers/Library/Application Support/Lecai/starfish.log");
+//    Mplib::MpStaticMethod::openFinder("D:\\kclive\\test.html");
+    Mplib::MpStaticMethod::openFinder(fileName);
 }
 
 void MainWindow::on_btn_test_clicked()

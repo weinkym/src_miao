@@ -20,9 +20,8 @@ public:
     static QString getSizeString(qint64 size,int precn = 6);
     static QColor getCursorPosColor();
     static QString convertToPinyin(const QString &text,bool initial = false);
-#ifdef Q_OS_MAC
     static void openFinder(const QString &filePath);
-#endif
+
 #ifdef Q_CC_MSVC
     static QStringList getPrinters();
     static QString getDefaultPrinter();
