@@ -25,6 +25,7 @@ public slots:
     void testPrinter();
     void testScreenShot();
     void testPinyin();
+    void testOpenFinder();
 
 private slots:
     void on_btn_test_clicked();

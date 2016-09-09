@@ -92,7 +92,12 @@ void MainWindow::testPinyin()
     ui->textEdit_2->append(pinyin2);
 }
 
+void MainWindow::testOpenFinder()
+{
+    Mplib::MpStaticMethod::openFinder("/Users/bitbrothers/Library/Application Support/Lecai/starfish.log");
+}
+
 void MainWindow::on_btn_test_clicked()
 {
-    testPinyin();
+    testOpenFinder();
 }
