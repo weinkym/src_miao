@@ -16,6 +16,7 @@ CScreenEditorToolbarItem::CScreenEditorToolbarItem(QGraphicsItem *parent)
     ,m_rect(0,0,300,m_toolbarHeight)
     ,m_currentButtonType(CSCREEN_BUTTON_TYPE_UNDEFINED)
 {
+    C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
     qreal x = m_buttonMargin;
     qreal y = 0.5 * (m_toolbarHeight - m_buttonHeight);
 

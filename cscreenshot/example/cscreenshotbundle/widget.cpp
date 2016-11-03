@@ -1,7 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include "cscreenshotmanager.h"
-#include <QProcess>
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),

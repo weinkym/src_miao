@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QWindowList>
 #include <QWindow>
+#include "cscreenshottimer.h"
 
 CScreenShotManager * CScreenShotManager::m_instance = NULL;
 
@@ -31,6 +32,7 @@ CScreenShotManager::~CScreenShotManager()
 
 void CScreenShotManager::startScreenShot()
 {
+    C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
     if(m_isRunning)
     {
         return;
@@ -58,6 +60,7 @@ void CScreenShotManager::startScreenShot()
 
 void CScreenShotManager::clearAll()
 {
+    C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
     //可能为导致crash
     //qDeleteAll(m_viewList);
     foreach (CScreenShotView *v, m_viewList)

@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = cscreenshottest
+TARGET = cscreenshotbundle
 TEMPLATE = app
 
 INCLUDEPATH += ../../include
@@ -37,15 +37,17 @@ CONFIG(release, debug|release) {
     UI_DIR = $$OUTPUT_DIR/release/cscreenshot/ui
     RCC_DIR = $$OUTPUT_DIR/release/cscreenshot/rcc
 }
+mac {
+    QMAKE_INFO_PLIST = $${TARGET}.plist
+}
 
 LIBS += -L$$C_LIB_PATH -l$$C_LIB_NAME
 
 SOURCES += main.cpp\
         widget.cpp \
-    cwidget.cpp
+    cscreenshotobject.cpp
 
 HEADERS  += widget.h \
-    cwidget.h
+    cscreenshotobject.h
 
-FORMS    += widget.ui \
-    cwidget.ui
+FORMS    += widget.ui

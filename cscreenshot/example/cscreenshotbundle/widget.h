@@ -7,8 +7,6 @@ namespace Ui {
 class Widget;
 }
 
-class QProcess;
-
 class Widget : public QWidget
 {
     Q_OBJECT
@@ -27,7 +25,6 @@ private slots:
 
 private:
     Ui::Widget *ui;
-    QProcess *m_proess;
 };
 
 #endif // WIDGET_H

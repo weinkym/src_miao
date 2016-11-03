@@ -10,6 +10,7 @@ CScreenTooltipItem::CScreenTooltipItem(QGraphicsItem *parent)
     ,m_colorBackgroud("#d3d3d3")
     ,m_colorText("#ffffff")
 {
+    C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
     this->setOpacity(0.8);
 }
 

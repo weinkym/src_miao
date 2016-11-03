@@ -81,5 +81,5 @@ LIBS += -lshell32
 
 mac {
 QMAKE_LFLAGS += -framework AppKit
-#OBJECTIVE_SOURCES +=   src/mplib_mac.mm
+OBJECTIVE_SOURCES +=   src/mplib_mac.mm
 }
