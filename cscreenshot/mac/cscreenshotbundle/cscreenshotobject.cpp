@@ -4,9 +4,12 @@
 #include <QPixmap>
 #include <QBuffer>
 #include <QTime>
+#include <QLocalServer>
+#include <QLocalSocket>
 
 CScreenShotObject::CScreenShotObject(QObject *parent)
     :QObject(parent)
+    ,m_localServer(NULL)
 {
     connect(CScreenShotManager::getInstance(),SIGNAL(sigScreenShotPixmapChanged(QPixmap)),
             this,SLOT(onScreenShotPixmapChanged(QPixmap)));
@@ -22,6 +25,38 @@ void CScreenShotObject::startScreenShot()
     QTime time=QTime::currentTime();
     CScreenShotManager::getInstance()->startScreenShot();
     C_SCREENSHOTSHARED_LOG(QString("time=%1").arg(time.msecsTo(QTime::currentTime())));
+}
+
+bool CScreenShotObject::isStart(const QString &account)
+{
+    QLocalSocket socket;
+    QString serverName = account;
+
+    socket.connectToServer(serverName);
+
+    if(socket.waitForConnected())
+    {
+        return true;
+    }
+    else
+    {
+        if(!m_localServer)
+        {
+            m_localServer = new QLocalServer(this);
+            if(!m_localServer->listen(serverName))
+            {
+                // 此时监听失败，可能是程序崩溃时,残留进程服务导致的,移除之
+                QAbstractSocket::SocketError socketError = m_localServer->serverError();
+                if(socketError == QAbstractSocket::AddressInUseError)
+                {
+                    QLocalServer::removeServer(serverName);
+                    m_localServer->listen(serverName); // 再次监听
+                }
+            }
+        }
+    }
+
+    return false;
 }
 
 void CScreenShotObject::onScreenShotPixmapChanged(const QPixmap &pixmap)

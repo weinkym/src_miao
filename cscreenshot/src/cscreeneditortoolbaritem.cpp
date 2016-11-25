@@ -45,17 +45,17 @@ CScreenEditorToolbarItem::CScreenEditorToolbarItem(QGraphicsItem *parent)
     x += m_buttonMargin + m_buttonWidth;
 
     //============
-    {
-        CScreenEditorButtonItem::Param param;
-        param.normalImage=QImage(":/screenshot/res/screenshot/rect_icon_normal.png");
-        param.pressedImage=QImage(":/screenshot/res/screenshot/rect_icon_pressed.png");
-        param.rect=QRectF(x,y,m_buttonWidth,m_buttonHeight);
-        param.type=CSCREEN_BUTTON_TYPE_RECT;
-        CScreenEditorButtonItem *item = new CScreenEditorButtonItem(param,this);
-        connect(item,SIGNAL(sigClicked(CScreenButtonType)),this,SLOT(onButtonClicked(CScreenButtonType)));
-        m_buttonItemList.append(item);
-    }
-    x += m_buttonMargin + m_buttonWidth;
+//    {
+//        CScreenEditorButtonItem::Param param;
+//        param.normalImage=QImage(":/screenshot/res/screenshot/rect_icon_normal.png");
+//        param.pressedImage=QImage(":/screenshot/res/screenshot/rect_icon_pressed.png");
+//        param.rect=QRectF(x,y,m_buttonWidth,m_buttonHeight);
+//        param.type=CSCREEN_BUTTON_TYPE_RECT;
+//        CScreenEditorButtonItem *item = new CScreenEditorButtonItem(param,this);
+//        connect(item,SIGNAL(sigClicked(CScreenButtonType)),this,SLOT(onButtonClicked(CScreenButtonType)));
+//        m_buttonItemList.append(item);
+//    }
+//    x += m_buttonMargin + m_buttonWidth;
     //============
     {
         CScreenEditorButtonItem::Param param;

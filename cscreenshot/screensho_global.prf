@@ -1,0 +1,20 @@
+
+TEMP_DIR=$$PWD/TEMP
+win32{
+PLATEFORM_NAME=win
+}
+mac{
+PLATEFORM_NAME=mac
+}
+DEBUG_RELEASE_NAME=release
+DEBUG_RELEASE_SUBFIX=
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+    DEBUG_RELEASE=debug
+    DEBUG_RELEASE_SUBFIX=d
+}
+OBJECTS_DIR = $$TEMP_DIR/$${DEBUG_RELEASE_NAME}/cscreenshot/obj
+MOC_DIR = $$TEMP_DIR/$${DEBUG_RELEASE_NAME}/cscreenshot/moc
+UI_DIR = $$TEMP_DIR/$${DEBUG_RELEASE_NAME}/cscreenshot/ui
+RCC_DIR = $$TEMP_DIR/$${DEBUG_RELEASE_NAME}/cscreenshot/rcc

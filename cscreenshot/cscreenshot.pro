@@ -6,34 +6,25 @@
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = cscreenshot
+
+#提供自定义的配置
+GLOBAL_PRF=screensho_global.prf
+exists($${GLOBAL_PRF}) {
+    message( "include($${GLOBAL_PRF})" )
+    include($${GLOBAL_PRF})
+    DESTDIR = $$PWD/lib/$${PLATEFORM_NAME}/$${DEBUG_RELEASE_NAME}
+}
+
 include(../include/global.prf)
 
 mac{
 QT += macextras
-DESTDIR = $$PWD/lib/mac
+#DESTDIR = $$PWD/lib/mac
 QMAKE_LFLAGS += -framework AppKit
 OBJECTIVE_SOURCES += \
     ./src/cscreenpublic.mm
 }
 
-CONFIG(debug, debug|release) {
-    TARGET = $$join(TARGET,,,d)
-    DESTDIR = $$LIB_DIR/debug/cscreenshot
-    DLLDESTDIR = $$LIB_DIR/debug/cscreenshot
-
-    OBJECTS_DIR = $$OUTPUT_DIR/debug/cscreenshot/obj
-    MOC_DIR = $$OUTPUT_DIR/debug/cscreenshot/moc
-    UI_DIR = $$OUTPUT_DIR/debug/cscreenshot/ui
-    RCC_DIR = $$OUTPUT_DIR/debug/cscreenshot/rcc
-}
-CONFIG(release, debug|release) {
-    DESTDIR = $$LIB_DIR/release/cscreenshot
-    DLLDESTDIR = $$LIB_DIR/release/cscreenshot
-    OBJECTS_DIR = $$OUTPUT_DIR/release/cscreenshot/obj
-    MOC_DIR = $$OUTPUT_DIR/release/cscreenshot/moc
-    UI_DIR = $$OUTPUT_DIR/release/cscreenshot/ui
-    RCC_DIR = $$OUTPUT_DIR/release/cscreenshot/rcc
-}
 win32 {
     LIBS += -luser32
     SOURCES += ./src/cscreenpublic.cpp
@@ -76,5 +67,3 @@ RESOURCES += \
     source.qrc
 
 DISTFILES +=
-
-include(test.pri)

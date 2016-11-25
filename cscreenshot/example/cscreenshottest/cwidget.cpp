@@ -2,6 +2,7 @@
 #include "ui_cwidget.h"
 #include <QProcess>
 #include <QPixmap>
+#include <QDir>
 
 CWidget::CWidget(QWidget *parent)
     :QWidget(parent)
@@ -27,7 +28,13 @@ void CWidget::on_btnStart_clicked()
         connect(m_process, SIGNAL(readyRead()), this, SLOT(readFromClient()));
     }
 //    m_process->start("/Users/bitbrothers/work/others/src/workroot/src_miao/cscreenshot/example/cscreenshotbundle/TEMP/cscreenshotbundle.app/Contents/MacOS/cscreenshotbundle");
-    m_process->start("/Users/bitbrothers/work/others/src/workroot/src_miao/cscreenshot/example/cscreenshotbundle/TEMP/cscreenshotbundle.app");
+//    m_process->start("/Users/bitbrothers/work/others/src/workroot/src_miao/cscreenshot/example/cscreenshotbundle/TEMP/cscreenshotbundle.app");
+    QString dirPath = QApplication::applicationDirPath();
+    QDir dir(dirPath);
+    dir.cd("../Library");
+    QString filePath = dir.path()+"/cscreenshotbundle.app";
+    ui->textEdit->append(QString("filePath = %1").arg(filePath));
+    m_process->start(filePath);
 }
 
 void CWidget::readFromClient()

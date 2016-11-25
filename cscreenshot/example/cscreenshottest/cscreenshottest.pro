@@ -4,6 +4,19 @@
 #
 #-------------------------------------------------
 
+#deployqtsss.target = .buildfile
+deployqtsss.commands = open "/Users/bitbrothers/Downloads/cscreenshottest.app"
+#deployqtsss.commands = @echo Building
+QMAKE_EXTRA_TARGETS += deployqtsss
+
+# mytarget.target = .buildfile
+#  mytarget.commands = open "/Users/bitbrothers/Downloads/cscreenshottest.app"
+#  mytarget.depends = mytarget2
+
+#  mytarget2.commands = open "/Users/bitbrothers/Downloads/cscreenshottest.app"
+#QMAKE_EXTRA_TARGETS += mytarget mytarget2
+
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -12,40 +25,31 @@ TARGET = cscreenshottest
 TEMPLATE = app
 
 INCLUDEPATH += ../../include
-OUTPUT_DIR=$$PWD/TEMP
 
-CONFIG(debug, debug|release) {
-    C_LIB_PATH = ../../lib/debug
-    C_LIB_NAME = cscreenshotd
-
-    TARGET = $$join(TARGET,,,d)
-    DESTDIR = $$OUTPUT_DIR/debug
-    DLLDESTDIR = $$LIB_DIR/debug
-
-    OBJECTS_DIR = $$OUTPUT_DIR/debug/cscreenshot/obj
-    MOC_DIR = $$OUTPUT_DIR/debug/cscreenshot/moc
-    UI_DIR = $$OUTPUT_DIR/debug/cscreenshot/ui
-    RCC_DIR = $$OUTPUT_DIR/debug/cscreenshot/rcc
-}
-CONFIG(release, debug|release) {
-    C_LIB_PATH = ../../lib/release
-    C_LIB_NAME = cscreenshot
-    DESTDIR = $$OUTPUT_DIR/release
-    DLLDESTDIR = $$LIB_DIR/release
-    OBJECTS_DIR = $$OUTPUT_DIR/release/cscreenshot/obj
-    MOC_DIR = $$OUTPUT_DIR/release/cscreenshot/moc
-    UI_DIR = $$OUTPUT_DIR/release/cscreenshot/ui
-    RCC_DIR = $$OUTPUT_DIR/release/cscreenshot/rcc
+#提供自定义的配置
+GLOBAL_PRF=../../screensho_global.prf
+exists($${GLOBAL_PRF}) {
+      message( "include($${GLOBAL_PRF})" )
+      include($${GLOBAL_PRF})
+    DESTDIR = $$PWD/$${DEBUG_RELEASE_NAME}
 }
 
-LIBS += -L$$C_LIB_PATH -l$$C_LIB_NAME
+mac {
+    QMAKE_INFO_PLIST = $${TARGET}.plist
+}
+
+LIB_PATH=../../lib/$${PLATEFORM_NAME}/$${DEBUG_RELEASE_NAME}
+message( "LIB_PATH=$${LIB_PATH}" )
+LIBS += -L$${LIB_PATH} -lcscreenshot$${DEBUG_RELEASE_SUBFIX}
+
+#LIBS += -L$$C_LIB_PATH -l$$C_LIB_NAME
 
 SOURCES += main.cpp\
-        widget.cpp \
+#        widget.cpp \
     cwidget.cpp
 
-HEADERS  += widget.h \
-    cwidget.h
+#HEADERS  += widget.h
+HEADERS  += cwidget.h
 
 FORMS    += widget.ui \
     cwidget.ui

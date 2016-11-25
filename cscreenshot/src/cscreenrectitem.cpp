@@ -84,18 +84,29 @@ QPixmap CScreenRectItem::createBackgroupdPixmap()
     QPainter painter(&pixmap);
     painter.setRenderHints(QPainter::Antialiasing);
 
-//    painter.setRenderHints(QPainter::Antialiasing
-//                            | QPainter::TextAntialiasing
-//                            | QPainter::SmoothPixmapTransform
-//                            | QPainter::HighQualityAntialiasing
-//                            | QPainter::NonCosmeticDefaultPen
-//                            | QPainter::Qt4CompatiblePainting);
+    //    painter.setRenderHints(QPainter::Antialiasing
+    //                            | QPainter::TextAntialiasing
+    //                            | QPainter::SmoothPixmapTransform
+    //                            | QPainter::HighQualityAntialiasing
+    //                            | QPainter::NonCosmeticDefaultPen
+    //                            | QPainter::Qt4CompatiblePainting);
 
     QPen pen;
     pen.setColor(m_lineColor);
     pen.setWidth(m_lineWidth);
     painter.setPen(pen);
-//    painter.drawRect(QRect(x,y,m_painterRect.width(),m_painterRect.height()));
-    painter.drawEllipse(QRect(x,y,paintRect.width(),paintRect.height()));
+    //    painter.drawRect(QRect(x,y,m_painterRect.width(),m_painterRect.height()));
+    switch (m_type)
+    {
+    case CSCREEN_BUTTON_TYPE_RECT:
+        painter.drawRect(QRect(x,y,paintRect.width(),paintRect.height()));
+        break;
+    case CSCREEN_BUTTON_TYPE_ELLIPSE:
+        painter.drawEllipse(QRect(x,y,paintRect.width(),paintRect.height()));
+        break;
+    default:
+        painter.drawRect(QRect(x,y,paintRect.width(),paintRect.height()));
+        break;
+    }
     return pixmap;
 }
