@@ -45,10 +45,10 @@ LIBS += -L$${LIB_PATH} -lcscreenshot$${DEBUG_RELEASE_SUBFIX}
 #LIBS += -L$$C_LIB_PATH -l$$C_LIB_NAME
 
 SOURCES += main.cpp\
-#        widget.cpp \
+        widget.cpp \
     cwidget.cpp
 
-#HEADERS  += widget.h
+HEADERS  += widget.h
 HEADERS  += cwidget.h
 
 FORMS    += widget.ui \

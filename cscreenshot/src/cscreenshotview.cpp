@@ -36,6 +36,7 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     ,m_isValid(false)
 {
     C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
+    this->setMouseTracking(true);
     m_screen = new CScreenShotScene(this);
     this->setScene(m_screen);
     QDesktopWidget *pDesktoWidget = QApplication::desktop();
