@@ -65,8 +65,8 @@ void CScreenShotManager::clearAll()
     //qDeleteAll(m_viewList);
     foreach (CScreenShotView *v, m_viewList)
     {
-       v->setVisible(false);
-       v->deleteLater();
+        v->setVisible(false);
+        v->deleteLater();
     }
     m_viewList.clear();
 }
@@ -94,11 +94,8 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
         {
             if(firstView != NULL)
             {
-#ifdef Q_OS_WIN
-            firstView->setVisible(false);
-#else
-            d->deleteLater();
-#endif
+                firstView->setVisible(false);
+                d->deleteLater();
             }
             else
             {
@@ -118,11 +115,8 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
     {
         if(firstView)
         {
-#ifdef Q_OS_WIN
             firstView->setVisible(false);
-#else
             firstView->deleteLater();
-#endif
         }
         m_viewList.clear();
         if(status == CSCREEN_SHOT_STATE_FINISHED)
@@ -134,8 +128,8 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
             else
             {
                 C_SCREENSHOTSHARED_LOG(QString("shot is %1valid,pixmap is %2null")
-                         .arg(isValid?"":"not")
-                         .arg(pixmap.isNull()?"":"not "));
+                                       .arg(isValid?"":"not")
+                                       .arg(pixmap.isNull()?"":"not "));
             }
         }
         m_isRunning = false;
