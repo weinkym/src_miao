@@ -2,6 +2,13 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include <QProcess>
+#include <QStandardPaths>
+#include <QUuid>
+#include <QMimeData>
+#include <QClipboard>
+#include <QFileInfo>
+#include <QUrl>
 
 namespace Ui {
 class Widget;
