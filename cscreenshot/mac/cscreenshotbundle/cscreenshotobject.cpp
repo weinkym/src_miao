@@ -22,13 +22,15 @@ CScreenShotObject::~CScreenShotObject()
 
 void CScreenShotObject::startScreenShot()
 {
+    C_SCREENSHOT_LOG_TEST;
     QTime time=QTime::currentTime();
     CScreenShotManager::getInstance()->startScreenShot();
-    C_SCREENSHOTSHARED_LOG(QString("time=%1").arg(time.msecsTo(QTime::currentTime())));
+    C_SCREENSHOT_LOG_INFO(QString("time=%1").arg(time.msecsTo(QTime::currentTime())));
 }
 
 bool CScreenShotObject::isStart(const QString &account)
 {
+    C_SCREENSHOT_LOG_TEST;
     QLocalSocket socket;
     QString serverName = account;
 
@@ -61,7 +63,7 @@ bool CScreenShotObject::isStart(const QString &account)
 
 void CScreenShotObject::onScreenShotPixmapChanged(const QPixmap &pixmap)
 {
-    C_SCREENSHOTSHARED_LOG(QString("pixmap size = %1,%2").arg(pixmap.size().width()).arg(pixmap.height()))
+    C_SCREENSHOT_LOG_INFO(QString("pixmap size = %1,%2").arg(pixmap.size().width()).arg(pixmap.height()));
     if(pixmap.isNull())
     {
         return;

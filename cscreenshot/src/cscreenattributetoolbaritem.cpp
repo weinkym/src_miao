@@ -195,7 +195,7 @@ void CScreenAttributeToolbarItem::onItemClicked(CScreenButtonType type)
     CScreenEditorButtonItem *buttonItem = dynamic_cast<CScreenEditorButtonItem*>(sender());
     if(buttonItem == NULL)
     {
-        C_SCREENSHOTSHARED_LOG(QString("buttonItem is NULL"));
+        C_SCREENSHOT_LOG_INFO(QString("buttonItem is NULL"));
         return;
     }
     m_colorToolbarItem->setVisible(false);

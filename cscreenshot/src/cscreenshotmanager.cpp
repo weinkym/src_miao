@@ -32,20 +32,23 @@ CScreenShotManager::~CScreenShotManager()
 
 void CScreenShotManager::startScreenShot()
 {
-    C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
+    C_SCREENSHOT_LOG_FUNCTION;
     if(m_isRunning)
     {
         return;
     }
+    C_SCREENSHOT_LOG_TEST;
     clearAll();
+    C_SCREENSHOT_LOG_TEST;
     QList<QScreen *> screens = QApplication::screens();
     int index = 0;
     QList<QRect> rectList = getWindownRectList();
-    C_SCREENSHOTSHARED_LOG(QString("all rect count %1").arg(rectList.count()));
+    C_SCREENSHOT_LOG_INFO(QString("all rect count %1").arg(rectList.count()));
 
     foreach (QScreen *d, screens)
     {
         index++;
+        C_SCREENSHOT_LOG_TEST;
         CScreenShotView *view = new CScreenShotView(rectList,d);
         m_viewList.append(view);
         connect(view,SIGNAL(sigStatusChanged(CScreenShotStatus)),
@@ -53,14 +56,17 @@ void CScreenShotManager::startScreenShot()
         connect(view,SIGNAL(sigPreviewItemShow()),
                 this,SLOT(onPreviewItemShow()));
         view->startSCreenShot();
+        C_SCREENSHOT_LOG_TEST;
         view->raise();
+        C_SCREENSHOT_LOG_TEST;
     }
     m_isRunning = true;
+    C_SCREENSHOT_LOG_TEST;
 }
 
 void CScreenShotManager::clearAll()
 {
-    C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
+    C_SCREENSHOT_LOG_FUNCTION;
     //可能为导致crash
     //qDeleteAll(m_viewList);
     foreach (CScreenShotView *v, m_viewList)
@@ -69,6 +75,7 @@ void CScreenShotManager::clearAll()
         v->deleteLater();
     }
     m_viewList.clear();
+    C_SCREENSHOT_LOG_TEST;
 }
 
 void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
@@ -76,16 +83,18 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
     CScreenShotView *view = dynamic_cast<CScreenShotView*>(sender());
     if(view == NULL)
     {
-        C_SCREENSHOTSHARED_LOG(QString("view is NULL"));
+        C_SCREENSHOT_LOG_INFO(QString("view is NULL"));
         return;
     }
     QPixmap pixmap;
     bool isValid = false;
+    C_SCREENSHOT_LOG_TEST;
     if(status == CSCREEN_SHOT_STATE_FINISHED)
     {
         pixmap = view->getPixmap();
         isValid = view->isValid();
     }
+    C_SCREENSHOT_LOG_TEST;
 
     CScreenShotView *firstView = NULL;
     foreach (CScreenShotView *d, m_viewList)
@@ -94,7 +103,6 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
         {
             if(firstView != NULL)
             {
-                firstView->setVisible(false);
                 d->deleteLater();
             }
             else
@@ -110,30 +118,34 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
             }
         }
     }
+    C_SCREENSHOT_LOG_TEST;
 
     if(status == CSCREEN_SHOT_STATE_CANCEL || status == CSCREEN_SHOT_STATE_FINISHED)
     {
         if(firstView)
         {
-            firstView->setVisible(false);
             firstView->deleteLater();
         }
         m_viewList.clear();
+        C_SCREENSHOT_LOG_TEST;
         if(status == CSCREEN_SHOT_STATE_FINISHED)
         {
+            C_SCREENSHOT_LOG_TEST;
             if(!pixmap.isNull() && isValid)
             {
+                C_SCREENSHOT_LOG_TEST;
                 emit sigScreenShotPixmapChanged(pixmap);
             }
             else
             {
-                C_SCREENSHOTSHARED_LOG(QString("shot is %1valid,pixmap is %2null")
+                C_SCREENSHOT_LOG_INFO(QString("shot is %1valid,pixmap is %2null")
                                        .arg(isValid?"":"not")
                                        .arg(pixmap.isNull()?"":"not "));
             }
         }
         m_isRunning = false;
     }
+    C_SCREENSHOT_LOG_TEST;
 }
 
 void CScreenShotManager::onPreviewItemShow()
@@ -141,7 +153,7 @@ void CScreenShotManager::onPreviewItemShow()
     CScreenShotView *view = dynamic_cast<CScreenShotView*>(sender());
     if(view == NULL)
     {
-        C_SCREENSHOTSHARED_LOG(QString("view is NULL"));
+        C_SCREENSHOT_LOG_INFO(QString("view is NULL"));
         return;
     }
     foreach (CScreenShotView *d, m_viewList)

@@ -148,7 +148,7 @@ void CScreenEditorButtonItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void CScreenEditorButtonItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    C_SCREENSHOTSHARED_LOG(QString("mouseReleaseEvent"));
+    C_SCREENSHOT_LOG_INFO(QString("mouseReleaseEvent"));
     QGraphicsObject::mouseReleaseEvent(event);
 }
 
@@ -168,6 +168,6 @@ void CScreenEditorButtonItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 void CScreenEditorButtonItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    C_SCREENSHOTSHARED_LOG(QString("mouseDoubleClickEvent"));
+    C_SCREENSHOT_LOG_INFO(QString("mouseDoubleClickEvent"));
     return QGraphicsObject::mouseDoubleClickEvent(event);
 }

@@ -16,7 +16,7 @@ CScreenEditorToolbarItem::CScreenEditorToolbarItem(QGraphicsItem *parent)
     ,m_rect(0,0,300,m_toolbarHeight)
     ,m_currentButtonType(CSCREEN_BUTTON_TYPE_UNDEFINED)
 {
-    C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
+    C_SCREENSHOT_LOG_FUNCTION;
     qreal x = m_buttonMargin;
     qreal y = 0.5 * (m_toolbarHeight - m_buttonHeight);
 
@@ -142,7 +142,7 @@ void CScreenEditorToolbarItem::updateAttributeToolbar(const qreal centerX)
     qreal veiwHeight = views.first()->height();
     qreal viewWidth = views.first()->width();
     QPointF maxPoint = this->mapFromScene(QPointF(viewWidth,veiwHeight));
-    C_SCREENSHOTSHARED_LOG(QString("pos(%1,%2),viewWidth %3,veiwHeight %4,maxPoint(%5,%6)")
+    C_SCREENSHOT_LOG_INFO(QString("pos(%1,%2),viewWidth %3,veiwHeight %4,maxPoint(%5,%6)")
              .arg(this->pos().x()).arg(this->pos().y())
              .arg(viewWidth).arg(veiwHeight)
              .arg(maxPoint.x()).arg(maxPoint.y()));
@@ -179,7 +179,7 @@ void CScreenEditorToolbarItem::onButtonClicked(CScreenButtonType type)
     CScreenEditorButtonItem *buttonItem = dynamic_cast<CScreenEditorButtonItem*>(sender());
     if(buttonItem == NULL)
     {
-        C_SCREENSHOTSHARED_LOG(QString("buttonItem is NULL"));
+        C_SCREENSHOT_LOG_INFO(QString("buttonItem is NULL"));
         return;
     }
 
@@ -194,5 +194,5 @@ void CScreenEditorToolbarItem::onButtonClicked(CScreenButtonType type)
         item->setSelected(buttonItem == item);
     }
     emit sigButtonClicked(m_currentButtonType);
-    C_SCREENSHOTSHARED_LOG(QString("onButtonClicked"));
+    C_SCREENSHOT_LOG_INFO(QString("onButtonClicked"));
 }

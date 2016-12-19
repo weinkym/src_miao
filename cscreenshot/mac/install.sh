@@ -4,8 +4,9 @@
 CIN_WOOK_ROOT=$1
 CIN_BUNDLE_OUT_PATH=$2
 CIN_QT_BIN_PATH=$3
+CIN_CODESIGN_TYPE=$4
 
-
+C_DEVELOPER_ID="6F8YPTA92C"
 P_QMAKE_BIN_PATH=${CIN_QT_BIN_PATH}/qmake
 P_MACDEPLOQT_PATH=${CIN_QT_BIN_PATH}/macdeployqt
 
@@ -92,8 +93,14 @@ for newlibname in ${P_LIBS_LIST[@]}; do
 	install_name_tool -change "${newlibname}" "${P_LIB_PATH}/${newlibname}" ${P_APP_PATH}
 done
 
+if [ ${CIN_CODESIGN_TYPE} -eq 0 ]; then
+	macdeployqt ${P_BUNDLE_PATH}
+else
+	macdeployqt ${P_BUNDLE_PATH} -verbose=3 -codesign=${C_DEVELOPER_ID}
+fi
+# exit
+
 # macdeployqt ${P_BUNDLE_PATH}  -verbose=3 -codesign=${C_DEVELOPER_ID}
-macdeployqt ${P_BUNDLE_PATH}
 # open ${P_BUNDLE_PATH} --args c8a55807-c95a-490e-91c0-74bdbc129904
 
 

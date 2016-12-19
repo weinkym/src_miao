@@ -4,7 +4,7 @@ CScreenShotTimer::CScreenShotTimer(const QString &prefix)
     :m_prefix(prefix)
     ,m_time(QTime::currentTime())
 {
-
+    C_SCREENSHOT_LOG_INFO(QString("Enter function:%1").arg(prefix));
 }
 
 CScreenShotTimer::~CScreenShotTimer()
@@ -15,5 +15,5 @@ CScreenShotTimer::~CScreenShotTimer()
     {
         msecs = currentTime.msecsTo(m_time);
     }
-    C_SCREENSHOTSHARED_LOG(m_prefix + QString(" %1ms").arg(msecs))
+    C_SCREENSHOT_LOG_INFO(QString("Leave function(%1ms) %2").arg(msecs).arg(m_prefix));
 }

@@ -48,6 +48,7 @@ private:
     void setShotStatus(CScreenShotStatus status);
     void updateSelectRect(const QPointF &startPoint,const QPointF &endPoint);
     QPixmap createPixmap(const QRect &rect);
+    QPixmap createDesktopPixmap();
     QString getSizeString(const QSize &size) const;
     QRgb getPixmapPosRgb(const QPixmap &pixmap,const QPoint &pos);
     void doFinished();

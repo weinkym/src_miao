@@ -22,6 +22,7 @@ exists($${GLOBAL_PRF}) {
 }
 
 mac {
+    ICON = $${TARGET}.icns
     QMAKE_INFO_PLIST = $${TARGET}.plist
 }
 

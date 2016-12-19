@@ -5,5 +5,7 @@ CIN_QT_BIN_PATH=/Users/bitbrothers/Qt5.6.0/5.6/clang_64/bin
 
 C_SHELL_NAME=install.sh
 C_SHELL_PATH=/Users/bitbrothers/work/others/src/workroot/src_miao/cscreenshot/mac
+#0 不签名 1 签名
+CIN_CODESIGN_TYPE=0
 
-sh  ${C_SHELL_PATH}/${C_SHELL_NAME} ${CIN_WOOK_ROOT} ${CIN_BUNDLE_OUT_PATH} ${CIN_QT_BIN_PATH}
+sh  ${C_SHELL_PATH}/${C_SHELL_NAME} ${CIN_WOOK_ROOT} ${CIN_BUNDLE_OUT_PATH} ${CIN_QT_BIN_PATH} ${CIN_CODESIGN_TYPE}

@@ -7,6 +7,7 @@
 
 #define C_SCREEN_ZERO  0.000000001
 
+class QScreen;
 enum CScreenShotStatus
 {
     CSCREEN_SHOT_STATE_INITIALIZED,
@@ -49,6 +50,10 @@ enum CScreenArrowDirection
 
 // 获取窗口矩形列表
 extern QList<QRect> CSCREENSHOTSHARED_EXPORT getWindownRectList();
+
+#ifdef Q_OS_MAC
+extern QPixmap CSCREENSHOTSHARED_EXPORT getScreenPixmap(const QScreen *screen);
+#endif
 
 #endif // _CSCREENPUBLIC_H_
 

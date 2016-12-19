@@ -35,22 +35,23 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     ,m_isLocked(false)
     ,m_isValid(false)
 {
-    C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
+    C_SCREENSHOT_LOG_FUNCTION;
     this->setMouseTracking(true);
     m_screen = new CScreenShotScene(this);
     this->setScene(m_screen);
-    QDesktopWidget *pDesktoWidget = QApplication::desktop();
     QRect geometry= screen->geometry();
-    C_SCREENSHOTSHARED_LOG(QString("screen->geometry() (%1,%2,%3,%4)")
+    C_SCREENSHOT_LOG_INFO(QString("screen->geometry() (%1,%2,%3,%4)")
                            .arg(geometry.x())
                            .arg(geometry.y())
                            .arg(geometry.width())
                            .arg(geometry.height()));
-    QPixmap pixmap = screen->grabWindow(pDesktoWidget->winId(),geometry.x()
-                                        ,geometry.y(),geometry.width(),geometry.height());
+    C_SCREENSHOT_LOG_TEST;
+    QPixmap pixmap = createDesktopPixmap();
+    C_SCREENSHOT_LOG_TEST;
     drawPixmap(pixmap);
     m_backgroundItem = new QGraphicsPixmapItem(m_backgroundPixmap);
     m_screen->addItem(m_backgroundItem);
+    C_SCREENSHOT_LOG_TEST;
     this->setGeometry(geometry);
     m_screen->setSceneRect(QRect(0,0,geometry.width(),geometry.height()));
     m_sx = 1.0 * geometry.width() / pixmap.width();
@@ -60,6 +61,7 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     m_selectRectItem->setScale(m_sx);
     m_selectRectItem->setVisible(false);
     m_screen->addItem(m_selectRectItem);
+    C_SCREENSHOT_LOG_TEST;
     //====================
     m_toolbarItem = new CScreenEditorToolbarItem;
     connect(m_toolbarItem,SIGNAL(sigButtonClicked(CScreenButtonType)),
@@ -68,11 +70,13 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     m_toolbarItem->setZValue(m_selectRectItem->zValue() + 1);
     m_screen->addItem(m_toolbarItem);
     m_tooltipSizeItem = new CScreenTooltipItem;
+    C_SCREENSHOT_LOG_TEST;
     m_tooltipSizeItem->setVisible(false);
     m_screen->addItem(m_tooltipSizeItem);
     m_previewItem = new QGraphicsPixmapItem;
     m_previewItem->setVisible(false);
     m_previewItem->setZValue(m_toolbarItem->zValue() + 1);
+    C_SCREENSHOT_LOG_TEST;
     m_screen->addItem(m_previewItem);
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -86,6 +90,7 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
         //TODO 暂时屏蔽 为了快速启动，耗时400ms
 //        updatePreviewItem(this->mapFromGlobal(pos));
     }
+    C_SCREENSHOT_LOG_TEST;
 }
 
 CScreenShotView::~CScreenShotView()
@@ -101,7 +106,7 @@ CScreenShotView::~CScreenShotView()
 
 void CScreenShotView::startSCreenShot()
 {
-    C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
+    C_SCREENSHOT_LOG_FUNCTION;
 #ifdef Q_OS_MAC
     //    this->overrideWindowFlags(Qt::ToolTip | Qt::WindowFullscreenButtonHint);
     this->setMouseTracking(true);
@@ -109,8 +114,10 @@ void CScreenShotView::startSCreenShot()
 #elif defined(Q_OS_WIN)
     this->overrideWindowFlags(Qt::ToolTip);
 #endif
+    C_SCREENSHOT_LOG_TEST;
 
     this->showFullScreen();
+    C_SCREENSHOT_LOG_TEST;
 }
 
 void CScreenShotView::setLocked(bool locked)
@@ -134,7 +141,7 @@ bool CScreenShotView::isValid() const
 
 void CScreenShotView::setPreviewItemHidden(bool isHidden)
 {
-    C_SCREENSHOTSHARED_LOG_FUNCTION;
+    C_SCREENSHOT_LOG_FUNCTION;
     m_previewItem->setVisible(!isHidden);
     if(m_selectRectItem->isVisible() && isHidden)
     {
@@ -144,21 +151,24 @@ void CScreenShotView::setPreviewItemHidden(bool isHidden)
 
 QPixmap CScreenShotView::createPixmap(const QRect &rect)
 {
-    C_SCREENSHOTSHARED_LOG_FUNCTION;
+    C_SCREENSHOT_LOG_FUNCTION;
     QPixmap pixmap;
     if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED || m_shotStatus == CSCREEN_SHOT_STATE_EDITED)
     {
-        QDesktopWidget *pDesktoWidget = QApplication::desktop();
-        QRect geometry= m_desktopScreen->geometry();
-        C_SCREENSHOTSHARED_LOG(QString("screen->geometry() (%1,%2,%3,%4)")
-                               .arg(geometry.x())
-                               .arg(geometry.y())
-                               .arg(geometry.width())
-                               .arg(geometry.height()));
-        QPixmap desktopPixmap = m_desktopScreen->grabWindow(pDesktoWidget->winId(),geometry.x()
-                                                            ,geometry.y(),geometry.width(),geometry.height());
-        pixmap = desktopPixmap.copy(rect);
+        pixmap = createDesktopPixmap().copy(rect);
     }
+    return pixmap;
+}
+
+QPixmap CScreenShotView::createDesktopPixmap()
+{
+#ifdef Q_OS_MAC
+    QPixmap pixmap = getScreenPixmap(m_desktopScreen);
+#else
+    QDesktopWidget *pDesktoWidget = QApplication::desktop();
+    QPixmap pixmap = m_desktopScreen->grabWindow(pDesktoWidget->winId(),geometry.x()
+                                        ,geometry.y(),geometry.width(),geometry.height());
+#endif
     return pixmap;
 }
 
@@ -272,7 +282,7 @@ bool CScreenShotView::event(QEvent *event)
             || event->type() == QEvent::MouseButtonRelease
             || event->type() == QEvent::MouseMove)
     {
-        C_SCREENSHOTSHARED_LOG(QString("EVENT type %1").arg(event->type()));
+        C_SCREENSHOT_LOG_INFO(QString("EVENT type %1").arg(event->type()));
         if(event->type() == QEvent::MouseMove)
         {
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
@@ -327,7 +337,7 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::RightButton)
     {
-        C_SCREENSHOTSHARED_LOG(QString("RightButton pos x %1,y %2,type %3").arg(event->pos().x()).arg(event->pos().y()).arg(event->type()));
+        C_SCREENSHOT_LOG_INFO(QString("RightButton pos x %1,y %2,type %3").arg(event->pos().x()).arg(event->pos().y()).arg(event->type()));
         setShotStatus(CSCREEN_SHOT_STATE_CANCEL);
         return;
     }
@@ -338,7 +348,7 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
     }
     if(event->button() == Qt::LeftButton)
     {
-        C_SCREENSHOTSHARED_LOG(QString("x %1,posX %2, xx%3").arg(this->geometry().x())
+        C_SCREENSHOT_LOG_INFO(QString("x %1,posX %2, xx%3").arg(this->geometry().x())
                                .arg(event->pos().x())
                                .arg(this->mapFromGlobal(event->pos()).x()));
         QRectF toolBarItemRect(m_toolbarItem->pos(),m_toolbarItem->boundingRect().size());
@@ -351,7 +361,7 @@ void CScreenShotView::mousePressEvent(QMouseEvent *event)
         m_endPoint = event->pos();
         m_selectRect = m_selectRectItem->getSelectRect();
         m_positionType = m_selectRectItem->getPostionType(getPointToSelectedItem(event->pos()));
-        C_SCREENSHOTSHARED_LOG(QString("m_positionType %1").arg(m_positionType));
+        C_SCREENSHOT_LOG_INFO(QString("m_positionType %1").arg(m_positionType));
         bool isContains = (m_positionType != CSCREEN_POSITION_TYPE_NOT_CONTAIN);
         if((isContains
             && m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
@@ -598,7 +608,7 @@ CScreenRectItem *CScreenShotView::createRectItem()
 
 void CScreenShotView::drawPixmap(const QPixmap &pixmap)
 {
-    C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
+    C_SCREENSHOT_LOG_FUNCTION;
     m_desktopPixmap = pixmap;
     m_backgroundPixmap = pixmap;
     QPainter painter(&m_backgroundPixmap);
@@ -690,7 +700,7 @@ void CScreenShotView::updateTooltipItem()
 
 void CScreenShotView::updatePreviewItem(const QPoint &pos)
 {
-    C_SCREENSHOTSHARED_LOG_TIMER_FUNCTION;
+    C_SCREENSHOT_LOG_FUNCTION;
     QPixmap pixmap(m_previewItemWidth,m_previewItemPixmapHeight+m_previewItemTextHeight);
     pixmap.fill(QColor(Qt::white));
     QPainter painter(&pixmap);
@@ -813,7 +823,7 @@ void CScreenShotView::updateCursor(const QPointF &pos)
     {
         this->setCursor(cursorShape);
 
-        C_SCREENSHOTSHARED_LOG(QString("move pos x %1,y %2,type %3,cursorShape %4")
+        C_SCREENSHOT_LOG_INFO(QString("move pos x %1,y %2,type %3,cursorShape %4")
                                .arg(pos.x()).arg(pos.y()).arg(type).arg(cursorShape));
     }
 }
@@ -931,7 +941,7 @@ void CScreenShotView::updateSelectRect(const QPointF &startPoint, const QPointF 
 
 void CScreenShotView::onButtonClicked(CScreenButtonType type)
 {
-    C_SCREENSHOTSHARED_LOG(QString("onButtonClicked type %1").arg(type));
+    C_SCREENSHOT_LOG_INFO(QString("onButtonClicked type %1").arg(type));
     m_screenButtonType = type;
     if(CScreenshotUtil::isEditType(m_screenButtonType))
     {
@@ -946,7 +956,7 @@ void CScreenShotView::onButtonClicked(CScreenButtonType type)
     {
     case CSCREEN_BUTTON_TYPE_OK:
         doFinished();
-        C_SCREENSHOTSHARED_LOG(QString("CSCREEN_SHOT_STATE_FINISHED type %1").arg(CSCREEN_SHOT_STATE_FINISHED));
+        C_SCREENSHOT_LOG_INFO(QString("CSCREEN_SHOT_STATE_FINISHED type %1").arg(CSCREEN_SHOT_STATE_FINISHED));
         break;
     case CSCREEN_BUTTON_TYPE_CANCLE:
         setShotStatus(CSCREEN_SHOT_STATE_CANCEL);
@@ -973,7 +983,7 @@ void CScreenShotView::onFinishTimerOut()
     {
         m_isValid = false;
     }
-    C_SCREENSHOTSHARED_LOG(QString("shot is %1valid,pixmap is %2null")
+    C_SCREENSHOT_LOG_INFO(QString("shot is %1valid,pixmap is %2null")
                            .arg(m_isValid?"":"not")
                            .arg(m_pixmap.isNull()?"":"not "));
     setShotStatus(CSCREEN_SHOT_STATE_FINISHED);
