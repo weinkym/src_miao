@@ -1,11 +1,33 @@
 #include "cdrawitem.h"
 #include <QPainter>
+#include "cwbrectitem.h"
+#include "cwbpathitem.h"
 
-CDrawItem::CDrawItem(QGraphicsItem *parent)
-    :QGraphicsItem(parent)
-    ,m_rect(-10,-10,100,100)
+CDrawItem::CDrawItem(CWB::DrawParam param, QGraphicsItem *parent)
+    :QObject(NULL)
+    ,m_rectItem(NULL)
+    ,m_pathItem(NULL)
+    ,m_drawParam(param)
+    ,m_startPoint(QPointF(0,0))
+    ,m_endPoint(QPointF(0,0))
 {
-
+    QPen pen(m_drawParam.lineColor);
+    pen.setWidth(m_drawParam.width);
+    switch (m_drawParam.type)
+    {
+    case CWB::DRAW_TYPE_RECT:
+        m_rectItem = new CWBRectItem(parent);
+        m_rectItem->setPen(pen);
+        break;
+    case CWB::DRAW_TYPE_PEN:
+        m_pathItem = new CWBPathItem(parent);
+        m_pathItem->setPen(pen);
+        break;
+    default:
+        m_rectItem = new CWBRectItem(parent);
+        m_rectItem->setPen(pen);
+        break;
+    }
 }
 
 CDrawItem::~CDrawItem()
@@ -13,31 +35,15 @@ CDrawItem::~CDrawItem()
 
 }
 
-
-void CDrawItem::setRect(const QRectF &rect)
+void CDrawItem::setPosition(const QPointF &startPoint, const QPointF &endPoint)
 {
-    m_rect = rect;
-    update();
-}
-
-QRectF CDrawItem::boundingRect() const
-{
-    return m_rect;
-}
-
-void CDrawItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    painter->save();
-    QPen pen(QColor("#00ff00"));
-    pen.setWidth(3);
-    painter->setPen(pen);
-    painter->drawRect(m_rect);
-    painter->restore();
-}
-
-QPainterPath CDrawItem::shape() const
-{
-    QPainterPath path;
-    path.addRect(0,0,10,10);
-    return path;
+    if(m_pathItem)
+    {
+        m_pathItem->appendLine(startPoint,endPoint);
+    }
+    else
+    {
+        QRect rect(qMin(endPoint.x(),startPoint.x()),qMin(endPoint.y(),startPoint.y()),qAbs(endPoint.x() - startPoint.x()),qAbs(endPoint.y()-startPoint.y()));
+        m_rectItem->setRect(rect);
+    }
 }

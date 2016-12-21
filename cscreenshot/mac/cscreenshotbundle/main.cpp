@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
     QStringList arguments = a.arguments();
     qDebug()<<arguments.join("-------");
-    bool needCheck = false;
+    bool needCheck = true;
     if(needCheck)
     {
         if(arguments.count() < 2)

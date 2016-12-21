@@ -17,12 +17,25 @@ SOURCES += main.cpp\
     cwhiteboarditem.cpp \
     cdrawitem.cpp \
     cwhiteboardview.cpp \
-    cwhiteboardscene.cpp
+    cwhiteboardscene.cpp \
+    cwbrectitem.cpp \
+    cwbpathitem.cpp \
+    cwhiteboardwidget.cpp \
+    cwhiteboardeditorbutton.cpp
 
 HEADERS  += mainwindow.h \
     cwhiteboarditem.h \
     cdrawitem.h \
     cwhiteboardview.h \
-    cwhiteboardscene.h
+    cwhiteboardscene.h \
+    cwhiteboardpublic.h \
+    cwbrectitem.h \
+    cwbpathitem.h \
+    cwhiteboardwidget.h \
+    cwhiteboardeditorbutton.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    cwhiteboardwidget.ui
+
+RESOURCES += \
+    source.qrc

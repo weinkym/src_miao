@@ -2,19 +2,24 @@
 #define CDRAWITEM_H
 
 #include <QGraphicsItem>
+#include <cwhiteboardpublic.h>
 
-class CDrawItem : public QGraphicsItem
+class CWBRectItem;
+class CWBPathItem;
+
+class CDrawItem : public QObject
 {
 public:
-   CDrawItem(QGraphicsItem *parent = Q_NULLPTR);
+   CDrawItem(CWB::DrawParam param,QGraphicsItem *parent);
     ~CDrawItem();
-    void setRect(const QRectF &rect);
-    virtual QRectF boundingRect() const ;
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = Q_NULLPTR);
-    virtual QPainterPath shape() const;
+    void setPosition(const QPointF &startPoint, const QPointF &endPoint);
 
 private:
-    QRectF m_rect;
+    CWBRectItem *m_rectItem;
+    CWBPathItem *m_pathItem;
+    CWB::DrawParam m_drawParam;
+    QPointF m_startPoint;
+    QPointF m_endPoint;
 };
 
 #endif // CDRAWITEM_H
