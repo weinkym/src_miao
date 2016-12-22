@@ -14,18 +14,14 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#pushButton{
-min-width: 80px;
-min-height:22px;
-max-width: 80px;
-max-height:22px;
-border-radius: 3px;
-border: 1px solid #1880ed;
-background-color: #ff9cfc;
-color:#ffffff;
+   <string notr="true">#CWhiteBoardWidget{
+border: 7px solid #00ff00;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -40,9 +36,15 @@ color:#ffffff;
    </property>
    <item>
     <layout class="QVBoxLayout" name="vLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
       <widget class="QWidget" name="widgetButtons" native="true">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -57,34 +59,9 @@ color:#ffffff;
         </property>
         <item>
          <layout class="QHBoxLayout" name="hLayout">
-          <item>
-           <widget class="QPushButton" name="pushButton_2">
-            <property name="text">
-             <string>PushButton</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_4">
-            <property name="text">
-             <string>PushButton</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_3">
-            <property name="text">
-             <string>PushButton</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton">
-            <property name="text">
-             <string>PushButton</string>
-            </property>
-           </widget>
-          </item>
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">

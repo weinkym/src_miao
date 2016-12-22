@@ -4,5 +4,11 @@
         <file>images/ellipse_pressed_128px.png</file>
         <file>images/rect_normal_128px.png</file>
         <file>images/rect_pressed_128px.png</file>
+        <file>images/pen_normal_128px.png</file>
+        <file>images/eraser_normal_128px.png</file>
+        <file>images/eraser_pressed_128px.png</file>
+        <file>images/pen_pressed_128px.png</file>
+        <file>images/color_normal_128px.png</file>
+        <file>images/linewidth_normal_128px.png</file>
     </qresource>
 </RCC>

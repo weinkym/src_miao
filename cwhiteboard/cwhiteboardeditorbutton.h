@@ -3,15 +3,31 @@
 
 #include <QWidget>
 #include <QPushButton>
+#include "cwhiteboardpublic.h"
 
 class CWhiteBoardEditorButton : public QWidget
 {
     Q_OBJECT
 
 public:
-    CWhiteBoardEditorButton(const QString &normalIamgeUrl,const QString &hoverIamgeUrl,const QString &pressedIamgeUrl,int type,QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    enum EditButtonType
+    {
+        EDIT_TYPE_UNDEFINE,
+        EDIT_TYPE_RECT,
+        EDIT_TYPE_ELLIPSE,
+        EDIT_TYPE_PEN,
+        EDIT_TYPE_TEXT,
+        EDIT_TYPE_ARROW,
+        EDIT_TYPE_CANCLE,
+        EDIT_TYPE_OK,
+        EDIT_TYPE_ERASER,
+        EDIT_TYPE_COLOR,
+        EDIT_TYPE_LINE_WIDTH,
+    };
+    CWhiteBoardEditorButton(const QString &normalIamgeUrl,const QString &hoverIamgeUrl,const QString &pressedIamgeUrl,CWhiteBoardEditorButton::EditButtonType type,QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~CWhiteBoardEditorButton();
     void setSelected(bool selected);
+    CWhiteBoardEditorButton::EditButtonType getType() const{return m_type;};
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -24,6 +40,7 @@ signals:
 private:
     bool m_isPressed;
     bool m_selected;
+    CWhiteBoardEditorButton::EditButtonType m_type;
     QString m_normalIamgeUrl;
     QString m_hoverIamgeUrl;
     QString m_pressedIamgeUrl;

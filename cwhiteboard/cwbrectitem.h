@@ -1,14 +1,31 @@
 #ifndef CWBRECTITEM_H
 #define CWBRECTITEM_H
-#include <QGraphicsRectItem>
+#include <QGraphicsObject>
+#include <QPen>
 
-class CWBRectItem : public QGraphicsRectItem
+class CWBRectItem : public QGraphicsObject
 {
 public:
-    CWBRectItem(QGraphicsItem *parent = Q_NULLPTR);
+    enum Type{
+        TYPE_RECT,
+        TYPE_ELLIPSE,
+    };
+    CWBRectItem(Type type,QGraphicsItem *parent = Q_NULLPTR);
+    void setPosition(const QPointF &startPoint, const QPointF &endPoint);
+    void setPen(const QPen &pen);
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = Q_NULLPTR);
 
 private:
-    //
+    void adjustBoundingRect();
+
+private:
+    Type m_type;
+    QRectF m_rect;
+    QRectF m_boundingRect;
+    QPointF m_startPoint;
+    QPointF m_endPoint;
+    QPen m_pen;
 };
 
 #endif // CWBRECTITEM_H

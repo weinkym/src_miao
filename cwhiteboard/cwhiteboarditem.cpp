@@ -35,12 +35,33 @@ void CWhiteBoardItem::setLineWidth(int width)
     m_drawParam.width = width;
 }
 
+void CWhiteBoardItem::clear()
+{
+    for(auto item : m_drawItems)
+    {
+        item->clear();
+        item->deleteLater();
+    }
+    m_drawItems.clear();
+    m_currentItem = NULL;
+}
+
+void CWhiteBoardItem::setDrawType(CWB::DrawType type)
+{
+    m_drawParam.type = type;
+}
+
+void CWhiteBoardItem::setDrawParam(CWB::DrawParam param)
+{
+    m_drawParam = param;
+}
+
 void CWhiteBoardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     m_isPressed = false;
     if(m_currentItem)
     {
-        m_drawItem.append(m_currentItem);
+        m_drawItems.append(m_currentItem);
         m_currentItem = NULL;
     }
 }

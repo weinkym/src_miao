@@ -19,6 +19,10 @@ public:
     void setState(CWhiteBoardItem::State state);
     void setLineColor(const QColor &color);
     void setLineWidth(int width);
+    void clear();
+    void setDrawType(CWB::DrawType type);
+    void setDrawParam(CWB::DrawParam param);
+    CWB::DrawParam getDrawParam() const{return m_drawParam;};
 
 protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -31,7 +35,7 @@ private:
     QPointF m_startPoint;
     CWB::DrawParam m_drawParam;
     CDrawItem *m_currentItem;
-    QList<CDrawItem *> m_drawItem;
+    QList<CDrawItem *> m_drawItems;
 };
 
 #endif // CWHITEBOARDITEM_H

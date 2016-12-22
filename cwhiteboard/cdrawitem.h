@@ -12,6 +12,7 @@ class CDrawItem : public QObject
 public:
    CDrawItem(CWB::DrawParam param,QGraphicsItem *parent);
     ~CDrawItem();
+    void clear();
     void setPosition(const QPointF &startPoint, const QPointF &endPoint);
 
 private:

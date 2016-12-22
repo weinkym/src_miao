@@ -4,10 +4,11 @@
 #include <QPainter>
 #include <QStyleOption>
 
-CWhiteBoardEditorButton::CWhiteBoardEditorButton(const QString &normalIamgeUrl, const QString &hoverIamgeUrl, const QString &pressedIamgeUrl, int type, QWidget *parent, Qt::WindowFlags f)
+CWhiteBoardEditorButton::CWhiteBoardEditorButton(const QString &normalIamgeUrl, const QString &hoverIamgeUrl, const QString &pressedIamgeUrl, CWhiteBoardEditorButton::EditButtonType type, QWidget *parent, Qt::WindowFlags f)
     :QWidget(parent,f)
     ,m_isPressed(false)
     ,m_selected(false)
+    ,m_type(type)
     ,m_normalIamgeUrl(normalIamgeUrl)
     ,m_hoverIamgeUrl(hoverIamgeUrl)
     ,m_pressedIamgeUrl(pressedIamgeUrl)
@@ -17,7 +18,6 @@ CWhiteBoardEditorButton::CWhiteBoardEditorButton(const QString &normalIamgeUrl, 
     styleSheetStringList.append(QString("QWidget:hover{border-image: url(%1) 0 0 0 0;}").arg(m_hoverIamgeUrl));
     this->setStyleSheet(styleSheetStringList.join("\n"));
 }
-
 
 CWhiteBoardEditorButton::~CWhiteBoardEditorButton()
 {

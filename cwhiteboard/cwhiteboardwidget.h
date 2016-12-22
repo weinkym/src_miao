@@ -20,7 +20,7 @@ public:
 
 private:
     void initButtons();
-    void addButton(const QString &normalIamgeUrl,const QString &hoverIamgeUrl,const QString &pressedIamgeUrl,int type);
+    void addButton(CWhiteBoardEditorButton *button);
 
 private slots:
     void onButtonClicked();
@@ -28,6 +28,8 @@ private slots:
 private:
     Ui::CWhiteBoardWidget *ui;
     CWhiteBoardView *m_whiteBoardView;
+    QColor m_color;
+    int m_lineWidth;
     QList<CWhiteBoardEditorButton*> m_buttons;
 };
 

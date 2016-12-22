@@ -19,16 +19,6 @@ struct DrawParam
     int width;
 };
 
-enum EditButtonType
-{
-    EDIT_TYPE_UNDEFINE,
-    EDIT_TYPE_RECT,
-    EDIT_TYPE_ELLIPSE,
-    EDIT_TYPE_ARROW,
-    EDIT_TYPE_CANCLE,
-    EDIT_TYPE_OK,
-};
-
 enum CWhiteBoardArrowDirection
 {
     ARROW_DIRECTION_UP,
