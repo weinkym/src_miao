@@ -4,7 +4,7 @@
 #include "cwbpathitem.h"
 #include <QGraphicsScene>
 
-CDrawItem::CDrawItem(CWB::DrawParam param, QGraphicsItem *parent)
+CDrawItem::CDrawItem(CWB::DrawParam param, qreal zValue, QGraphicsItem *parent)
     :QObject(NULL)
     ,m_rectItem(NULL)
     ,m_pathItem(NULL)
@@ -19,14 +19,17 @@ CDrawItem::CDrawItem(CWB::DrawParam param, QGraphicsItem *parent)
     case CWB::DRAW_TYPE_ELLIPSE:
         m_rectItem = new CWBRectItem(CWBRectItem::TYPE_ELLIPSE,parent);
         m_rectItem->setPen(pen);
+        m_rectItem->setZValue(zValue);
         break;
     case CWB::DRAW_TYPE_PEN:
         m_pathItem = new CWBPathItem(parent);
         m_pathItem->setPen(pen);
+        m_pathItem->setZValue(zValue);
         break;
     default:
         m_rectItem = new CWBRectItem(CWBRectItem::TYPE_RECT,parent);
         m_rectItem->setPen(pen);
+        m_rectItem->setZValue(zValue);
         break;
     }
 }
@@ -49,6 +52,7 @@ void CDrawItem::clear()
     }
     if(item)
     {
+        item->setVisible(false);
         QGraphicsScene *scene = item->scene();
         if(scene)
         {

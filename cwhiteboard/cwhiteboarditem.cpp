@@ -74,7 +74,7 @@ void CWhiteBoardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         QPointF endPoint = event->pos();
         if(m_currentItem == NULL)
         {
-            m_currentItem = new CDrawItem(m_drawParam,this);
+            m_currentItem = new CDrawItem(m_drawParam,m_drawItems.count(),this);
         }
         m_currentItem->setPosition(m_startPoint,endPoint);
     }

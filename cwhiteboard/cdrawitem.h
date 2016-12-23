@@ -10,7 +10,7 @@ class CWBPathItem;
 class CDrawItem : public QObject
 {
 public:
-   CDrawItem(CWB::DrawParam param,QGraphicsItem *parent);
+   CDrawItem(CWB::DrawParam param,qreal zValue,QGraphicsItem *parent);
     ~CDrawItem();
     void clear();
     void setPosition(const QPointF &startPoint, const QPointF &endPoint);
