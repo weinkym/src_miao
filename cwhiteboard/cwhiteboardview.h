@@ -7,13 +7,16 @@ class CWhiteBoardItem;
 class CWhiteBoardScene;
 class CWhiteBoardView : public QGraphicsView
 {
+    Q_OBJECT
 public:
     CWhiteBoardView(QWidget *parent = Q_NULLPTR);
     ~CWhiteBoardView();
-    void clear();
-    void setDrawType(CWB::DrawType type);
-    void setLineColor(const QColor &color);
-    void setLineWidth(int width);
+
+public slots:
+    void onClear();
+    void onDrawTypeChanged(CWB::DrawType type);
+    void onLineColorChanged(const QColor &color);
+    void onLineWidthChanged(int width);
 
 protected:
     void resizeEvent(QResizeEvent *event);

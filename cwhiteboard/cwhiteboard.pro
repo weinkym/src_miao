@@ -20,8 +20,9 @@ SOURCES += main.cpp\
     cwhiteboardscene.cpp \
     cwbrectitem.cpp \
     cwbpathitem.cpp \
-    cwhiteboardwidget.cpp \
-    cwhiteboardeditorbutton.cpp
+    cwhiteboardeditorbutton.cpp \
+    cwhiteboard.cpp \
+    cwhiteboardeditorbar.cpp
 
 HEADERS  += mainwindow.h \
     cwhiteboarditem.h \
@@ -31,8 +32,9 @@ HEADERS  += mainwindow.h \
     cwhiteboardpublic.h \
     cwbrectitem.h \
     cwbpathitem.h \
-    cwhiteboardwidget.h \
-    cwhiteboardeditorbutton.h
+    cwhiteboardeditorbutton.h \
+    cwhiteboard.h \
+    cwhiteboardeditorbar.h
 
 FORMS    += mainwindow.ui \
     cwhiteboardwidget.ui

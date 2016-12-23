@@ -61,6 +61,7 @@ void CWhiteBoardEditorButton::mouseReleaseEvent(QMouseEvent *event)
 //具体参考Qt Style Sheets Reference中的QWidget
 void CWhiteBoardEditorButton::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
     QStyleOption opt;
     opt.init(this);
     QPainter p(this);

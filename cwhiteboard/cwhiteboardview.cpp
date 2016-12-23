@@ -18,22 +18,22 @@ CWhiteBoardView::~CWhiteBoardView()
 
 }
 
-void CWhiteBoardView::clear()
+void CWhiteBoardView::onClear()
 {
     m_whiteBoardItem->clear();
 }
 
-void CWhiteBoardView::setDrawType(CWB::DrawType type)
+void CWhiteBoardView::onDrawTypeChanged(CWB::DrawType type)
 {
     m_whiteBoardItem->setDrawType(type);
 }
 
-void CWhiteBoardView::setLineColor(const QColor &color)
+void CWhiteBoardView::onLineColorChanged(const QColor &color)
 {
     m_whiteBoardItem->setLineColor(color);
 }
 
-void CWhiteBoardView::setLineWidth(int width)
+void CWhiteBoardView::onLineWidthChanged(int width)
 {
     m_whiteBoardItem->setLineWidth(width);
 }
@@ -44,7 +44,7 @@ void CWhiteBoardView::resizeEvent(QResizeEvent *event)
 //    size /= 2;
     m_scene->setSceneRect(QRect(0,0,size.width(),size.height()));
     QPixmap pixmap(size);
-    pixmap.fill(QColor("#912a09"));
+    pixmap.fill(QColor("#ffffff"));
     m_whiteBoardItem->setPixmap(pixmap);
     return QGraphicsView::resizeEvent(event);
 }

@@ -38,7 +38,6 @@ CDrawItem::~CDrawItem()
 
 void CDrawItem::clear()
 {
-    QGraphicsScene *scene = NULL;
     QGraphicsItem *item = NULL;
     if(m_rectItem)
     {

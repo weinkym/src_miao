@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "cwhiteboard.h"
 
 class CWhiteBoardView;
 namespace Ui {
@@ -18,7 +19,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    CWhiteBoardView *m_view;
+//    CWhiteBoardView *m_view;
+//    CWhiteBoard m_whiteBoard;
 };
 
 #endif // MAINWINDOW_H

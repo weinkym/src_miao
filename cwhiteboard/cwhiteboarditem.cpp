@@ -58,6 +58,7 @@ void CWhiteBoardItem::setDrawParam(CWB::DrawParam param)
 
 void CWhiteBoardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    Q_UNUSED(event);
     m_isPressed = false;
     if(m_currentItem)
     {
