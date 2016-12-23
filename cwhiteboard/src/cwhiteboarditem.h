@@ -3,10 +3,11 @@
 
 #include <QGraphicsPixmapItem>
 #include "cwhiteboardpublic.h"
+#include "cwhiteboard_global.h"
 
 class CDrawItem;
 
-class CWhiteBoardItem : public QGraphicsPixmapItem
+class CWHITEBOARDSHARED_EXPORT CWhiteBoardItem : public QGraphicsPixmapItem
 {
 public:
     enum State{

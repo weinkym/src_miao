@@ -1,8 +1,9 @@
 #ifndef CWHITEBOARDSCENE_H
 #define CWHITEBOARDSCENE_H
 #include <QGraphicsScene>
+#include "cwhiteboard_global.h"
 
-class CWhiteBoardScene : public QGraphicsScene
+class CWHITEBOARDSHARED_EXPORT CWhiteBoardScene : public QGraphicsScene
 {
 public:
     CWhiteBoardScene();

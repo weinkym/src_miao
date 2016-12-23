@@ -2,8 +2,9 @@
 #define CWBRECTITEM_H
 #include <QGraphicsObject>
 #include <QPen>
+#include "cwhiteboard_global.h"
 
-class CWBRectItem : public QGraphicsObject
+class CWHITEBOARDSHARED_EXPORT CWBRectItem : public QGraphicsObject
 {
 public:
     enum Type{

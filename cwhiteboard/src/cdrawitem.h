@@ -3,11 +3,12 @@
 
 #include <QGraphicsItem>
 #include <cwhiteboardpublic.h>
+#include "cwhiteboard_global.h"
 
 class CWBRectItem;
 class CWBPathItem;
 
-class CDrawItem : public QObject
+class CWHITEBOARDSHARED_EXPORT CDrawItem : public QObject
 {
 public:
    CDrawItem(CWB::DrawParam param,qreal zValue,QGraphicsItem *parent);

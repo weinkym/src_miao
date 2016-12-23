@@ -1,8 +1,9 @@
 #ifndef CWBPATHITEM_H
 #define CWBPATHITEM_H
 #include <QGraphicsPathItem>
+#include "cwhiteboard_global.h"
 
-class CWBPathItem : public QGraphicsPathItem
+class CWHITEBOARDSHARED_EXPORT CWBPathItem : public QGraphicsPathItem
 {
 public:
     CWBPathItem(QGraphicsItem *parent = Q_NULLPTR);

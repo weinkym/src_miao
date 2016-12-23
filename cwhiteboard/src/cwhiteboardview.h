@@ -2,10 +2,11 @@
 #define CWHITEBOARDVIEW_H
 #include <QGraphicsView>
 #include "cwhiteboardpublic.h"
+#include "cwhiteboard_global.h"
 
 class CWhiteBoardItem;
 class CWhiteBoardScene;
-class CWhiteBoardView : public QGraphicsView
+class CWHITEBOARDSHARED_EXPORT CWhiteBoardView : public QGraphicsView
 {
     Q_OBJECT
 public:

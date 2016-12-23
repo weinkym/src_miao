@@ -4,8 +4,9 @@
 #include <QWidget>
 #include <QPushButton>
 #include "cwhiteboardpublic.h"
+#include "cwhiteboard_global.h"
 
-class CWhiteBoardEditorButton : public QWidget
+class CWHITEBOARDSHARED_EXPORT CWhiteBoardEditorButton : public QWidget
 {
     Q_OBJECT
 

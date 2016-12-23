@@ -3,10 +3,11 @@
 
 #include <QWidget>
 #include "cwhiteboardeditorbutton.h"
+#include "cwhiteboard_global.h"
 
 class QHBoxLayout;
 class CWhiteBoardView;
-class CWhiteBoardEditorBar : public QWidget
+class CWHITEBOARDSHARED_EXPORT CWhiteBoardEditorBar : public QWidget
 {
     Q_OBJECT
 

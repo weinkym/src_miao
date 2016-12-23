@@ -2,6 +2,7 @@
 #define CWHITEBOARDPUBLIC_H
 #include <QDebug>
 #include <QColor>
+
 namespace CWB
 {
 enum DrawType{

@@ -6,38 +6,47 @@
 
 QT       += core gui
 
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+
 TARGET = cwhiteboard
-TEMPLATE = app
+TEMPLATE = lib
+DEFINES += CWHITEBOARD_LIBRARY
+
+CGLOBAL_PRF=cglobal.prf
+!exists($${CGLOBAL_PRF}) {
+    error("$${CGLOBAL_PRF} is not found")
+}
+include($${CGLOBAL_PRF})
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    cwhiteboarditem.cpp \
-    cdrawitem.cpp \
-    cwhiteboardview.cpp \
-    cwhiteboardscene.cpp \
-    cwbrectitem.cpp \
-    cwbpathitem.cpp \
-    cwhiteboardeditorbutton.cpp \
-    cwhiteboard.cpp \
-    cwhiteboardeditorbar.cpp
-
-HEADERS  += mainwindow.h \
-    cwhiteboarditem.h \
-    cdrawitem.h \
-    cwhiteboardview.h \
-    cwhiteboardscene.h \
-    cwhiteboardpublic.h \
-    cwbrectitem.h \
-    cwbpathitem.h \
-    cwhiteboardeditorbutton.h \
-    cwhiteboard.h \
-    cwhiteboardeditorbar.h
-
-FORMS    += mainwindow.ui \
-    cwhiteboardwidget.ui
+INCLUDEPATH += ./src
+INCLUDEPATH += ./include
 
 RESOURCES += \
     source.qrc
+
+HEADERS += \
+    src/cdrawitem.h \
+    src/cwbpathitem.h \
+    src/cwbrectitem.h \
+    src/cwhiteboardeditorbar.h \
+    src/cwhiteboardeditorbutton.h \
+    src/cwhiteboarditem.h \
+    src/cwhiteboardpublic.h \
+    src/cwhiteboardscene.h \
+    src/cwhiteboardview.h \
+    include/cwhiteboard_global.h \
+    include/cwhiteboard.h
+
+SOURCES += \
+    src/cdrawitem.cpp \
+    src/cwbpathitem.cpp \
+    src/cwbrectitem.cpp \
+    src/cwhiteboard.cpp \
+    src/cwhiteboardeditorbar.cpp \
+    src/cwhiteboardeditorbutton.cpp \
+    src/cwhiteboarditem.cpp \
+    src/cwhiteboardscene.cpp \
+    src/cwhiteboardview.cpp
