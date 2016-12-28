@@ -23,6 +23,8 @@ public:
         EDIT_TYPE_OK,
         EDIT_TYPE_ERASER,
         EDIT_TYPE_UNDO,
+        EDIT_TYPE_REDO,
+        EDIT_TYPE_CLEAR,
         EDIT_TYPE_COLOR,
         EDIT_TYPE_LINE_WIDTH,
     };

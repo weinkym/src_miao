@@ -1,7 +1,10 @@
 #include "cwhiteboarditem.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QBrush>
+#include <QUndoStack>
 #include "cdrawitem.h"
+#include "cwbaddcommand.h"
+#include "cwbclearcommand.h"
 
 CWhiteBoardItem::CWhiteBoardItem()
 {
@@ -10,11 +13,16 @@ CWhiteBoardItem::CWhiteBoardItem()
     m_drawParam.lineColor = QColor("00000ff");
     m_drawParam.type = CWB::DRAW_TYPE_PEN;
     m_drawParam.width = 3;
+    m_undoStack = new QUndoStack;
 }
 
 CWhiteBoardItem::~CWhiteBoardItem()
 {
-
+    if(m_undoStack)
+    {
+        m_undoStack->deleteLater();
+        m_undoStack = NULL;
+    }
 }
 
 void CWhiteBoardItem::setState(CWhiteBoardItem::State state)
@@ -38,12 +46,19 @@ void CWhiteBoardItem::setLineWidth(int width)
 
 void CWhiteBoardItem::clear()
 {
+    QList<CDrawItem *> visibleItems;
     for(auto item : m_drawItems)
     {
-        item->clear();
-        item->deleteLater();
+        if(item->isVisible())
+        {
+            visibleItems.append(item);
+        }
     }
-    m_drawItems.clear();
+    if(!visibleItems.isEmpty())
+    {
+        CWBClearCommand *cmd = new CWBClearCommand(visibleItems);
+        m_undoStack->push(cmd);
+    }
     m_currentItem = NULL;
 }
 
@@ -67,14 +82,20 @@ void CWhiteBoardItem::undo()
         m_currentItem = NULL;
         return;
     }
-    if(m_drawItems.isEmpty())
-    {
-        return;
-    }
-    CDrawItem *item = m_drawItems.last();
-    m_drawItems.removeLast();
-    item->clear();
-    item->deleteLater();
+//    if(m_drawItems.isEmpty())
+//    {
+//        return;
+//    }
+//    CDrawItem *item = m_drawItems.last();
+//    m_drawItems.removeLast();
+//    item->clear();
+//    item->deleteLater();
+    m_undoStack->undo();
+}
+
+void CWhiteBoardItem::redo()
+{
+    m_undoStack->redo();
 }
 
 void CWhiteBoardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -97,6 +118,10 @@ void CWhiteBoardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         {
             m_currentItem = new CDrawItem(m_drawParam,m_drawItems.count(),this);
             m_currentItem->setBrush(QBrush(this->pixmap()));
+            QList<CDrawItem*> itemList;
+            itemList.append(m_currentItem);
+            CWBAddCommand *cmd = new CWBAddCommand(itemList);
+            m_undoStack->push(cmd);
         }
         m_currentItem->setPosition(m_startPoint,endPoint);
     }

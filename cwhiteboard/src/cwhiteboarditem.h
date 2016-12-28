@@ -6,6 +6,7 @@
 #include "cwhiteboard_global.h"
 
 class CDrawItem;
+class QUndoStack;
 
 class CWHITEBOARDSHARED_EXPORT CWhiteBoardItem : public QGraphicsPixmapItem
 {
@@ -25,6 +26,7 @@ public:
     void setDrawParam(CWB::DrawParam param);
     CWB::DrawParam getDrawParam() const{return m_drawParam;};
     void undo();
+    void redo();
 
 protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -37,6 +39,7 @@ private:
     QPointF m_startPoint;
     CWB::DrawParam m_drawParam;
     CDrawItem *m_currentItem;
+    QUndoStack *m_undoStack;
     QList<CDrawItem *> m_drawItems;
 };
 

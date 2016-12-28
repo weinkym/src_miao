@@ -19,6 +19,7 @@ public slots:
     void onLineColorChanged(const QColor &color);
     void onLineWidthChanged(int width);
     void onUndo();
+    void onRedo();
 
 protected:
     void resizeEvent(QResizeEvent *event);

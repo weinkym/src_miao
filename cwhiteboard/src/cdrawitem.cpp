@@ -47,19 +47,8 @@ CDrawItem::~CDrawItem()
 
 void CDrawItem::clear()
 {
-    QGraphicsItem *item = NULL;
-    if(m_rectItem)
-    {
-       item = m_rectItem;
-    }
-    else if(m_pathItem)
-    {
-        item = m_pathItem;
-    }
-    else if(m_eraserItem)
-    {
-        item = m_eraserItem;
-    }
+    QGraphicsItem *item = this->item();
+
     if(item)
     {
         item->setVisible(false);
@@ -100,4 +89,41 @@ void CDrawItem::setBrush(const QBrush &brush)
     {
         m_pathItem->setBrush(brush);
     }
+}
+
+void CDrawItem::setVisible(bool visible)
+{
+    QGraphicsItem *item = this->item();
+    if(item)
+    {
+        item->setVisible(visible);
+    }
+}
+
+bool CDrawItem::isVisible()
+{
+    QGraphicsItem *item = this->item();
+    if(item)
+    {
+        return item->isVisible();
+    }
+    return false;
+}
+
+QGraphicsItem *CDrawItem::item()
+{
+    QGraphicsItem *item = NULL;
+    if(m_rectItem)
+    {
+       item = m_rectItem;
+    }
+    else if(m_pathItem)
+    {
+        item = m_pathItem;
+    }
+    else if(m_eraserItem)
+    {
+        item = m_eraserItem;
+    }
+return item;
 }

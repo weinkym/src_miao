@@ -12,5 +12,7 @@
         <file>images/linewidth_normal_128px.png</file>
         <file>images/undo_normal_128px.png</file>
         <file>images/undo_pressed_128px.png</file>
+        <file>images/redo_normal_128px.png</file>
+        <file>images/redo_pressed_128px.png</file>
     </qresource>
 </RCC>

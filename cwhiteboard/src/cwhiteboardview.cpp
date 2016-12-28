@@ -43,6 +43,11 @@ void CWhiteBoardView::onUndo()
     m_whiteBoardItem->undo();
 }
 
+void CWhiteBoardView::onRedo()
+{
+    m_whiteBoardItem->redo();
+}
+
 void CWhiteBoardView::resizeEvent(QResizeEvent *event)
 {
     QSize size = event->size();

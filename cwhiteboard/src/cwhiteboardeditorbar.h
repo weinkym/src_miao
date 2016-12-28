@@ -34,6 +34,7 @@ signals:
     void sigLineColorChanged(const QColor &color);
     void sigLineWidthChanged(int width);
     void sigUndo();
+    void sigRedo();
 
 private:
     QHBoxLayout *m_hLayout;

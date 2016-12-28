@@ -17,6 +17,11 @@ public:
     void clear();
     void setPosition(const QPointF &startPoint, const QPointF &endPoint);
     void setBrush(const QBrush &brush);
+    void setVisible(bool visible);
+    bool isVisible();
+
+private:
+    QGraphicsItem *item();
 
 private:
     CWBRectItem *m_rectItem;
