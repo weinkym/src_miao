@@ -38,7 +38,8 @@ HEADERS += \
     src/cwhiteboardscene.h \
     src/cwhiteboardview.h \
     include/cwhiteboard_global.h \
-    include/cwhiteboard.h
+    include/cwhiteboard.h \
+    src/cwberaseritem.h
 
 SOURCES += \
     src/cdrawitem.cpp \
@@ -49,4 +50,5 @@ SOURCES += \
     src/cwhiteboardeditorbutton.cpp \
     src/cwhiteboarditem.cpp \
     src/cwhiteboardscene.cpp \
-    src/cwhiteboardview.cpp
+    src/cwhiteboardview.cpp \
+    src/cwberaseritem.cpp

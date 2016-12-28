@@ -3,11 +3,13 @@
 #include "cwbrectitem.h"
 #include "cwbpathitem.h"
 #include <QGraphicsScene>
+#include "cwberaseritem.h"
 
 CDrawItem::CDrawItem(CWB::DrawParam param, qreal zValue, QGraphicsItem *parent)
     :QObject(NULL)
     ,m_rectItem(NULL)
     ,m_pathItem(NULL)
+    ,m_eraserItem(NULL)
     ,m_drawParam(param)
     ,m_startPoint(QPointF(0,0))
     ,m_endPoint(QPointF(0,0))
@@ -26,6 +28,10 @@ CDrawItem::CDrawItem(CWB::DrawParam param, qreal zValue, QGraphicsItem *parent)
         m_pathItem->setPen(pen);
         m_pathItem->setZValue(zValue);
         break;
+    case CWB::DRAW_TYPE_ERASER:
+        m_eraserItem = new CWBEraserItem(parent);
+        m_eraserItem->setZValue(zValue);
+    break;
     default:
         m_rectItem = new CWBRectItem(CWBRectItem::TYPE_RECT,parent);
         m_rectItem->setPen(pen);
@@ -50,6 +56,10 @@ void CDrawItem::clear()
     {
         item = m_pathItem;
     }
+    else if(m_eraserItem)
+    {
+        item = m_eraserItem;
+    }
     if(item)
     {
         item->setVisible(false);
@@ -61,6 +71,7 @@ void CDrawItem::clear()
     }
     m_pathItem = NULL;
     m_rectItem = NULL;
+    m_eraserItem = NULL;
 }
 
 void CDrawItem::setPosition(const QPointF &startPoint, const QPointF &endPoint)
@@ -69,10 +80,24 @@ void CDrawItem::setPosition(const QPointF &startPoint, const QPointF &endPoint)
     {
         m_pathItem->appendLine(startPoint,endPoint);
     }
+    else if(m_eraserItem)
+    {
+        m_eraserItem->appendLine(startPoint,endPoint);
+    }
     else
     {
-//        QRect rect(qMin(endPoint.x(),startPoint.x()),qMin(endPoint.y(),startPoint.y()),qAbs(endPoint.x() - startPoint.x()),qAbs(endPoint.y()-startPoint.y()));
-//        m_rectItem->setRect(rect);
         m_rectItem->setPosition(startPoint,endPoint);
+    }
+}
+
+void CDrawItem::setBrush(const QBrush &brush)
+{
+    if(m_eraserItem)
+    {
+       m_eraserItem->setBrush(brush);
+    }
+    else if(m_pathItem)
+    {
+        m_pathItem->setBrush(brush);
     }
 }

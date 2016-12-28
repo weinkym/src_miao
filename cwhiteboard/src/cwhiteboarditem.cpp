@@ -1,5 +1,6 @@
 #include "cwhiteboarditem.h"
 #include <QGraphicsSceneMouseEvent>
+#include <QBrush>
 #include "cdrawitem.h"
 
 CWhiteBoardItem::CWhiteBoardItem()
@@ -56,6 +57,26 @@ void CWhiteBoardItem::setDrawParam(CWB::DrawParam param)
     m_drawParam = param;
 }
 
+void CWhiteBoardItem::undo()
+{
+    m_isPressed = false;
+    if(m_currentItem)
+    {
+        m_currentItem->clear();
+        m_currentItem->deleteLater();
+        m_currentItem = NULL;
+        return;
+    }
+    if(m_drawItems.isEmpty())
+    {
+        return;
+    }
+    CDrawItem *item = m_drawItems.last();
+    m_drawItems.removeLast();
+    item->clear();
+    item->deleteLater();
+}
+
 void CWhiteBoardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_UNUSED(event);
@@ -75,6 +96,7 @@ void CWhiteBoardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         if(m_currentItem == NULL)
         {
             m_currentItem = new CDrawItem(m_drawParam,m_drawItems.count(),this);
+            m_currentItem->setBrush(QBrush(this->pixmap()));
         }
         m_currentItem->setPosition(m_startPoint,endPoint);
     }

@@ -38,6 +38,11 @@ void CWhiteBoardView::onLineWidthChanged(int width)
     m_whiteBoardItem->setLineWidth(width);
 }
 
+void CWhiteBoardView::onUndo()
+{
+    m_whiteBoardItem->undo();
+}
+
 void CWhiteBoardView::resizeEvent(QResizeEvent *event)
 {
     QSize size = event->size();

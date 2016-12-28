@@ -10,5 +10,7 @@
         <file>images/pen_pressed_128px.png</file>
         <file>images/color_normal_128px.png</file>
         <file>images/linewidth_normal_128px.png</file>
+        <file>images/undo_normal_128px.png</file>
+        <file>images/undo_pressed_128px.png</file>
     </qresource>
 </RCC>

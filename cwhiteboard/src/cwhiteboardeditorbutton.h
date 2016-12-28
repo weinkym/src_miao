@@ -22,6 +22,7 @@ public:
         EDIT_TYPE_CANCLE,
         EDIT_TYPE_OK,
         EDIT_TYPE_ERASER,
+        EDIT_TYPE_UNDO,
         EDIT_TYPE_COLOR,
         EDIT_TYPE_LINE_WIDTH,
     };

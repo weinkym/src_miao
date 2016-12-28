@@ -18,6 +18,7 @@ public slots:
     void onDrawTypeChanged(CWB::DrawType type);
     void onLineColorChanged(const QColor &color);
     void onLineWidthChanged(int width);
+    void onUndo();
 
 protected:
     void resizeEvent(QResizeEvent *event);

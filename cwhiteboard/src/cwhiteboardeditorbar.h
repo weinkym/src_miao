@@ -33,6 +33,7 @@ signals:
     void sigDrawTypeChanged(CWB::DrawType type);
     void sigLineColorChanged(const QColor &color);
     void sigLineWidthChanged(int width);
+    void sigUndo();
 
 private:
     QHBoxLayout *m_hLayout;

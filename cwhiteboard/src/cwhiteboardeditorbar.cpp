@@ -25,6 +25,7 @@ CWhiteBoardEditorBar::CWhiteBoardEditorBar(CWhiteBoardView *whiteBoardView, QWid
         connect(this,SIGNAL(sigDrawTypeChanged(CWB::DrawType)),whiteBoardView,SLOT(onDrawTypeChanged(CWB::DrawType)));
         connect(this,SIGNAL(sigLineColorChanged(QColor)),whiteBoardView,SLOT(onLineColorChanged(QColor)));
         connect(this,SIGNAL(sigLineWidthChanged(int)),whiteBoardView,SLOT(onLineWidthChanged(int)));
+        connect(this,SIGNAL(sigUndo()),whiteBoardView,SLOT(onUndo()));
     }
     setMinimumHeight(50);
 }
@@ -46,6 +47,7 @@ void CWhiteBoardEditorBar::paintEvent(QPaintEvent *event)
 
 void CWhiteBoardEditorBar::initButtons()
 {
+    addButton(":/images/undo_normal_128px.png",":/images/undo_pressed_128px.png",":/images/undo_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_UNDO);
     addButton(":/images/eraser_normal_128px.png",":/images/eraser_normal_128px.png",":/images/eraser_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_ERASER);
     addButton(":/images/ellipse_normal_128px.png",":/images/ellipse_pressed_128px.png",":/images/ellipse_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_ELLIPSE);
     addButton(":/images/rect_normal_128px.png",":/images/rect_pressed_128px.png",":/images/rect_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_RECT);
@@ -100,9 +102,14 @@ void CWhiteBoardEditorBar::onButtonClicked()
         }
         return;
     }
-    if(type == CWhiteBoardEditorButton::EDIT_TYPE_ERASER)
+//    if(type == CWhiteBoardEditorButton::EDIT_TYPE_ERASER)
+//    {
+//        emit sigClear();
+//        return;
+//    }
+    if(type == CWhiteBoardEditorButton::EDIT_TYPE_UNDO)
     {
-        emit sigClear();
+        emit sigUndo();
         return;
     }
 
@@ -113,7 +120,7 @@ void CWhiteBoardEditorBar::onButtonClicked()
     switch (type)
     {
     case CWhiteBoardEditorButton::EDIT_TYPE_ERASER:
-        emit sigClear();
+        emit sigDrawTypeChanged(CWB::DRAW_TYPE_ERASER);
         break;
     case CWhiteBoardEditorButton::EDIT_TYPE_PEN:
         emit sigDrawTypeChanged(CWB::DRAW_TYPE_PEN);

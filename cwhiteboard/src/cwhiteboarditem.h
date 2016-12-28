@@ -24,6 +24,7 @@ public:
     void setDrawType(CWB::DrawType type);
     void setDrawParam(CWB::DrawParam param);
     CWB::DrawParam getDrawParam() const{return m_drawParam;};
+    void undo();
 
 protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);

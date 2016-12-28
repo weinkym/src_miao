@@ -11,6 +11,7 @@ enum DrawType{
     DRAW_TYPE_ELLIPSE,
     DRAW_TYPE_PEN,
     DRAW_TYPE_ARROW,
+    DRAW_TYPE_ERASER,
 };
 struct DrawParam
 {
@@ -28,6 +29,4 @@ enum CWhiteBoardArrowDirection
 
 }
 
-#define C_WhiteBoard_ZERO 0.000000001
-#define C_WhiteBoardSHOT_LOG_INFO(x)
 #endif // CWHITEBOARDPUBLIC_H
