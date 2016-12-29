@@ -22,6 +22,9 @@ public:
     static QString convertToPinyin(const QString &text,bool initial = false);
     static void openFinder(const QString &filePath);
 
+    static void convertToMosaic(int mosaicSize,QImage &image);
+    static void convertToGray(QImage &image,int percentageR,int percentageG,int percentageB);
+
 #ifdef Q_CC_MSVC
     static QStringList getPrinters();
     static QString getDefaultPrinter();

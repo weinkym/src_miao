@@ -26,6 +26,7 @@ public slots:
     void testScreenShot();
     void testPinyin();
     void testOpenFinder();
+    void testMosaic();
 
 private slots:
     void on_btn_test_clicked();

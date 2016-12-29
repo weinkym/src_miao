@@ -104,7 +104,22 @@ void MainWindow::testOpenFinder()
     Mplib::MpStaticMethod::openFinder(fileName);
 }
 
+void MainWindow::testMosaic()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
+                                                     ".",
+                                                     tr("Images (*.png *.jpg)"));
+    if(fileName.isEmpty())
+    {
+        return;
+    }
+    QImage image(fileName);
+//    Mplib::MpStaticMethod::convertToMosaic(9,image);
+    Mplib::MpStaticMethod::convertToGray(image,39,10,51);
+    ui->label->setPixmap(QPixmap::fromImage(image));
+}
+
 void MainWindow::on_btn_test_clicked()
 {
-    testOpenFinder();
+    testMosaic();
 }

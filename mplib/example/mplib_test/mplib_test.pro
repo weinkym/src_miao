@@ -19,10 +19,9 @@ HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
 
-
-LIBS +=   -L../../lib -lmplib
-DESTDIR = $$PWD/bin
-#contains(QMAKE_CC,cl){
-#-LD:/workroot/lib
-#}
-INCLUDEPATH += ../../include
+CGLOBAL_PRF=../../cglobal.prf
+!exists($${CGLOBAL_PRF}) {
+    error("$${CGLOBAL_PRF} is not found")
+}
+include($${CGLOBAL_PRF})
+include(../../mplib.pri)

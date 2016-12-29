@@ -275,3 +275,136 @@ QString Mplib::MpStaticMethod::convertToPinyin(const QString &text, bool initial
     }
     return resutlString;
 }
+
+
+void Mplib::MpStaticMethod::convertToMosaic(int mosaicSize, QImage &image)
+{
+    qDebug()<<QString("line=%1").arg(image.format())<<image.format();
+
+    if(mosaicSize <= 1)
+    {
+        return;
+    }
+    int width = image.width();
+    int height = image.height();
+    uchar* imageBits = image.bits();
+    int bytePerLine=image.bytesPerLine();
+    qDebug()<<QString("width=%1,height=%2,bytePerLine=%3").arg(width).arg(height).arg(bytePerLine)<<image.byteCount();
+    int indexR=0;
+    int indexG=0;
+    int indexB=0;
+    int r=0;
+    int g=0;
+    int b=0;
+
+    int i = 0;
+    int j = 0;
+    while(i < height)
+    {
+        j = 0;
+        int maxRow = mosaicSize;
+        maxRow = qMin(maxRow,height - i);
+        if(maxRow <= 1)
+        {
+            break;
+        }
+        while(j < width)
+        {
+            int maxCol = mosaicSize;
+            maxCol = qMin(maxCol,width - j);
+            if(maxCol <= 1)
+            {
+                break;
+            }
+
+            quint64 sumColorR = 0;
+            quint64 sumColorG = 0;
+            quint64 sumColorB = 0;
+            for(int row = 0; row < maxRow; ++row)
+            {
+                for(int col = 0; col < maxCol; col++)
+                {
+                    indexR = (i + row) * bytePerLine + (j + col) * 4 + 2;
+                    indexG = (i + row) * bytePerLine + (j + col) * 4 + 1;
+                    indexB = (i + row) * bytePerLine + (j + col) * 4 + 0;
+                    if(indexR >= image.byteCount())
+                    {
+                        qDebug()<<QString("indexR=%1,row=%2,col=%3,i=%4,j=%5").arg(indexR).arg(row).arg(col).arg(i).arg(j);
+                        return;
+                    }
+                    r=imageBits[indexR];
+                    g=imageBits[indexG];
+                    b=imageBits[indexB];
+
+                    sumColorR+=r;
+                    sumColorG+=g;
+                    sumColorB+=b;
+                }
+            }
+            int avgColorR = sumColorR / (maxRow * maxCol);
+            int avgColorG = sumColorG / (maxRow * maxCol);
+            int avgColorB = sumColorB / (maxRow * maxCol);
+            for(int row = 0; row < maxRow; ++row)
+            {
+                for(int col = 0; col < maxCol; col++)
+                {
+                    indexR = (i + row) * bytePerLine + (j + col) * 4 + 2;
+                    indexG = (i + row) * bytePerLine + (j + col) * 4 + 1;
+                    indexB = (i + row) * bytePerLine + (j + col) * 4 + 0;
+                    imageBits[indexR] = avgColorR;
+                    imageBits[indexG] = avgColorG;
+                    imageBits[indexB] = avgColorB;
+                }
+            }
+            j += mosaicSize;
+        }
+        i += mosaicSize;
+    }
+    return;
+}
+
+void Mplib::MpStaticMethod::convertToGray(QImage &image, int percentageR, int percentageG, int percentageB)
+{
+    if(percentageR <= 0 || percentageG <= 0 || percentageB <=0)
+    {
+        return;
+    }
+    int sumRgb = percentageB + percentageG + percentageR;
+
+    int width = image.width();
+    int height = image.height();
+    uchar* imageBits = image.bits();
+    int bytePerLine=image.bytesPerLine();
+    qDebug()<<QString("width=%1,height=%2,bytePerLine=%3").arg(width).arg(height).arg(bytePerLine)<<image.byteCount();
+    int indexR=0;
+    int indexG=0;
+    int indexB=0;
+    int r=0;
+    int g=0;
+    int b=0;
+
+    for(int row = 0; row < height; ++row)
+    {
+        int lineS = bytePerLine * row;
+        for(int col = 0; col < width; col++)
+        {
+            indexR = lineS + col * 4 + 2;
+            indexG = lineS + col * 4 + 1;
+            indexB = lineS + col * 4 + 0;
+            if(indexR >= image.byteCount())
+            {
+                qDebug()<<QString("indexR=%1,row=%2,col=%3").arg(indexR).arg(row).arg(col);
+                return;
+            }
+            r=imageBits[indexR];
+            g=imageBits[indexG];
+            b=imageBits[indexB];
+            int rgb = (r * percentageR + g * percentageG + b * percentageB) / sumRgb;
+
+            imageBits[indexR] = rgb;
+            imageBits[indexG] = rgb;
+            imageBits[indexB] = rgb;
+
+        }
+    }
+}

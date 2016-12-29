@@ -4,27 +4,20 @@
 #
 #-------------------------------------------------
 
-TARGET_NAME = mplib
+TARGET = mplib
+
 DEFINES_NAME = MPLIB_LIBRARY
 #CONFIG += static
 QT       += network
-DEFINES += $${DEFINES_NAME}
+DEFINES += MPLIB_LIBRARY
 TEMPLATE = lib
 DESTDIR  = $$PWD/lib
 
-TARGET = $${TARGET_NAME}
-win32 {
-CONFIG(debug, debug|release) : TARGET = $${TARGET_NAME}d
-CONFIG(debug, debug|release): OBJECTS_DIR =  $$PWD/TEMP/$${TARGET}/debug
-CONFIG(release, debug|release): OBJECTS_DIR =  $$PWD/TEMP/$${TARGET}/release
-} else {
-OBJECTS_DIR = $$PWD/TEMP/$${TARGET}
+CGLOBAL_PRF=cglobal.prf
+!exists($${CGLOBAL_PRF}) {
+    error("$${CGLOBAL_PRF} is not found")
 }
-###############################################################################
-UI_DIR      = $${OBJECTS_DIR}/uic
-MOC_DIR     = $${OBJECTS_DIR}/moc
-RCC_DIR     = $${OBJECTS_DIR}/rcc
-INCLUDEPATH += $${OBJECTS_DIR}/uic
+include($${CGLOBAL_PRF})
 
 #VERSION########################################################################
 greaterThan(QT_MAJOR_VERSION, 4) {
@@ -76,7 +69,7 @@ RESOURCES += \
 
 win32{
  SOURCES += src/mplib_win.cpp
-LIBS += -lshell32
+ LIBS += -lshell32
 }
 
 mac {
