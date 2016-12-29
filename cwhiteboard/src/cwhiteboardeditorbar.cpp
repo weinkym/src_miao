@@ -50,18 +50,19 @@ void CWhiteBoardEditorBar::initButtons()
 {
     addButton(":/images/redo_normal_128px.png",":/images/redo_pressed_128px.png",":/images/redo_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_REDO);
     addButton(":/images/undo_normal_128px.png",":/images/undo_pressed_128px.png",":/images/undo_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_UNDO);
-    addButton(":/images/eraser_normal_128px.png",":/images/eraser_normal_128px.png",":/images/eraser_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_CLEAR);
+    addButton(":/images/eraser_normal_128px.png",":/images/eraser_pressed_128px.png",":/images/eraser_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_CLEAR);
 //    addButton(":/images/eraser_normal_128px.png",":/images/eraser_normal_128px.png",":/images/eraser_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_ERASER);
     addButton(":/images/ellipse_normal_128px.png",":/images/ellipse_pressed_128px.png",":/images/ellipse_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_ELLIPSE);
-    addButton(":/images/rect_normal_128px.png",":/images/rect_pressed_128px.png",":/images/rect_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_RECT);
-    addButton(":/images/pen_normal_128px.png",":/images/pen_normal_128px.png",":/images/pen_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_PEN);
+    CWhiteBoardEditorButton *rectButton = addButton(":/images/rect_normal_128px.png",":/images/rect_pressed_128px.png",":/images/rect_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_RECT);
+    addButton(":/images/pen_normal_128px.png",":/images/pen_pressed_128px.png",":/images/pen_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_PEN);
     addButton(":/images/color_normal_128px.png",":/images/color_normal_128px.png",":/images/color_normal_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_COLOR);
-    addButton(":/images/linewidth_normal_128px.png",":/images/linewidth_normal_128px.png",":/images/linewidth_normal_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_LINE_WIDTH);
+    addButton(":/images/linewidth_normal_128px.png",":/images/linewidth_pressed_128px.png",":/images/linewidth_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_LINE_WIDTH);
     QSpacerItem *item = new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Minimum);
     m_hLayout->addSpacerItem(item);
+    emit rectButton->sigClicked();
 }
 
-void CWhiteBoardEditorBar::addButton(const QString &normalIamgeUrl, const QString &hoverIamgeUrl, const QString &pressedIamgeUrl, CWhiteBoardEditorButton::EditButtonType type)
+CWhiteBoardEditorButton *CWhiteBoardEditorBar::addButton(const QString &normalIamgeUrl, const QString &hoverIamgeUrl, const QString &pressedIamgeUrl, CWhiteBoardEditorButton::EditButtonType type)
 {
     CWhiteBoardEditorButton *button = new CWhiteBoardEditorButton(normalIamgeUrl,hoverIamgeUrl,pressedIamgeUrl,type);
     QSize size(30,30);
@@ -70,6 +71,7 @@ void CWhiteBoardEditorBar::addButton(const QString &normalIamgeUrl, const QStrin
     connect(button,SIGNAL(sigClicked()),this,SLOT(onButtonClicked()));
     m_hLayout->insertWidget(0,button);
     m_buttons.append(button);
+    return button;
 }
 
 void CWhiteBoardEditorBar::onButtonClicked()

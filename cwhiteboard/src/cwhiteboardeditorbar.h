@@ -23,7 +23,7 @@ protected:
 
 private:
     void initButtons();
-    void addButton(const QString &normalIamgeUrl,const QString &hoverIamgeUrl,const QString &pressedIamgeUrl,CWhiteBoardEditorButton::EditButtonType type);
+    CWhiteBoardEditorButton* addButton(const QString &normalIamgeUrl,const QString &hoverIamgeUrl,const QString &pressedIamgeUrl,CWhiteBoardEditorButton::EditButtonType type);
 
 private slots:
     void onButtonClicked();
