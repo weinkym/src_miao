@@ -4,6 +4,7 @@
 #include <QTime>
 #include <QDate>
 #include <QTextEdit>
+#include <qmath.h>
 #include "mplib.h"
 static QTextEdit* g_textEdit = NULL;
 
@@ -407,4 +408,111 @@ void Mplib::MpStaticMethod::convertToGray(QImage &image, int percentageR, int pe
 
         }
     }
+}
+
+//http://www.ruanyifeng.com/blog/2012/11/gaussian_blur.html
+void Mplib::MpStaticMethod::convertToGaussianBlur(QImage &image, int gaussianRadius, qreal deta)
+{
+    if(gaussianRadius < 1 || deta < 0.0001)
+    {
+        return;
+    }
+    qDebug()<<QString("image.format=%1").arg(image.format());
+
+    int width = image.width();
+    int height = image.height();
+    QImage tempImage = image;
+    uchar* tempImageBits = tempImage.bits();
+    uchar* imageBits = image.bits();
+    int radius = 2 * gaussianRadius + 1;
+    qreal** gaussianRect = new qreal*[radius];
+    for(int i =0; i < radius;++i)
+    {
+        gaussianRect[i] = new qreal[radius];
+    }
+    qreal deta2DaoShu = 0.5 / (deta * deta);
+    qreal rate = deta2DaoShu / M_PI;
+
+    qreal sum = 0.0;
+    for(int i = 0; i < radius;++i)
+    {
+        for(int j = 0; j < radius;++j)
+        {
+            int x = i - radius / 2;
+            int y = j - radius / 2;
+            qreal v = rate * qExp(-1.0 * (x*x + y*y) * deta2DaoShu);
+            gaussianRect[i][j]= v;
+            sum += v;
+        }
+    }
+    for(int i = 0; i < radius;++i)
+    {
+        for(int j = 0; j < radius;++j)
+        {
+            gaussianRect[i][j] /= sum;
+        }
+    }
+
+    int bytePerLine=image.bytesPerLine();
+    qDebug()<<QString("width=%1,height=%2,bytePerLine=%3").arg(width).arg(height).arg(bytePerLine)<<image.byteCount();
+    int indexR=0;
+
+    for(int row = 0; row < height; row++)
+    {
+        for(int col = 0; col < width;col++)
+        {
+            qreal sumR = 0.0;
+            qreal sumG = 0.0;
+            qreal sumB = 0.0;
+            for(int i = 0; i < radius;++i)
+            {
+                for(int j = 0; j < radius;++j)
+                {
+                    int x = i - radius / 2 + col;
+                    int y = j - radius / 2 + row;
+                    if(x < 0)
+                    {
+                        x = -x;
+                    }
+                    else if(x > width - 1)
+                    {
+                        x = 2 * (width -1) - x;
+                    }
+                    if(x < 0 || x > width - 1)
+                    {
+                        qWarning()<<QString("width=%1,height=%2,bytePerLine=%3,x=%4 is out").arg(width).arg(height).arg(bytePerLine).arg(x);
+                        break;
+                    }
+                    if(y < 0)
+                    {
+                        y = -y;
+                    }
+                    else if(y > height - 1)
+                    {
+                        y = 2 * (height -1) - y;
+                    }
+                    if(y < 0 || y > height - 1)
+                    {
+                        qWarning()<<QString("width=%1,height=%2,bytePerLine=%3,y=%4 is out").arg(width).arg(height).arg(bytePerLine).arg(y);
+                        break;
+                    }
+                    indexR = y * bytePerLine + x * 4 + 2;
+                    sumR += gaussianRect[j][i] * tempImageBits[indexR];
+                    sumG += gaussianRect[j][i] * tempImageBits[indexR - 1];
+                    sumB += gaussianRect[j][i] * tempImageBits[indexR - 2];
+                }
+            }
+            indexR = row * bytePerLine + col * 4 + 2;
+            imageBits[indexR] = sumR ;
+            imageBits[indexR - 1] = sumG ;
+            imageBits[indexR - 2] = sumB ;
+        }
+    }
+
+    for(int i = 0; i < radius;++i)
+    {
+        delete[]gaussianRect[i];
+    }
+    delete []gaussianRect;
+    return;
 }

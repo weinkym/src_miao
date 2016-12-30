@@ -24,6 +24,7 @@ public:
 
     static void convertToMosaic(int mosaicSize,QImage &image);
     static void convertToGray(QImage &image,int percentageR,int percentageG,int percentageB);
+    static void convertToGaussianBlur(QImage &image,int gaussianRadius,qreal deta);
 
 #ifdef Q_CC_MSVC
     static QStringList getPrinters();
