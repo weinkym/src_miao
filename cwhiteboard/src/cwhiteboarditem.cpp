@@ -5,6 +5,10 @@
 #include "cdrawitem.h"
 #include "cwbaddcommand.h"
 #include "cwbclearcommand.h"
+#include <QGraphicsSceneMouseEvent>
+#include <QApplication>
+#include <QGraphicsScene>
+#include <QTimer>
 
 CWhiteBoardItem::CWhiteBoardItem()
 {
@@ -75,54 +79,55 @@ void CWhiteBoardItem::setDrawParam(CWB::DrawParam param)
 void CWhiteBoardItem::undo()
 {
     m_isPressed = false;
-    if(m_currentItem)
-    {
-        m_currentItem->clear();
-        m_currentItem->deleteLater();
-        m_currentItem = NULL;
-        return;
-    }
-//    if(m_drawItems.isEmpty())
-//    {
-//        return;
-//    }
-//    CDrawItem *item = m_drawItems.last();
-//    m_drawItems.removeLast();
-//    item->clear();
-//    item->deleteLater();
+    m_currentItem = NULL;
     m_undoStack->undo();
 }
 
 void CWhiteBoardItem::redo()
 {
+    m_currentItem = NULL;
     m_undoStack->redo();
 }
 
 void CWhiteBoardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_UNUSED(event);
-    m_isPressed = false;
+
+    bool currentItemIsNull = (m_currentItem == NULL);
     if(m_currentItem)
     {
         m_drawItems.append(m_currentItem);
         m_currentItem = NULL;
     }
+    if(m_drawParam.type == CWB::DRAW_TYPE_TEXT && m_isPressed && currentItemIsNull)
+    {
+        createCurrentItem();
+        m_currentItem->setPosition(m_startPoint,m_startPoint);
+        if(m_drawParam.type == CWB::DRAW_TYPE_TEXT)
+        {
+            QPointF scenePos = event->scenePos();
+            event->accept();
+            QTimer::singleShot(100, [this,scenePos]{
+                if(this->scene())
+                {
+                    QGraphicsSceneMouseEvent pressedEvent(QEvent::GraphicsSceneMousePress);
+                    pressedEvent.setScenePos(scenePos);
+                    pressedEvent.setButton(Qt::LeftButton);
+                    pressedEvent.setButtons(Qt::LeftButton);
+                    QApplication::sendEvent(this->scene(),&pressedEvent);
+                }
+            });
+        }
+    }
+    m_isPressed = false;
 }
 
 void CWhiteBoardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(m_isPressed)
+    if(m_isPressed && m_drawParam.type != CWB::DRAW_TYPE_TEXT)
     {
         QPointF endPoint = event->pos();
-        if(m_currentItem == NULL)
-        {
-            m_currentItem = new CDrawItem(m_drawParam,m_drawItems.count(),this);
-            m_currentItem->setBrush(QBrush(this->pixmap()));
-            QList<CDrawItem*> itemList;
-            itemList.append(m_currentItem);
-            CWBAddCommand *cmd = new CWBAddCommand(itemList);
-            m_undoStack->push(cmd);
-        }
+        createCurrentItem();
         m_currentItem->setPosition(m_startPoint,endPoint);
     }
 }
@@ -131,12 +136,29 @@ void CWhiteBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton)
     {
+        qDebug()<<"event.scenePos()"<<event->scenePos();
         m_isPressed = true;
         m_startPoint = event->pos();
-        m_currentItem = NULL;
+        if(m_drawParam.type != CWB::DRAW_TYPE_TEXT)
+        {
+            m_currentItem = NULL;
+        }
     }
     else
     {
         m_isPressed = false;
+    }
+}
+
+void CWhiteBoardItem::createCurrentItem()
+{
+    if(m_currentItem == NULL)
+    {
+        m_currentItem = new CDrawItem(m_drawParam,m_drawItems.count(),this);
+        m_currentItem->setBrush(QBrush(this->pixmap()));
+        QList<CDrawItem*> itemList;
+        itemList.append(m_currentItem);
+        CWBAddCommand *cmd = new CWBAddCommand(itemList);
+        m_undoStack->push(cmd);
     }
 }

@@ -52,6 +52,7 @@ void CWhiteBoardEditorBar::initButtons()
     addButton(":/images/undo_normal_128px.png",":/images/undo_pressed_128px.png",":/images/undo_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_UNDO);
     addButton(":/images/eraser_normal_128px.png",":/images/eraser_pressed_128px.png",":/images/eraser_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_CLEAR);
 //    addButton(":/images/eraser_normal_128px.png",":/images/eraser_normal_128px.png",":/images/eraser_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_ERASER);
+    addButton(":/images/text_normal_128px.png",":/images/text_pressed_128px.png",":/images/text_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_TEXT);
     addButton(":/images/ellipse_normal_128px.png",":/images/ellipse_pressed_128px.png",":/images/ellipse_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_ELLIPSE);
     CWhiteBoardEditorButton *rectButton = addButton(":/images/rect_normal_128px.png",":/images/rect_pressed_128px.png",":/images/rect_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_RECT);
     addButton(":/images/pen_normal_128px.png",":/images/pen_pressed_128px.png",":/images/pen_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_PEN);
@@ -141,6 +142,9 @@ void CWhiteBoardEditorBar::onButtonClicked()
         break;
     case CWhiteBoardEditorButton::EDIT_TYPE_ELLIPSE:
         emit sigDrawTypeChanged(CWB::DRAW_TYPE_ELLIPSE);
+        break;
+    case CWhiteBoardEditorButton::EDIT_TYPE_TEXT:
+        emit sigDrawTypeChanged(CWB::DRAW_TYPE_TEXT);
         break;
     default:
         break;

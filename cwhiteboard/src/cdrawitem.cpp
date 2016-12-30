@@ -3,13 +3,16 @@
 #include "cwbrectitem.h"
 #include "cwbpathitem.h"
 #include <QGraphicsScene>
+
 #include "cwberaseritem.h"
+#include "cwbtextitem.h"
 
 CDrawItem::CDrawItem(CWB::DrawParam param, qreal zValue, QGraphicsItem *parent)
     :QObject(NULL)
     ,m_rectItem(NULL)
     ,m_pathItem(NULL)
     ,m_eraserItem(NULL)
+    ,m_textItem(NULL)
     ,m_drawParam(param)
     ,m_startPoint(QPointF(0,0))
     ,m_endPoint(QPointF(0,0))
@@ -32,6 +35,16 @@ CDrawItem::CDrawItem(CWB::DrawParam param, qreal zValue, QGraphicsItem *parent)
         m_eraserItem = new CWBEraserItem(parent);
         m_eraserItem->setZValue(zValue);
     break;
+    case CWB::DRAW_TYPE_TEXT:
+    {
+        m_textItem = new CWBTextItem(parent);
+        m_textItem->setDefaultTextColor(m_drawParam.lineColor);
+        m_textItem->setPlainText("");
+        QFont font;
+        font.setPixelSize(16);
+        m_textItem->setFont(font);
+        break;
+    }
     default:
         m_rectItem = new CWBRectItem(CWBRectItem::TYPE_RECT,parent);
         m_rectItem->setPen(pen);
@@ -73,9 +86,14 @@ void CDrawItem::setPosition(const QPointF &startPoint, const QPointF &endPoint)
     {
         m_eraserItem->appendLine(startPoint,endPoint);
     }
-    else
+    else if(m_rectItem)
     {
         m_rectItem->setPosition(startPoint,endPoint);
+    }
+    else if(m_textItem)
+    {
+        QRectF rect = m_textItem->boundingRect();
+        m_textItem->setPos(startPoint - QPointF(rect.width() / 2,rect.height() / 2) + QPointF(m_textItem->addMargin(),m_textItem->addMargin()));
     }
 }
 
@@ -125,5 +143,9 @@ QGraphicsItem *CDrawItem::item()
     {
         item = m_eraserItem;
     }
-return item;
+    else if(m_textItem)
+    {
+        item = m_textItem;
+    }
+    return item;
 }

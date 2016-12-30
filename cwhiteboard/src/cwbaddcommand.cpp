@@ -12,7 +12,10 @@ void CWBAddCommand::undo()
 {
     for(auto obj:m_itemList)
     {
-        obj->setVisible(false);
+        if(obj)
+        {
+            obj->setVisible(false);
+        }
     }
 }
 
@@ -20,6 +23,9 @@ void CWBAddCommand::redo()
 {
     for(auto obj:m_itemList)
     {
-        obj->setVisible(true);
+        if(obj)
+        {
+            obj->setVisible(true);
+        }
     }
 }

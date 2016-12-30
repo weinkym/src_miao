@@ -280,8 +280,7 @@ QString Mplib::MpStaticMethod::convertToPinyin(const QString &text, bool initial
 
 void Mplib::MpStaticMethod::convertToMosaic(int mosaicSize, QImage &image)
 {
-    qDebug()<<QString("line=%1").arg(image.format())<<image.format();
-
+    qDebug()<<QString("image.format=%1").arg(image.format());
     if(mosaicSize <= 1)
     {
         return;

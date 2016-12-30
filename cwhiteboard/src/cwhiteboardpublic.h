@@ -12,6 +12,7 @@ enum DrawType{
     DRAW_TYPE_PEN,
     DRAW_TYPE_ARROW,
     DRAW_TYPE_ERASER,
+    DRAW_TYPE_TEXT,
 };
 struct DrawParam
 {
@@ -19,6 +20,7 @@ struct DrawParam
     DrawType type;
     QColor lineColor;
     int width;
+    QVariant value;
 };
 
 enum CWhiteBoardArrowDirection

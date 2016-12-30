@@ -8,6 +8,7 @@
 class CWBRectItem;
 class CWBPathItem;
 class CWBEraserItem;
+class CWBTextItem;
 
 class CWHITEBOARDSHARED_EXPORT CDrawItem : public QObject
 {
@@ -20,13 +21,16 @@ public:
     void setVisible(bool visible);
     bool isVisible();
 
+
 private:
     QGraphicsItem *item();
 
 private:
+    friend class CWhiteBoardItem;
     CWBRectItem *m_rectItem;
     CWBPathItem *m_pathItem;
     CWBEraserItem *m_eraserItem;
+    CWBTextItem *m_textItem;
     CWB::DrawParam m_drawParam;
     QPointF m_startPoint;
     QPointF m_endPoint;

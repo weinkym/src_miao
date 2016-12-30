@@ -41,7 +41,8 @@ HEADERS += \
     include/cwhiteboard.h \
     src/cwberaseritem.h \
     src/cwbaddcommand.h \
-    src/cwbclearcommand.h
+    src/cwbclearcommand.h \
+    src/cwbtextitem.h
 
 SOURCES += \
     src/cdrawitem.cpp \
@@ -55,4 +56,5 @@ SOURCES += \
     src/cwhiteboardview.cpp \
     src/cwberaseritem.cpp \
     src/cwbaddcommand.cpp \
-    src/cwbclearcommand.cpp
+    src/cwbclearcommand.cpp \
+    src/cwbtextitem.cpp

@@ -34,6 +34,9 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:
+    void createCurrentItem();
+
+private:
     State m_state;
     bool m_isPressed;
     QPointF m_startPoint;
