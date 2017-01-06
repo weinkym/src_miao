@@ -14,6 +14,7 @@ CWhiteBoardEditorBarPrivate::CWhiteBoardEditorBarPrivate()
 
 void CWhiteBoardEditorBarPrivate::initButtons()
 {
+    addButton(":/images/arrow_normal_128px.png",":/images/arrow_pressed_128px.png",":/images/arrow_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_ARROW);
 //    addButton(":/images/eraser_normal_128px.png",":/images/eraser_normal_128px.png",":/images/eraser_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_ERASER);
     addButton(":/images/eraser_normal_128px.png",":/images/eraser_pressed_128px.png",":/images/eraser_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_CLEAR);
     addButton(":/images/redo_normal_128px.png",":/images/redo_pressed_128px.png",":/images/redo_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_REDO);
@@ -102,6 +103,9 @@ void CWhiteBoardEditorBarPrivate::onButtonClicked()
     }
     switch (type)
     {
+    case CWhiteBoardEditorButton::EDIT_TYPE_ARROW:
+        emit sigDrawTypeChanged(CWB::DRAW_TYPE_ARROW);
+        break;
     case CWhiteBoardEditorButton::EDIT_TYPE_ERASER:
         emit sigDrawTypeChanged(CWB::DRAW_TYPE_ERASER);
         break;

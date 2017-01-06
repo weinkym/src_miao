@@ -19,6 +19,12 @@ border-image: url(:/background.jpg) 0 0 0 0;
 }</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QVBoxLayout" name="vLayout">
@@ -36,6 +42,13 @@ border-image: url(:/background.jpg) 0 0 0 0;
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QSlider" name="horizontalSlider">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton">

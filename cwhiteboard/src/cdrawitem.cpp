@@ -30,6 +30,11 @@ CDrawItem::CDrawItem(CWB::DrawParam param, qreal zValue, QGraphicsItem *parent)
         m_rectItem->setPen(pen);
         m_rectItem->setZValue(zValue);
         break;
+    case CWB::DRAW_TYPE_ARROW:
+        m_rectItem = new CWBRectItem(CWBRectItem::TYPE_ARROW,parent);
+        m_rectItem->setPen(pen);
+        m_rectItem->setZValue(zValue);
+        break;
     case CWB::DRAW_TYPE_PEN:
         m_pathItem = new CWBPathItem(parent);
         m_pathItem->setPen(pen);

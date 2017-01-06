@@ -11,6 +11,7 @@ CWhiteBoardView::CWhiteBoardView(QWidget *parent)
     ,m_data(new CWhiteBoardViewPrivate)
 {
     this->setStyleSheet(QString("QGraphicsView{border: 0px solid #000000;background: transparent;}"));
+//    this->setStyleSheet(QString("QGraphicsView{border: 0px solid #000000;background: #00ff00;}"));
     this->setScene(m_data->m_scene);
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -33,8 +34,24 @@ void CWhiteBoardView::setBackgroundColor(const QColor &color)
     {
         return;
     }
+    m_data->m_backgroundColor = color;
     updateSize(this->size());
 }
+
+void CWhiteBoardView::setExpanding(bool enabled)
+{
+    if(m_data->m_needScale == enabled)
+    {
+        return;
+    }
+    m_data->m_needScale = enabled;
+    if(m_data->m_needScale)
+    {
+        m_data->m_baseRect = m_data->m_scene->sceneRect();
+    }
+    updateSize(this->size());
+}
+
 
 void CWhiteBoardView::onClear()
 {
@@ -90,17 +107,34 @@ void CWhiteBoardView::mousePressEvent(QMouseEvent *e)
 
 void CWhiteBoardView::updateSize(const QSize &size)
 {
-    QSize adjustSize = size;
-    QTransform transform = this->transform();
-    qreal m11 = transform.m11();
-    qreal m22 = transform.m22();
-
-    if(m11 > 0.001 && m22 > 0.001)
+    if(size.width() <= 0 && size.height() <= 0)
     {
-        adjustSize.setWidth(size.width() / m11);
-        adjustSize.setHeight(size.height() / m22);
+        return;
     }
-    m_data->m_scene->setSceneRect(QRect(0,0,adjustSize.width(),adjustSize.height()));
+    QSize adjustSize = size;
+    if(m_data->m_needScale)
+    {
+        QRectF sceneRect = m_data->m_baseRect;
+        if(sceneRect.width() < 0.001 && sceneRect.height() < 0.001)
+        {
+            return;
+        }
+
+        qreal sx = size.width() /  sceneRect.width();
+        qreal sy = size.height() /  sceneRect.height();
+        QTransform form = this->transform();
+        form.setMatrix(sx,form.m12(),form.m13(),form.m21(),sy,form.m23(),form.m31(),form.m32(),form.m33());
+        this->setTransform(form);
+        adjustSize = sceneRect.size().toSize();
+    }
+    else
+    {
+        QTransform form = this->transform();
+        form.reset();
+        this->setTransform(form);
+
+        m_data->m_scene->setSceneRect(QRect(0,0,adjustSize.width(),adjustSize.height()));
+    }
     if(m_data->m_backgroundColor.alpha() == 0)
     {
         m_data->m_backgroundColor.setAlpha(1);

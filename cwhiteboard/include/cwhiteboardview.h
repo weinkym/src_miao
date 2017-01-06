@@ -13,6 +13,7 @@ public:
     ~CWhiteBoardView();
     void setEditable(bool enabled);
     void setBackgroundColor(const QColor &color);
+    void setExpanding(bool enabled);
 
 protected:
     void resizeEvent(QResizeEvent *event);

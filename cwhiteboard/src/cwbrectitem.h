@@ -10,6 +10,7 @@ public:
     enum Type{
         TYPE_RECT,
         TYPE_ELLIPSE,
+        TYPE_ARROW,
     };
     CWBRectItem(Type type,QGraphicsItem *parent = Q_NULLPTR);
     void setPosition(const QPointF &startPoint, const QPointF &endPoint);
@@ -19,13 +20,18 @@ public:
 
 private:
     void adjustBoundingRect();
+    QRectF getPointsRect(const QList<QPointF> &pointList);
 
 private:
+    static const int m_arrowLength = 15;
     Type m_type;
     QRectF m_rect;
     QRectF m_boundingRect;
     QPointF m_startPoint;
     QPointF m_endPoint;
+
+    QPointF m_arrowPointUp;
+    QPointF m_arrowPointDown;
     QPen m_pen;
 };
 

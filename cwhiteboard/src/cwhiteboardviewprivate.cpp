@@ -3,7 +3,8 @@
 #include "cwhiteboardscene.h"
 
 CWhiteBoardViewPrivate::CWhiteBoardViewPrivate()
-    :m_backgroundColor(QColor(255,255,255,1))
+    :m_needScale(false)
+    ,m_backgroundColor(QColor(255,255,255,1))
     ,m_whiteBoardItem(NULL)
     ,m_scene(NULL)
 {
