@@ -1,25 +1,20 @@
-#ifndef CWHITEBOARDEDITORBAR_H
-#define CWHITEBOARDEDITORBAR_H
-
-#include <QWidget>
+#ifndef CWHITEBOARDEDITORBARPRIVATE_H
+#define CWHITEBOARDEDITORBARPRIVATE_H
+#include <QGraphicsView>
 #include "cwhiteboardeditorbutton.h"
 #include "cwhiteboard_global.h"
+#include "cwhiteboardpublic.h"
 
 class QHBoxLayout;
 class CWhiteBoardView;
-class CWHITEBOARDSHARED_EXPORT CWhiteBoardEditorBar : public QWidget
+class CWhiteBoardEditorBar;
+
+class CWHITEBOARDSHARED_EXPORT CWhiteBoardEditorBarPrivate : QObject
 {
     Q_OBJECT
 
 public:
-    CWhiteBoardEditorBar(CWhiteBoardView *whiteBoardView,QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
-
-    void setBackgroundColor(const QColor &color);
-    int lineWidth() const {return m_lineWidth;};
-    QColor lineColor() const {return m_color;};
-
-protected:
-    void paintEvent(QPaintEvent *event);
+    CWhiteBoardEditorBarPrivate();
 
 private:
     void initButtons();
@@ -37,10 +32,11 @@ signals:
     void sigRedo();
 
 private:
+    friend class CWhiteBoardEditorBar;
     QHBoxLayout *m_hLayout;
     QColor m_color;
     int m_lineWidth;
     QList<CWhiteBoardEditorButton*> m_buttons;
 };
 
-#endif // CWHITEBOARDEDITORBAR_H
+#endif // CWHITEBOARDEDITORBARPRIVATE_H

@@ -13,6 +13,8 @@ enum DrawType{
     DRAW_TYPE_ARROW,
     DRAW_TYPE_ERASER,
     DRAW_TYPE_TEXT,
+    DRAW_TYPE_LINE,
+    DRAW_TYPE_POINT,
 };
 struct DrawParam
 {

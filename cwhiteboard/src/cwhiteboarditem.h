@@ -27,6 +27,7 @@ public:
     CWB::DrawParam getDrawParam() const{return m_drawParam;};
     void undo();
     void redo();
+    void setEditable(bool enabled);
 
 protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -35,10 +36,12 @@ protected:
 
 private:
     void createCurrentItem();
+    bool isOnlyPoint();
 
 private:
     State m_state;
     bool m_isPressed;
+    bool m_editable;
     QPointF m_startPoint;
     CWB::DrawParam m_drawParam;
     CDrawItem *m_currentItem;

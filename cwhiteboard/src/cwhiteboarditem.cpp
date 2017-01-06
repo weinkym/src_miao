@@ -13,6 +13,7 @@
 CWhiteBoardItem::CWhiteBoardItem()
 {
     m_isPressed = false;
+    m_editable = true;
     m_currentItem = NULL;
     m_drawParam.lineColor = QColor("00000ff");
     m_drawParam.type = CWB::DRAW_TYPE_PEN;
@@ -89,14 +90,35 @@ void CWhiteBoardItem::redo()
     m_undoStack->redo();
 }
 
+void CWhiteBoardItem::setEditable(bool enabled)
+{
+    if(m_editable == enabled)
+    {
+        return;
+    }
+    m_editable = enabled;
+    if(!m_editable && m_currentItem)
+    {
+        QGraphicsItem *item = m_currentItem->item();
+        if(item && item->isVisible())
+        {
+            m_currentItem->setVisible(false);
+            m_currentItem->setVisible(true);
+        }
+    }
+}
+
 void CWhiteBoardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     Q_UNUSED(event);
+    if(!m_editable)
+    {
+        return;
+    }
 
     bool currentItemIsNull = (m_currentItem == NULL);
     if(m_currentItem)
     {
-        m_drawItems.append(m_currentItem);
         m_currentItem = NULL;
     }
     if(m_drawParam.type == CWB::DRAW_TYPE_TEXT && m_isPressed && currentItemIsNull)
@@ -124,7 +146,11 @@ void CWhiteBoardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void CWhiteBoardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(m_isPressed && m_drawParam.type != CWB::DRAW_TYPE_TEXT)
+    if(!m_editable)
+    {
+        return;
+    }
+    if(m_isPressed && !isOnlyPoint())
     {
         QPointF endPoint = event->pos();
         createCurrentItem();
@@ -134,12 +160,24 @@ void CWhiteBoardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void CWhiteBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    if(!m_editable)
+    {
+        return;
+    }
     if(event->button() == Qt::LeftButton)
     {
-        qDebug()<<"event.scenePos()"<<event->scenePos();
         m_isPressed = true;
         m_startPoint = event->pos();
-        if(m_drawParam.type != CWB::DRAW_TYPE_TEXT)
+
+        if(isOnlyPoint())
+        {
+            if(m_drawParam.type == CWB::DRAW_TYPE_POINT)
+            {
+                createCurrentItem();
+                m_currentItem->setPosition(m_startPoint,m_startPoint);
+            }
+        }
+        else
         {
             m_currentItem = NULL;
         }
@@ -156,9 +194,15 @@ void CWhiteBoardItem::createCurrentItem()
     {
         m_currentItem = new CDrawItem(m_drawParam,m_drawItems.count(),this);
         m_currentItem->setBrush(QBrush(this->pixmap()));
+        m_drawItems.append(m_currentItem);
         QList<CDrawItem*> itemList;
         itemList.append(m_currentItem);
         CWBAddCommand *cmd = new CWBAddCommand(itemList);
         m_undoStack->push(cmd);
     }
+}
+
+bool CWhiteBoardItem::isOnlyPoint()
+{
+    return (m_drawParam.type == CWB::DRAW_TYPE_TEXT || m_drawParam.type == CWB::DRAW_TYPE_POINT);
 }

@@ -12,8 +12,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 private:
-    int m_radius;
     bool m_isFirst;
+    int m_radius;
     QList<QPolygonF> m_polygonfList;
     QList<QRectF> m_rectList;
     QPointF m_prePoint;

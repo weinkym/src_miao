@@ -56,11 +56,12 @@ void CWBEraserItem::appendLine(const QPointF &startPoint, const QPointF &endPoin
     m_polygonfList.append(polygon);
     m_prePoint = endPoint;
     this->setPath(path);
-//    update();
 }
 
 void CWBEraserItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
     painter->setBrush(this->brush());
     painter->setPen(this->pen());
     for(auto obj:m_rectList)

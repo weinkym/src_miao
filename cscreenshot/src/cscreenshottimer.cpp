@@ -10,7 +10,7 @@ CScreenShotTimer::CScreenShotTimer(const QString &prefix)
 CScreenShotTimer::~CScreenShotTimer()
 {
     QTime currentTime = QTime::currentTime();
-    int msecs = m_time.msecsTo(currentTime);
+    int msecs = currentTime.msecsTo(m_time);
     if(msecs < 0)
     {
         msecs = currentTime.msecsTo(m_time);

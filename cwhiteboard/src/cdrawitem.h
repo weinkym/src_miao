@@ -9,6 +9,8 @@ class CWBRectItem;
 class CWBPathItem;
 class CWBEraserItem;
 class CWBTextItem;
+class CWBLineItem;
+class CWBPointItem;
 
 class CWHITEBOARDSHARED_EXPORT CDrawItem : public QObject
 {
@@ -31,6 +33,8 @@ private:
     CWBPathItem *m_pathItem;
     CWBEraserItem *m_eraserItem;
     CWBTextItem *m_textItem;
+    CWBPointItem *m_pointItem;
+    CWBLineItem *m_lineItem;
     CWB::DrawParam m_drawParam;
     QPointF m_startPoint;
     QPointF m_endPoint;

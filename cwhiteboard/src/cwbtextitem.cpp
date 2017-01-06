@@ -25,7 +25,6 @@ QPainterPath CWBTextItem::shape() const
 
 void CWBTextItem::focusOutEvent(QFocusEvent *event)
 {
-    qDebug()<<"focusOutEvent";
     if(this->textInteractionFlags() == Qt::TextEditorInteraction)
     {
         this->setTextInteractionFlags(Qt::NoTextInteraction);
@@ -33,13 +32,13 @@ void CWBTextItem::focusOutEvent(QFocusEvent *event)
     this->setFlag(QGraphicsItem::ItemIsSelectable,false);
     if(!this->toPlainText().simplified().isEmpty())
     {
-        this->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
+        //TODO 暂时屏蔽,目前还存在逻辑问题
+//        this->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
     }
     QGraphicsTextItem::focusOutEvent(event);
 }
 
 void CWBTextItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug()<<event->scenePos()<<event->pos()<<event->screenPos()<<event->lastPos()<<event->lastScenePos()<<event->lastScreenPos();
     return QGraphicsTextItem::mouseReleaseEvent(event);
 }

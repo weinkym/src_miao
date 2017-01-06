@@ -27,6 +27,8 @@ public:
         EDIT_TYPE_CLEAR,
         EDIT_TYPE_COLOR,
         EDIT_TYPE_LINE_WIDTH,
+        EDIT_TYPE_LINE,
+        EDIT_TYPE_POINT,
     };
     CWhiteBoardEditorButton(const QString &normalIamgeUrl,const QString &hoverIamgeUrl,const QString &pressedIamgeUrl,CWhiteBoardEditorButton::EditButtonType type,QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
     ~CWhiteBoardEditorButton();
