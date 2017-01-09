@@ -20,6 +20,7 @@ CGLOBAL_PRF=cglobal.prf
 }
 include($${CGLOBAL_PRF})
 
+TRANSLATIONS += $${TARGET}_zh_CN.ts
 
 INCLUDEPATH += ./src
 INCLUDEPATH += ./include
