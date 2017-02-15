@@ -22,6 +22,8 @@ private:
     void updateText();
     bool regExpString(const QRegExp &rx, const QString  &source,QString &dest);
     QString  toHtmlString(const QString &source,const QColor &backgroundColor,const QColor &color);
+    void doUpdateFunction();
+    QStringList regExpStringList(const QRegExp &rx, const QString  &source);
 
 private slots:
     void on_pushButtonUpdate_clicked();

@@ -51,6 +51,11 @@ bool ZCatlogWidget::eventFilter(QObject *obj, QEvent *event)
 
 void ZCatlogWidget::updateText()
 {
+    if(ui->checkBoxFunction->isChecked())
+    {
+        doUpdateFunction();
+        return;
+    }
     ui->textEdit->clear();
     QFile file(ui->lineEditPath->text());
     if(!file.open(QIODevice::ReadOnly))
@@ -132,6 +137,83 @@ bool ZCatlogWidget::regExpString(const QRegExp &rx, const QString &source, QStri
 QString ZCatlogWidget::toHtmlString(const QString &source, const QColor &backgroundColor, const QColor &color)
 {
     return QString("<strong style=\"background:%1\"><font color=\"%2\">%3</font></strong>").arg(backgroundColor.name()).arg(color.name()).arg(source);
+}
+
+void ZCatlogWidget::doUpdateFunction()
+{
+    ui->textEdit->clear();
+    ui->textEdit->append("start");
+    QFile file(ui->lineEditPath->text());
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        return;
+    }
+    QTextStream textStream(&file);
+    int line = 1;
+    Qt:: CaseSensitivity cs = ui->checkBoxCaseSensitivity->isChecked() ? Qt::CaseSensitive : Qt::CaseInsensitive;
+    bool isRegExp = true;
+
+    //    QRegExp rx("(((http|ftp|https)://)|(www\\.))+([\\S]+\\.)+([a-zA-Z0-9]{2,6})+(:[0-9]{1,4})*(/[\\S]*)*");
+    //    QRegExp rx("((\([5-9][0-9]{1,}ms\))|\(([0-9][0-9]{1,}ms\)))");
+    QString key = ui->lineEditKey->text();
+    ui->textEdit->append(QString("key=%1").arg(key));
+
+//    QRegExp rx(key);
+    QRegExp rx("\\[\\[.*\\]\\]");
+
+    QString startKey = "[[Enter";
+    QString endKey = "[[Leave";
+    QMap<QString,int> funMap;
+    rx.setMinimal(true);
+    int row = 1;
+    while(!textStream.atEnd())
+    {
+        line++;
+        QString lineString = textStream.readLine();
+        lineString = lineString.replace(QString("<"),QString("&lt;"))
+                .replace(QString(">"),QString("&gt;"))
+                .replace(QString("&nbsp;"),QString(" "));
+        QStringList tempString = regExpStringList(rx,lineString);
+        if(tempString.isEmpty())
+        {
+            continue;
+        }
+        QString content = tempString.first();
+        int addCount = 0;
+        if(content.startsWith(startKey))
+        {
+            content.remove(startKey);
+            addCount = 1;
+        }
+        else if(content.startsWith(endKey))
+        {
+            content.remove(endKey);
+            addCount = -1;
+        }
+        funMap.insert(content,funMap.value(content) + addCount);
+    }
+    QMapIterator<QString,int> iter(funMap);
+    while(iter.hasNext())
+    {
+        iter.next();
+        if(iter.value() != 0)
+        {
+        ui->textEdit->append(QString("fun=%1,count=%2").arg(iter.key()).arg(iter.value()));
+        }
+    }
+    ui->textEdit->append("end");
+}
+
+QStringList ZCatlogWidget::regExpStringList(const QRegExp &rx, const QString &source)
+{
+    QStringList capList;
+    int pos = 0;
+    while ((pos = rx.indexIn(source, pos)) != -1)
+    {
+        capList << rx.cap(0);
+        pos += rx.matchedLength();
+    }
+    return capList;
 }
 
 void ZCatlogWidget::on_pushButtonUpdate_clicked()
