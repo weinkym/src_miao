@@ -10,5 +10,18 @@
         <file>images/pen_pressed_128px.png</file>
         <file>images/color_normal_128px.png</file>
         <file>images/linewidth_normal_128px.png</file>
+        <file>images/undo_normal_128px.png</file>
+        <file>images/redo_normal_128px.png</file>
+        <file>images/redo_pressed_128px.png</file>
+        <file>images/linewidth_pressed_128px.png</file>
+        <file>images/text_normal_128px.png</file>
+        <file>images/text_pressed_128px.png</file>
+        <file>images/line_normal_128px.png</file>
+        <file>images/line_pressed_128px.png</file>
+        <file>images/arrow_normal_128px.png</file>
+        <file>images/arrow_pressed_128px.png</file>
+        <file>images/point_normal_128px.png</file>
+        <file>images/point_pressed_128px.png</file>
+        <file>images/undo_pressed_128px.png</file>
     </qresource>
 </RCC>

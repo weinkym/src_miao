@@ -11,6 +11,10 @@ enum DrawType{
     DRAW_TYPE_ELLIPSE,
     DRAW_TYPE_PEN,
     DRAW_TYPE_ARROW,
+    DRAW_TYPE_ERASER,
+    DRAW_TYPE_TEXT,
+    DRAW_TYPE_LINE,
+    DRAW_TYPE_POINT,
 };
 struct DrawParam
 {
@@ -18,6 +22,7 @@ struct DrawParam
     DrawType type;
     QColor lineColor;
     int width;
+    QVariant value;
 };
 
 enum CWhiteBoardArrowDirection
@@ -28,6 +33,4 @@ enum CWhiteBoardArrowDirection
 
 }
 
-#define C_WhiteBoard_ZERO 0.000000001
-#define C_WhiteBoardSHOT_LOG_INFO(x)
 #endif // CWHITEBOARDPUBLIC_H

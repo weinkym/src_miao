@@ -2,7 +2,7 @@
 #include "cwhiteboardeditorbar.h"
 #include "cwhiteboardview.h"
 
-void createWhiteBoardWidgets(QWidget **view, QWidget **editorBar)
+void createWhiteBoardWidgets(CWhiteBoardView **view, CWhiteBoardEditorBar **editorBar)
 {
     CWhiteBoardView *whiteBoardView = new CWhiteBoardView;
     CWhiteBoardEditorBar *witeBoardEditorBar = new CWhiteBoardEditorBar(whiteBoardView);

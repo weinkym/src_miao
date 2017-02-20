@@ -20,6 +20,7 @@ CGLOBAL_PRF=cglobal.prf
 }
 include($${CGLOBAL_PRF})
 
+TRANSLATIONS += $${TARGET}_zh_CN.ts
 
 INCLUDEPATH += ./src
 INCLUDEPATH += ./include
@@ -31,14 +32,22 @@ HEADERS += \
     src/cdrawitem.h \
     src/cwbpathitem.h \
     src/cwbrectitem.h \
-    src/cwhiteboardeditorbar.h \
-    src/cwhiteboardeditorbutton.h \
     src/cwhiteboarditem.h \
-    src/cwhiteboardpublic.h \
     src/cwhiteboardscene.h \
-    src/cwhiteboardview.h \
     include/cwhiteboard_global.h \
-    include/cwhiteboard.h
+    include/cwhiteboard.h \
+    include/cwhiteboardview.h \
+    include/cwhiteboardeditorbar.h \
+    include/cwhiteboardpublic.h \
+    src/cwhiteboardeditorbutton.h \
+    src/cwberaseritem.h \
+    src/cwbaddcommand.h \
+    src/cwbclearcommand.h \
+    src/cwbtextitem.h \
+    src/cwblineitem.h \
+    src/cwbpointitem.h \
+    src/cwhiteboardviewprivate.h \
+    src/cwhiteboardeditorbarprivate.h
 
 SOURCES += \
     src/cdrawitem.cpp \
@@ -49,4 +58,12 @@ SOURCES += \
     src/cwhiteboardeditorbutton.cpp \
     src/cwhiteboarditem.cpp \
     src/cwhiteboardscene.cpp \
-    src/cwhiteboardview.cpp
+    src/cwhiteboardview.cpp \
+    src/cwberaseritem.cpp \
+    src/cwbaddcommand.cpp \
+    src/cwbclearcommand.cpp \
+    src/cwbtextitem.cpp \
+    src/cwblineitem.cpp \
+    src/cwbpointitem.cpp \
+    src/cwhiteboardviewprivate.cpp \
+    src/cwhiteboardeditorbarprivate.cpp
