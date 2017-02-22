@@ -1,4 +1,5 @@
 #include "cwbpathitem.h"
+#include <QPainter>
 
 CWBPathItem::CWBPathItem(QGraphicsItem *parent)
     :QGraphicsPathItem(parent)
@@ -18,4 +19,10 @@ void CWBPathItem::appendLine(const QPointF &startPoint, const QPointF &endPoint)
     path.lineTo(endPoint);
     path.moveTo(endPoint);
     this->setPath(path);
+}
+
+void CWBPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    return QGraphicsPathItem::paint(painter,option,widget);
 }

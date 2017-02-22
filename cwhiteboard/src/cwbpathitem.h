@@ -8,6 +8,7 @@ class CWHITEBOARDSHARED_EXPORT CWBPathItem : public QGraphicsPathItem
 public:
     CWBPathItem(QGraphicsItem *parent = Q_NULLPTR);
     void appendLine(const QPointF &startPoint, const QPointF &endPoint);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = Q_NULLPTR);
 
 private:
     bool m_isFirst;
