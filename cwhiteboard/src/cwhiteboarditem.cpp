@@ -164,7 +164,7 @@ void CWhiteBoardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
         return;
     }
-    if(event->button() == Qt::LeftButton)
+    if(event->button() == Qt::LeftButton && m_drawParam.type != CWB::DRAW_TYPE_UNDEFINE)
     {
         m_isPressed = true;
         m_startPoint = event->pos();

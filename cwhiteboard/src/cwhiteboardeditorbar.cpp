@@ -16,7 +16,7 @@ CWhiteBoardEditorBar::CWhiteBoardEditorBar(CWhiteBoardView *whiteBoardView, QWid
     {
         whiteBoardView->onLineColorChanged(m_data->m_color);
         whiteBoardView->onLineWidthChanged(m_data->m_lineWidth);
-        whiteBoardView->onDrawTypeChanged(CWB::DRAW_TYPE_RECT);
+        whiteBoardView->onDrawTypeChanged(CWB::DRAW_TYPE_UNDEFINE);
         connect(m_data,SIGNAL(sigClear()),whiteBoardView,SLOT(onClear()));
         connect(m_data,SIGNAL(sigDrawTypeChanged(CWB::DrawType)),whiteBoardView,SLOT(onDrawTypeChanged(CWB::DrawType)));
         connect(m_data,SIGNAL(sigLineColorChanged(QColor)),whiteBoardView,SLOT(onLineColorChanged(QColor)));

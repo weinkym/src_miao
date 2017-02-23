@@ -19,7 +19,7 @@ void CWhiteBoardEditorBarPrivate::initButtons()
     addButton(":/images/redo_normal_128px.png",":/images/redo_pressed_128px.png",":/images/redo_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_REDO);
     addButton(":/images/undo_normal_128px.png",":/images/undo_pressed_128px.png",":/images/undo_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_UNDO);
     addButton(":/images/arrow_normal_128px.png",":/images/arrow_pressed_128px.png",":/images/arrow_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_ARROW);
-    CWhiteBoardEditorButton *rectButton = addButton(":/images/rect_normal_128px.png",":/images/rect_pressed_128px.png",":/images/rect_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_RECT);
+    /*CWhiteBoardEditorButton *rectButton = */addButton(":/images/rect_normal_128px.png",":/images/rect_pressed_128px.png",":/images/rect_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_RECT);
     addButton(":/images/ellipse_normal_128px.png",":/images/ellipse_pressed_128px.png",":/images/ellipse_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_ELLIPSE);
     addButton(":/images/text_normal_128px.png",":/images/text_pressed_128px.png",":/images/text_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_TEXT);
     addButton(":/images/line_normal_128px.png",":/images/line_pressed_128px.png",":/images/line_pressed_128px.png",CWhiteBoardEditorButton::EDIT_TYPE_LINE);
@@ -32,7 +32,7 @@ void CWhiteBoardEditorBarPrivate::initButtons()
 
     QSpacerItem *item = new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Minimum);
     m_hLayout->addSpacerItem(item);
-    emit rectButton->sigClicked();
+//    emit rectButton->sigClicked();
 }
 
 CWhiteBoardEditorButton *CWhiteBoardEditorBarPrivate::addButton(const QString &normalIamgeUrl, const QString &hoverIamgeUrl, const QString &pressedIamgeUrl, CWhiteBoardEditorButton::EditButtonType type)
