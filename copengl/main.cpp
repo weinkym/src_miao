@@ -1,4 +1,10 @@
+#ifdef Q_OS_WIN
 #include <GL/glut.h>
+#else
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <GLUT/glut.h>
+#endif
 
 #include <math.h>
 #include <QString>
@@ -54,6 +60,7 @@ void myDisplay(void)
 {
     int i;
     glClear(GL_COLOR_BUFFER_BIT);
+//    glClearColor(1.0f,1.0f,1.0f,1.0f);
     glLineWidth(3);
     glPointSize(3);
     glEnable(GL_BLEND);
@@ -95,15 +102,17 @@ void myDisplay(void)
 //    }
 
     glColor4f(0.5f, 0.5f, 0.5f,0.5f);
-    qreal width = 0.28f;
-    qreal height = 0.18f;
-    for(auto obj:g_oldLineList)
-    {
-        QRectF rect1(obj.x1() - width / 2,obj.y1() - height / 2 ,width,height);
+    qreal width = 0.5f;
+    qreal height = 0.5f;
+//    for(auto obj:g_oldLineList)
+//    {
 //        QRectF rect1(obj.x1() - width / 2,obj.y1() - height / 2 ,width,height);
-        drawEllpsse(g_rect,rect1);
+//        QRectF rect1(obj.x1() - width / 2,obj.y1() - height / 2 ,width,height);
+//        drawEllpsse(g_rect,rect1);
 //        drawEllpsse(g_rect,rect2);
-    }
+//    }
+
+    drawEllpsse(QRectF(-0.25,-0.25,0.5,0.5),QRectF(-0.25,-0.25,0.5,0.8));
 
     glFlush();
 }

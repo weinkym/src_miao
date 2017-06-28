@@ -104,8 +104,20 @@ void CUtilInterface::adjuestEllipsePoints(const QRectF &randRect, QList<QPointF>
 
 QList<QPointF> CUtilInterface::getEllipsePoints(const QRectF &randRect, const QRectF &srcRect)
 {
-    QList<QPointF> pointList = getEllipsePoints(srcRect);
-    adjuestEllipsePoints(randRect,pointList);
+//    QList<QPointF> pointList = getEllipsePoints(srcRect);
+//    adjuestEllipsePoints(randRect,pointList);
+//    return pointList;
+
+    QList<QPointF> pointList;
+
+    if(randRect.contains(srcRect) || randRect.intersects(srcRect))
+    {
+        pointList = getEllipsePoints(srcRect);
+        if(randRect.intersects(srcRect))
+        {
+            adjuestEllipsePoints(randRect,pointList);
+        }
+    }
     return pointList;
 }
 
@@ -116,7 +128,7 @@ QList<QPointF> CUtilInterface::getEllipsePoints(const QRectF &srcRect)
     int n = 360;
     for(int i = 0; i <= n; ++i)
     {
-        pointList.append(srcRect.center() + QPointF(M_PI * qCos(2 * M_PI  / n * i) * srcRect.width() / 2, M_PI * qSin(2 * M_PI  /  n * i) * srcRect.height() / 2));
+        pointList.append(srcRect.center() + QPointF(qCos(2 * M_PI  / n * i) * srcRect.width() / 2,qSin(2 * M_PI  /  n * i) * srcRect.height() / 2));
     }
     return pointList;
 }
