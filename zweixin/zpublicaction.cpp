@@ -48,6 +48,22 @@ ZPublicAction *ZPublicAction::createAvatarAction(const QString &url)
     return action;
 }
 
+ZPublicAction *ZPublicAction::createStatusNotify(const ZBaseRequestParam &baseRequestParam, const QString &fromUserName, const QString &toUserName)
+{
+    ZPublicAction *action = new ZPublicAction(TYPE_REQUEST_STATUS_NOTIFY);
+    action->m_baseRequestParam = baseRequestParam;
+    action->m_fromUserName = fromUserName;
+    action->m_toUserName = toUserName;
+    return action;
+}
+
+ZPublicAction *ZPublicAction::createGetContact(const ZBaseRequestParam &baseRequestParam)
+{
+    ZPublicAction *action = new ZPublicAction(TYPE_REQUEST_CONTACT);
+    action->m_baseRequestParam = baseRequestParam;
+    return action;
+}
+
 ZPublicAction::ZPublicAction(HttpRequestType type)
     :ZRequestAction(type)
 {
@@ -56,16 +72,18 @@ ZPublicAction::ZPublicAction(HttpRequestType type)
 
 ZRequestAction::Operation ZPublicAction::getOperation()
 {
-    switch (m_type)
+    switch (getType())
     {
     case TYPE_REQUEST_LOGIN_UUID:
     case TYPE_REQUEST_WAIT_LOGIN:
     case TYPE_REQUEST_COOKIE:
     case TYPE_REQUEST_AVATAR:
+    case TYPE_REQUEST_CONTACT:
         return Get;
         break;
     case TYPE_REQUEST_QR_CODE:
     case TYPE_REQUEST_WX_INIT:
+    case TYPE_REQUEST_STATUS_NOTIFY:
         return PostByteArray;
         break;
     default:
@@ -74,10 +92,10 @@ ZRequestAction::Operation ZPublicAction::getOperation()
     return Get;
 }
 
-QNetworkRequest ZPublicAction::getRequest() const
+QNetworkRequest ZPublicAction::createRequest() const
 {
     QNetworkRequest request;
-    switch (m_type)
+    switch (getType())
     {
     case TYPE_REQUEST_LOGIN_UUID:
     {
@@ -134,6 +152,24 @@ QNetworkRequest ZPublicAction::getRequest() const
         return request;
         break;
     }
+    case TYPE_REQUEST_STATUS_NOTIFY:
+    {
+        QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxstatusnotify?lang=zh_CN&pass_ticket=%1").arg(m_baseRequestParam.pass_ticket);
+
+        QNetworkRequest request(QUrl(head.toLatin1()));
+        request.setHeader(QNetworkRequest::ContentTypeHeader,"Content-Type: application/json; charset=UTF-8");
+        return request;
+        break;
+    }
+    case TYPE_REQUEST_CONTACT:
+    {
+        QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxgetcontact?lang=zh_CN&pass_ticket=%1&seq=0&skey=%2&r=%3")
+                .arg(m_baseRequestParam.pass_ticket).arg(m_baseRequestParam.skey).arg(QDateTime::currentDateTime().toTime_t());
+        QNetworkRequest request(QUrl(head.toLatin1()));
+        request.setHeader(QNetworkRequest::ContentTypeHeader,"Content-Type: application/json; charset=UTF-8");
+        return request;
+        break;
+    }
 
     default:
         break;
@@ -144,7 +180,7 @@ QNetworkRequest ZPublicAction::getRequest() const
 QByteArray ZPublicAction::getByteArray() const
 {
     QByteArray array;
-    switch(m_type)
+    switch(getType())
     {
     case TYPE_REQUEST_QR_CODE:
     {
@@ -179,6 +215,24 @@ QByteArray ZPublicAction::getByteArray() const
         objBaseRequest.insert("Skey",m_baseRequestParam.skey);
         objBaseRequest.insert("DeviceID",m_baseRequestParam.deviceID);
         obj.insert("BaseRequest", objBaseRequest);
+        QJsonDocument objDoc(obj);
+        array = objDoc.toJson();
+        break;
+    }
+    case TYPE_REQUEST_STATUS_NOTIFY:
+    {
+        QJsonObject obj;
+        QJsonObject objBaseRequest;
+        objBaseRequest.insert("Uin",m_baseRequestParam.uin);
+        objBaseRequest.insert("Sid",m_baseRequestParam.sid);
+        objBaseRequest.insert("Skey",m_baseRequestParam.skey);
+        objBaseRequest.insert("DeviceID",m_baseRequestParam.deviceID);
+        obj.insert("BaseRequest", objBaseRequest);
+        obj.insert("Code",3);
+        obj.insert("FromUserName",m_fromUserName);
+        obj.insert("ToUserName",m_toUserName);
+        obj.insert("ClientMsgId",QJsonValue::fromVariant(QDateTime::currentDateTime().toTime_t()));
+
         QJsonDocument objDoc(obj);
         array = objDoc.toJson();
         break;

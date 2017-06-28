@@ -23,10 +23,14 @@ public:
 
 private:
     void requestInit();
+    void requestStatusNotify();
+    void requestContact();
+
     bool parseInitData(const QByteArray &byteArray);
+    bool parseContactData(const QByteArray &byteArray);
 
 private slots:
-    void onFinished(const ZRequestAction::ZRequestResponse &response);
+    void onRequestFinished(const CPB::RequestReplyData &response);
     void on_btnTest01_clicked();
     void onLoginFinished(bool ok);
     void onTest();
@@ -37,6 +41,8 @@ private:
     ZBaseRequestParam m_baseRequestParam;
     ZPeerObjectData m_userAvatar;
     Z_WX_USER_DATA m_userData;
+    Z_WX_SyncKeyList m_syncKeyList;
+    QMap<QString,QSharedPointer<Z_WX_USER_DATA> >m_contackMap;
 };
 
 #endif // MAINWINDOW_H

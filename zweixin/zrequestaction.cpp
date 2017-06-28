@@ -5,24 +5,44 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include "zrequestaccessmanager.h"
+#include <QSize>
+#include <QFile>
+#include <QTimer>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <ctime>
+#include <QCryptographicHash>
+#include "zrequestaction.h"
+#include "zrequestaccessmanager.h"
+
+
+//QString CRequestAction::m_appKey = "d82680c1ca7e435b98a251472261880c";
+//QString CRequestAction::m_secretKey = "d7a5fea84fe93a706edb16473cc89ee94dab3719";
+//QString CRequestAction::m_appKey = "d842d7d064dd4338b0632472b5a4ddcb";
+QString ZRequestAction::m_appKey = "77d632c3dbd5421bb13bdbacad0da52a";
+//QString CRequestAction::m_secretKey = "2178ffb77f74bfa48b137e6f9aa4179af1d11892";
+
+//QString CRequestAction::m_secretKey = "301c46a6e0b621f99282d1fa585f95870d715113";
+QString ZRequestAction::m_secretKey = "9ad3c9d917ef370b3b91a52150404202117e1775";
 
 ZRequestAction::ZRequestAction(HttpRequestType type, QObject *parent) :
     QObject(parent),
     m_networkReply(NULL),
-    m_nReplyErrCode(QNetworkReply::NetworkError::NoError),
     m_httpTimeout(m_defaultHttpTimeout),
     m_maxRetryTime(m_defaultMaxRetryTime),
     m_curRetryTime(0),
-    m_type(type),
+    m_msgSendCancelled(false),
     m_timerTimeout(NULL)
 {
-    m_timeTest.start();
-    m_uuid = QUuid::createUuid();
+    m_replayStatusData.type = type;
+    m_replayStatusData.uuid = QUuid::createUuid();
     initTimeoutTimer();
 }
 
 ZRequestAction::~ZRequestAction()
 {
+    //    LOG_DEBUG << QString("http request(type=%1) consume: %2ms")
+    //                 .arg(m_type).arg(m_timeTest.elapsed());
     if(m_networkReply)
     {
         delete m_networkReply;
@@ -32,8 +52,8 @@ ZRequestAction::~ZRequestAction()
 
 void ZRequestAction::trigger()
 {
+    m_replayStatusData.startTime = QDateTime::currentDateTime();
     Operation operation = getOperation();
-    LOG_DEBUG(QString("trigger action with type = [%1]").arg(operation));
     ZRequestAccessManager *accessManager = ZRequestAccessManager::getInstance();
     switch(operation)
     {
@@ -59,28 +79,32 @@ void ZRequestAction::trigger()
         accessManager->putByteArray(this);
         break;
     default:
-        LOG_DEBUG(QString("Bad action with type = [%1]").arg(operation));
+        LOG_ERROR(QString("Bad action with type = [%1]").arg(operation));
         break;
     }
 }
 
+// !TODO add by Guilai, 函数名字和trigger 很奇怪，后续调整，数据获取途径可能也可以调整
+void ZRequestAction::startRequestAction()
+{
+    trigger();
+}
+
 void ZRequestAction::setReply(QNetworkReply *reply)
 {
-    LOG_FUNCTION;
     if(reply == NULL)
     {
-        LOG_WARNING(QString("param reply is NULL"));
+        LOG_ERROR("param reply is NULL");
         return;
     }
     if(m_networkReply)
     {
         disconnect(m_networkReply,SIGNAL(finished()),
-                this,SLOT(onReplyFinished()));
+                   this,SLOT(onReplyFinished()));
         m_networkReply->deleteLater();
         m_networkReply = NULL;
     }
     m_networkReply = reply;
-    LOG_TEST(QString("reply isFinished %1").arg(reply->isFinished() ? "true":"false"));
     connect(m_networkReply, SIGNAL(finished()), this, SLOT(onReplyFinished()));
     connect(m_networkReply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onReplyError(QNetworkReply::NetworkError)));
     connect(m_networkReply, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(onIgnoreSSlErrors(const QList<QSslError>&)));
@@ -89,14 +113,14 @@ void ZRequestAction::setReply(QNetworkReply *reply)
     m_timerTimeout->start();
 }
 
-HttpRequestType ZRequestAction::getType() const
+int ZRequestAction::getType() const
 {
-    return m_type;
+    return m_replayStatusData.type;
 }
 
 void ZRequestAction::setType(HttpRequestType type)
 {
-    m_type = type;
+    m_replayStatusData.type = type;
 }
 
 QString ZRequestAction::createBoundary()
@@ -109,32 +133,16 @@ QString ZRequestAction::createBoundary()
     return boundary;
 }
 
-
-void ZRequestAction::requestFromDB()
-{
-    //TODO 子类自身实现从数据库获取数据逻辑
-}
-
 void ZRequestAction::requestFromHttp()
 {
     trigger();
-}
-
-void ZRequestAction::sendFinishedSignal(const quint64 errorCode, bool fromSever, const QByteArray &value, int type)
-{
-   ZRequestResponse response;
-   response.code = errorCode;
-   response.fromSever = fromSever;
-   response.data = value;
-   response.type = type;
-    emit sigFinished(response);
 }
 
 QString ZRequestAction::description()
 {
     QString dataString(getByteArray());
     return QString("type:%1 url:%2 dataString_simplified: %3 dataString:%4")
-            .arg(m_type).arg(dataString.simplified()).arg(dataString);
+            .arg(m_replayStatusData.type).arg(dataString.simplified()).arg(dataString);
 }
 
 void ZRequestAction::initTimeoutTimer()
@@ -147,11 +155,6 @@ void ZRequestAction::initTimeoutTimer()
 ZRequestAction::Operation ZRequestAction::getOperation()
 {
     return Undefine;
-}
-
-QNetworkRequest ZRequestAction::getRequest() const
-{
-    return QNetworkRequest();
 }
 
 QByteArray ZRequestAction::getByteArray() const
@@ -177,12 +180,6 @@ void ZRequestAction::onReplyError(QNetworkReply::NetworkError error)
         LOG_ERROR(QString("Bad network reply."));
         return;
     }
-
-    // !TODO add by Guilai, should delete the resource here.
-    //ZRequestAccessManager::getInstance()->deleteResource(m_request);
-    //m_networkReply->abort();
-    // !TODO add by Guilai, should call deleteLater or call deleteLater in onReplyFinished.
-    //m_networkReply->deleteLater();
 }
 
 void ZRequestAction::onHttpTimeout()
@@ -223,141 +220,98 @@ void ZRequestAction::onReplyFinished()
     if(m_networkReply != reply)
     {
         //该网络请求已过期
-        LOG_WARNING(QString("This network request is overdue, action type:%1").arg(m_type));
+        LOG_WARNING(QString("This network request is overdue, action type:%1").arg(m_replayStatusData.type));
         return;
     }
-
-    int consuming = m_timeTest.msecsTo(QTime::currentTime());
-    consuming = qAbs(consuming);
     m_timerTimeout->stop();
-    m_nReplyErrCode = reply->error();
+
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    LOG_TEST(QString("statusCode=%1").arg(statusCode));
+    m_replayStatusData.statusCode = statusCode;
+
+    m_replayStatusData.endTime = QDateTime::currentDateTime();
+    m_replayStatusData.networkErrorCode = reply->error();
+    int consuming = m_replayStatusData.endTime.time().msecsTo(m_replayStatusData.startTime.time());
+    consuming = qAbs(consuming);
     QString urlString = reply->request().url().toString();
-    QString logInfo = QString("[Http Return] request url:%1  type(%2) consuming %3ms")
-            .arg(urlString)
-            .arg(m_type)
-            .arg(consuming);
+    QString logInfo = QString("[HttpReturn] request url:%1  type(%2) consuming %3ms statusCode = %4 getByteArray = %5")
+            .arg(urlString).arg(m_replayStatusData.type).arg(consuming).arg(statusCode).arg(QString(this->getByteArray()));
+
     LOG_INFO(logInfo);
-    QByteArray array = reply->readAll();
+    m_replayStatusData.replyData = reply->readAll();
+    LOG_DEBUG(QString("[HttpReturn]request return data = %1").arg(QString(m_replayStatusData.replyData)));
 
-    LOG_TEST(QString("className:%1--type:%2--consuming:%3--url:%4--data:%5--postData:%6")
-             .arg(this->metaObject()->className())
-             .arg(m_type)
-             .arg(consuming).arg(urlString)
-             .arg( QString(array)).arg(QString(getByteArray())));
-    LOG_TEST(QString("postData=%1").arg(QString(getByteArray())));
-
-    if(m_nReplyErrCode == QNetworkReply::NoError)
+    if(m_replayStatusData.networkErrorCode == QNetworkReply::NoError)
     {
-        QTime testTime = QTime::currentTime();
-        setReplyData(array, reply);
-        LOG_INFO(QString("setReplyData type:%1 consuming:%2")
-                 .arg(m_type)
-                 .arg(testTime.msecsTo(QTime::currentTime())));
+        emit sigRequestFinished(m_replayStatusData);
     }
-
     else
     {
-        LOG_ERROR(QString("type:%1,Network error:%2,url:%3").arg(m_type).arg(m_nReplyErrCode).arg(urlString));
+        LOG_ERROR(QString("type:%1,Network error:%2,url:%3").arg(m_replayStatusData.type).arg(m_replayStatusData.networkErrorCode).arg(urlString));
         if(m_curRetryTime < m_maxRetryTime)
         {
             LOG_WARNING(QString("Action trigger again, m_curRetryTime:%1,action type:%2").
-                        arg(m_curRetryTime).arg(m_type));
-            trigger();
+                        arg(m_curRetryTime).arg(m_replayStatusData.type));
             m_curRetryTime++;
+            trigger();
             return;
         }
-        sendFinishedSignal(reply->error(),false,"",m_type);
+        else
+        {
+            emit sigRequestFinished(m_replayStatusData);
+        }
     }
+    this->deleteLater();
 }
 
-void ZRequestAction::setReplyData(const QByteArray &dataArray, const QNetworkReply *reply)
-{
-    Q_UNUSED(dataArray)
-    Q_UNUSED(reply)
-    sendFinishedSignal(reply->error(),false,dataArray,m_type);
-}
+//QNetworkRequest ZRequestAction::createRequest(const QString &lastHeader, bool needVerify) const
+//{
+//    LOG_FUNCTION;
+//    QString urlPrefix = "https://api-zhibo.yxt.com/v1";
 
-QNetworkRequest ZRequestAction::createRequest(const QString &lastHeader, bool isOrgApi, const QString &typeHeader) const
-{
-    LOG_FUNCTION;
-//    QString urlPrefix;
-//    if(!isOrgApi)
-//        urlPrefix = AppUrl::getHttpUrlPrefix();
-//    else
-//        urlPrefix = AppUrl::getOrgApiUrl(m_orgId);
 //    QUrl url(urlPrefix + lastHeader);
-        QUrl url("http://123.57.59.182:9876/v1" + lastHeader);
-    QNetworkRequest request(url);
-//    //    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-//    request.setHeader(QNetworkRequest::ContentTypeHeader, typeHeader);
 
-//    // 这块代码为服务器调试做准备，保证服务器确定命令发送端的操作系统
-//    request.setRawHeader("User-Agent", CDbCacheUtils::getAgent().toLatin1());
-
-//    if(isOrgApi)
-//    {
-//        request.setHeader(QNetworkRequest::CookieHeader, CBizUtil::getLoginCookies());
-//    }
-
-    return request;
-}
-
-QNetworkRequest ZRequestAction::createAttachmentRequest(const QString &lastHeader, const QString &boundary)
-{
-    LOG_FUNCTION;
-    QString urlPrefix/* = AppUrl::getHttpUrlPrefix()*/;
-    QUrl url(urlPrefix + lastHeader);
-    QNetworkRequest request(url);
-//    QString header = QString("multipart/form-data;%1").arg(boundary);
-//    request.setHeader(QNetworkRequest::ContentTypeHeader, header);
-    return request;
-}
+//    QNetworkRequest request(url);
+//    request.setRawHeader("Accept", "application/json");
+//    request.setRawHeader("Content-Type", "application/json");
+//    request.setRawHeader("Source", "907");
+//    return request;
+//}
 
 int ZRequestAction::parseErrorCode(const QVariantMap &result)
 {
     LOG_FUNCTION;
-//    if(result.contains(JK_ERROR))
-//    {
-//        QVariantMap errMap = result[JK_ERROR].toMap();
-//        if(errMap.contains(JK_CODE))
-//        {
-//            m_nReplyErrCode = errMap[JK_CODE].toInt();
-//            if(m_nReplyErrCode == 103)
-//            {
-//                LOG_ERROR(QString("Yxt token invalid: %1").arg(m_nReplyErrCode));
-//                ZRequestAccessManager::getInstance()->refreshYxtToken();
-//            }
-//        }
-//        else
-//        {
-//            LOG_ERROR(QString("Bad result, set error code to  -999"));
-//            m_nReplyErrCode = -999;
-//        }
-//    }
+    int errorCode = 0;
+    if(result.contains("error"))
+    {
+        QVariantMap errMap = result["error"].toMap();
+        if(errMap.contains("key"))
+        {
+            errorCode = errMap["key"].toInt();
+        }
+        else if(errMap.contains("code"))
+        {
+            errorCode = errMap["code"].toInt();
+        }
+        else
+        {
+            LOG_ERROR(QString("Bad result, set error code to  -999"));
+            errorCode = -999;
+        }
+    }
 
-    return m_nReplyErrCode;
+    return errorCode;
 }
 
 QString ZRequestAction::parseErrorMsg(const QVariantMap &result)
 {
     QString errMsg;
 
-//    if(result.contains(JK_MSG))
-//    {
-//        errMsg = result[JK_MSG].toString();
-//    }
+    if(result.contains("message"))
+    {
+        errMsg = result["message"].toString();
+    }
 
     return errMsg;
 }
 
-QString ZRequestAction::getAttachContentType(const QString &suffix)
-{
-    LOG_FUNCTION;
-    if(suffix == "jpg" || suffix == "jpeg")
-        return "image/jpeg";
-    else if(suffix == "png")
-        return "image/png";
-    else if(suffix == "mp4")
-        return "audio/mp4";
-    return QString();
-}

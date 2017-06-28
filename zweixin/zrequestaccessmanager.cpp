@@ -146,7 +146,7 @@ void ZRequestAccessManager::postByteArray(ZRequestAction *action)
         return;
     }
     QByteArray array = action->getByteArray();
-    QNetworkRequest request = action->getRequest();
+    QNetworkRequest request = action->createRequest();
 
     QString logInfo = QString("[Http Request][POST]url: ") + request.url().toString();
     LOG_INFO(logInfo);
@@ -163,7 +163,7 @@ void ZRequestAccessManager::putByteArray(ZRequestAction *action)
         return;
     }
     QByteArray array = action->getByteArray();
-    QNetworkRequest request = action->getRequest();
+    QNetworkRequest request = action->createRequest();
 
     QString logInfo = QString("[Http Request][PUT]url: ") + request.url().toString();
     LOG_INFO(logInfo);
@@ -179,7 +179,7 @@ void ZRequestAccessManager::postWithttachment(ZRequestAction *action)
         LOG_WARNING(QString("action is null"));
         return;
     }
-    QNetworkRequest request = action->getRequest();
+    QNetworkRequest request = action->createRequest();
     QHttpMultiPart *multiPart = action->getMultiPart();
 
     LOG_INFO(QString("[Http Request][Post]post url: %1").arg(request.url().toString()));
@@ -196,7 +196,7 @@ void ZRequestAccessManager::get(ZRequestAction *action)
         LOG_WARNING(QString("action is null"));
         return;
     }
-    QNetworkRequest request = action->getRequest();
+    QNetworkRequest request = action->createRequest();
 
     QString url = request.url().toString();
     if(!url.startsWith("http"))
@@ -219,7 +219,7 @@ void ZRequestAccessManager::patchByteArray(ZRequestAction *action)
         LOG_WARNING(QString("action is null"));
         return;
     }
-    QNetworkRequest request = action->getRequest();
+    QNetworkRequest request = action->createRequest();
     QByteArray array = action->getByteArray();
 
     QBuffer *buffer = new QBuffer;
@@ -239,7 +239,7 @@ void ZRequestAccessManager::patchMulti(ZRequestAction *action)
         LOG_WARNING(QString("action is null"));
         return;
     }
-    QNetworkRequest request = action->getRequest();
+    QNetworkRequest request = action->createRequest();
     QByteArray array = action->getByteArray();
 
     QBuffer *buffer = new QBuffer;
@@ -258,7 +258,7 @@ void ZRequestAccessManager::deleteResource(ZRequestAction *action)
         LOG_ERROR(QString("action is null"));
         return;
     }
-    QNetworkRequest request = action->getRequest();
+    QNetworkRequest request = action->createRequest();
     LOG_INFO(QString("[Http Request][Delete]url: ") + request.url().toString());
     QNetworkReply *reply = m_access->deleteResource(request);
     action->setReply(reply);

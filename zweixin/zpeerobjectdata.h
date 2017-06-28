@@ -14,7 +14,7 @@ public:
     void requestAvatar();
 
 protected slots:
-    void onFinished(const ZRequestAction::ZRequestResponse &response);
+    void onRequestFinished(const CPB::RequestReplyData &response);
 
 signals:
     void sigUpdate();

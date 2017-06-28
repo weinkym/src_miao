@@ -23,7 +23,7 @@ void ZLoginWidget::requestUuid()
 {
     LOG_FUNCTION;
     ZRequestAction *action = ZPublicAction::createLoginUuidAction();
-    connect(action,SIGNAL(sigFinished(ZRequestAction::ZRequestResponse)),this,SLOT(onFinished(ZRequestAction::ZRequestResponse)));
+    connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
     action->trigger();
 }
 
@@ -31,7 +31,7 @@ void ZLoginWidget::requestQrCode(const QString &uuid)
 {
     LOG_FUNCTION;
     ZRequestAction *action = ZPublicAction::createQrCodeAction(uuid);
-    connect(action,SIGNAL(sigFinished(ZRequestAction::ZRequestResponse)),this,SLOT(onFinished(ZRequestAction::ZRequestResponse)));
+    connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
     action->trigger();
 }
 
@@ -39,7 +39,7 @@ void ZLoginWidget::requestWaitLogin(const QString &uuid, int tip)
 {
     LOG_FUNCTION;
     ZRequestAction *action = ZPublicAction::createWaitLoginAction(uuid,tip);
-    connect(action,SIGNAL(sigFinished(ZRequestAction::ZRequestResponse)),this,SLOT(onFinished(ZRequestAction::ZRequestResponse)));
+    connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
     action->trigger();
 }
 
@@ -47,7 +47,7 @@ void ZLoginWidget::requestCookie(const QString &uuid, const QString &ticket, con
 {
     LOG_FUNCTION;
     ZRequestAction *action = ZPublicAction::createCookieAction(uuid,ticket,scan);
-    connect(action,SIGNAL(sigFinished(ZRequestAction::ZRequestResponse)),this,SLOT(onFinished(ZRequestAction::ZRequestResponse)));
+    connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
     action->trigger();
 }
 
@@ -166,35 +166,40 @@ bool ZLoginWidget::parseCookieData(const QByteArray &byteArray)
     return ok;
 }
 
-void ZLoginWidget::onFinished(const ZRequestAction::ZRequestResponse &response)
+void ZLoginWidget::onRequestFinished(const CPB::RequestReplyData &response)
 {
     LOG_FUNCTION;
-    if(response.code != 0)
+    if(response.statusCode > 200)
     {
-        LOG_TEST(QString("request is error").arg(QString(response.data)));
+        LOG_TEST(QString("request is error").arg(QString(response.replyData)));
+
+        if(response.statusCode == 408 && response.type == TYPE_REQUEST_WAIT_LOGIN)
+        {
+            requestUuid();
+        }
         return;
     }
     switch (response.type)
     {
     case HttpRequestType::TYPE_REQUEST_LOGIN_UUID:
     {
-        m_uuid = parseUuid(response.data);
+        m_uuid = parseUuid(response.replyData);
         requestQrCode(m_uuid);
         break;
     }
     case HttpRequestType::TYPE_REQUEST_QR_CODE:
     {
-        QImage image = QImage::fromData(response.data);
-        ui->label->setPixmap(QPixmap::fromImage(image));
+        QImage image = QImage::fromData(response.replyData);
+
+
+        ui->labelImage->setPixmap(QPixmap::fromImage(image).scaled(ui->labelImage->size()));
         requestWaitLogin(m_uuid,1);
 //        requestWaitLogin(m_uuid,0);
         break;
     }
     case HttpRequestType::TYPE_REQUEST_WAIT_LOGIN:
     {
-//        requestWaitLogin(m_uuid,0);
-        QString res = response.data;
-        ui->textEdit->setHtml(res);
+        QString res = response.replyData;
         if(res.isEmpty())
         {
             if( !m_timer.isActive())
@@ -206,7 +211,7 @@ void ZLoginWidget::onFinished(const ZRequestAction::ZRequestResponse &response)
         else if(res.contains("window.code=201"))
         {
             m_tip = 0;
-            ui->textEdit->append(QString("扫描成功"));
+            ui->labelStatus->setText(QString("扫描成功"));
             if(!m_timer.isActive())
             {
                 m_timer.start();
@@ -214,11 +219,15 @@ void ZLoginWidget::onFinished(const ZRequestAction::ZRequestResponse &response)
         }
         else if(res.contains("window.code=200"))
         {
-            ui->textEdit->append(QString("登陆成功"));
-            bool ok = parseRedirectUri(response.data);
+            ui->labelStatus->setText(QString("登陆成功"));
+            bool ok = parseRedirectUri(response.replyData);
             if(ok)
             {
                 requestCookie(m_uuid,m_ticket,m_scan);
+            }
+            else
+            {
+                ui->labelStatus->setText(QString("解析错误"));
             }
         }
 
@@ -226,7 +235,7 @@ void ZLoginWidget::onFinished(const ZRequestAction::ZRequestResponse &response)
     }
     case HttpRequestType::TYPE_REQUEST_COOKIE:
     {
-        bool ok = parseCookieData(response.data);
+        bool ok = parseCookieData(response.replyData);
         emit sigLoginFinished(ok);
         if(ok)
         {
@@ -234,22 +243,14 @@ void ZLoginWidget::onFinished(const ZRequestAction::ZRequestResponse &response)
         }
         else
         {
-            ui->textEdit->append("login error");
-            ui->stackedWidget->setCurrentIndex(1);
+            ui->labelStatus->setText("login error");
         }
         break;
     }
     default:
         break;
     }
-    LOG_TEST(QString(response.data));
-}
-
-void ZLoginWidget::on_btnNext_clicked()
-{
-    int index = ui->stackedWidget->currentIndex() + 1;
-    index = index % ui->stackedWidget->count();
-    ui->stackedWidget->setCurrentIndex(index);
+    LOG_TEST(QString(response.replyData));
 }
 
 void ZLoginWidget::onRequestWaitLogin()

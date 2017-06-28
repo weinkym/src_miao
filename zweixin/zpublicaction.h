@@ -22,11 +22,13 @@ public:
     static ZPublicAction *createCookieAction(const QString &uuid, const QString &ticket,const QString &scan);
     static ZPublicAction *createWxInitAction(const ZBaseRequestParam &baseRequestParam);
     static ZPublicAction *createAvatarAction(const QString &url);
+    static ZPublicAction *createStatusNotify(const ZBaseRequestParam &baseRequestParam,const QString &fromUserName,const QString &toUserName);
+    static ZPublicAction *createGetContact(const ZBaseRequestParam &baseRequestParam);
 
 protected:
     ZPublicAction(HttpRequestType type);
     Operation getOperation();
-    QNetworkRequest getRequest() const;
+    QNetworkRequest createRequest() const;
     virtual QByteArray getByteArray() const;
 
 private:
@@ -34,6 +36,8 @@ private:
     QString m_ticket;
     QString m_scan;
     QString m_url;
+    QString m_fromUserName;
+    QString m_toUserName;
     ZBaseRequestParam m_baseRequestParam;
     int m_tip;
 };

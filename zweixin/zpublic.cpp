@@ -1,5 +1,8 @@
 #include "zpublic.h"
 #include <QRegExp>
+#include <QVariant>
+#include <QMap>
+#include <QList>
 
 QList<QStringList> Zpublic::regexCapture(const QString &source, const QString &pattern)
 {
@@ -19,11 +22,10 @@ QList<QStringList> Zpublic::regexCapture(const QString &source, const QString &p
     return result;
 }
 
-Z_WX_USER_DATA Zpublic::parseUserData(const QVariantMap &objMap)
+Z_WX_USER_DATA Z_WX_USER_DATA::parseMap(const QVariantMap &objMap)
 {
     Z_WX_USER_DATA obj;
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,UserName);
-    Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,MemberList);
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,RemarkName);
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,Signature);
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,PYInitial);
@@ -52,5 +54,21 @@ Z_WX_USER_DATA Zpublic::parseUserData(const QVariantMap &objMap)
     Z_DEFINE_PARSE_VALUE_FOR_INT(obj,objMap,UniFriend);
     Z_DEFINE_PARSE_VALUE_FOR_INT(obj,objMap,ChatRoomId);
     Z_DEFINE_PARSE_VALUE_FOR_INT(obj,objMap,KeyWord);
+
+//    Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,MemberList);
     return obj;
+}
+
+Z_WX_SyncKeyList Z_WX_SyncKeyList::parseList(const QVariantList &objList)
+{
+    Z_WX_SyncKeyList syncKeys;
+    for(auto d:objList)
+    {
+        Z_WX_SyncKey_ITEM item;
+        QVariantMap objMap = d.toMap();
+        Z_DEFINE_PARSE_VALUE_FOR_INT(item,objMap,Key);
+        Z_DEFINE_PARSE_VALUE_FOR_INT(item,objMap,Val);
+        syncKeys.itemList.append(item);
+    }
+    return syncKeys;
 }

@@ -30,9 +30,8 @@ private:
     bool parseCookieData(const QByteArray &byteArray);
 
 private slots:
-    void onFinished(const ZRequestAction::ZRequestResponse &response);
+    void onRequestFinished(const CPB::RequestReplyData &response);
 
-    void on_btnNext_clicked();
     void onRequestWaitLogin();
 
 signals:
