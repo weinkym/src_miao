@@ -64,6 +64,25 @@ ZPublicAction *ZPublicAction::createGetContact(const ZBaseRequestParam &baseRequ
     return action;
 }
 
+ZPublicAction *ZPublicAction::createGetGroup(const ZBaseRequestParam &baseRequestParam, const QStringList &groupNameList)
+{
+    ZPublicAction *action = new ZPublicAction(TYPE_REQUEST_GROUP);
+    action->m_baseRequestParam = baseRequestParam;
+    action->m_groupNameList = groupNameList;
+    return action;
+}
+
+ZPublicAction *ZPublicAction::createSendMessage(const ZBaseRequestParam &baseRequestParam, const QString &fromUserName,
+                                                const QString &toUserName, const QString &message)
+{
+    ZPublicAction *action = new ZPublicAction(TYPE_REQUEST_WX_SEND_MSG);
+    action->m_baseRequestParam = baseRequestParam;
+    action->m_fromUserName = fromUserName;
+    action->m_toUserName = toUserName;
+    action->m_message = message;
+    return action;
+}
+
 ZPublicAction::ZPublicAction(HttpRequestType type)
     :ZRequestAction(type)
 {
@@ -84,6 +103,8 @@ ZRequestAction::Operation ZPublicAction::getOperation()
     case TYPE_REQUEST_QR_CODE:
     case TYPE_REQUEST_WX_INIT:
     case TYPE_REQUEST_STATUS_NOTIFY:
+    case TYPE_REQUEST_WX_SEND_MSG:
+    case TYPE_REQUEST_GROUP:
         return PostByteArray;
         break;
     default:
@@ -138,7 +159,7 @@ QNetworkRequest ZPublicAction::createRequest() const
     }
     case TYPE_REQUEST_WX_INIT:
     {
-        QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r=%1&pass_ticket=%2").arg(QDateTime::currentDateTime().toTime_t()).arg(m_baseRequestParam.pass_ticket);
+        QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r=-%1&pass_ticket=%2").arg(QDateTime::currentDateTime().toTime_t()).arg(m_baseRequestParam.pass_ticket);
 
         QNetworkRequest request(QUrl(head.toLatin1()));
         request.setHeader(QNetworkRequest::ContentTypeHeader,"Content-Type: application/json; charset=UTF-8");
@@ -170,6 +191,25 @@ QNetworkRequest ZPublicAction::createRequest() const
         return request;
         break;
     }
+    case TYPE_REQUEST_GROUP:
+    {
+        QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxbatchgetcontact?type=ex&pass_ticket=%1&r=%2&lang=zh_CN")
+                .arg(m_baseRequestParam.pass_ticket).arg(QDateTime::currentDateTime().toTime_t());
+        QNetworkRequest request(QUrl(head.toLatin1()));
+        request.setHeader(QNetworkRequest::ContentTypeHeader,"Content-Type: application/json; charset=UTF-8");
+        return request;
+        break;
+    }
+    case TYPE_REQUEST_WX_SEND_MSG:
+    {
+        QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxsendmsg?lang=zh_CN&pass_ticket=%1")
+                .arg(m_baseRequestParam.pass_ticket);
+        QNetworkRequest request(QUrl(head.toLatin1()));
+        request.setHeader(QNetworkRequest::ContentTypeHeader,"Content-Type: application/json; charset=UTF-8");
+        return request;
+        break;
+        break;
+    }
 
     default:
         break;
@@ -184,24 +224,9 @@ QByteArray ZPublicAction::getByteArray() const
     {
     case TYPE_REQUEST_QR_CODE:
     {
-//        QByteArray array;
-//        QJsonObject payloadObj;
-//        QJsonObject chatObj;
-
-//        chatObj.insert(JK_CONTENT, m_content);
-//        payloadObj.insert(JK_CHAT, chatObj);
-
         QJsonObject obj;
         obj.insert("t","webwx");
         obj.insert("_",QJsonValue::fromVariant(QDateTime::currentDateTime().toTime_t()));
-//        QJsonValue destIdValue = QJsonValue::fromVariant(m_destId);
-//        obj.insert(JK_DEST_ID, destIdValue);
-//        QJsonValue destTypeValue = QJsonValue::fromVariant(m_destType);
-//        obj.insert(JK_DEST_TYPE, destTypeValue);
-//        QJsonValue typeValue = QJsonValue::fromVariant(m_msgType);
-//        obj.insert(JK_TYPE, typeValue);
-//        obj.insert(JK_BODY, payloadObj);
-
         QJsonDocument objDoc(obj);
         array = objDoc.toJson();
         break;
@@ -236,6 +261,60 @@ QByteArray ZPublicAction::getByteArray() const
         QJsonDocument objDoc(obj);
         array = objDoc.toJson();
         break;
+    }
+    case TYPE_REQUEST_GROUP:
+    {
+        QJsonObject obj;
+        QJsonObject objBaseRequest;
+        objBaseRequest.insert("Uin",m_baseRequestParam.uin);
+        objBaseRequest.insert("Sid",m_baseRequestParam.sid);
+        objBaseRequest.insert("Skey",m_baseRequestParam.skey);
+        objBaseRequest.insert("DeviceID",m_baseRequestParam.deviceID);
+        obj.insert("BaseRequest", objBaseRequest);
+
+        QJsonArray jsonArray;
+        for(auto d:m_groupNameList)
+        {
+            QJsonObject tempObj;
+            tempObj.insert("UserName",d);
+            tempObj.insert("EncryChatRoomId","");
+            jsonArray.append(tempObj);
+        }
+        obj.insert("List",jsonArray);
+        obj.insert("Count",m_groupNameList.count());
+        QJsonDocument objDoc(obj);
+        array = objDoc.toJson();
+        break;
+    }
+    case TYPE_REQUEST_WX_SEND_MSG:
+    {
+        QJsonObject obj;
+        QJsonObject objBaseRequest;
+        objBaseRequest.insert("Uin",m_baseRequestParam.uin);
+        objBaseRequest.insert("Sid",m_baseRequestParam.sid);
+        objBaseRequest.insert("Skey",m_baseRequestParam.skey);
+        objBaseRequest.insert("DeviceID",m_baseRequestParam.deviceID);
+        obj.insert("BaseRequest", objBaseRequest);
+
+        QJsonObject objMsg;
+
+        quint64 id = QDateTime::currentDateTime().toTime_t();
+        id<<4;
+        id += qrand() %10000;
+        LOG_DEBUG(QString("client id = %1").arg(id));
+
+        objMsg.insert("ClientMsgId",QJsonValue::fromVariant(id));
+        objMsg.insert("Content",m_message);
+        objMsg.insert("LocalID",QJsonValue::fromVariant(id));
+        objMsg.insert("FromUserName",m_fromUserName);
+        objMsg.insert("ToUserName",m_toUserName);
+        objMsg.insert("Type",1);
+
+        obj.insert("Msg", objMsg);
+        obj.insert("Scene",0);
+
+        QJsonDocument objDoc(obj);
+        array = objDoc.toJson();
     }
     default:
         break;

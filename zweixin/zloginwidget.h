@@ -31,6 +31,7 @@ private:
 
 private slots:
     void onRequestFinished(const CPB::RequestReplyData &response);
+    void onDateUpdate(int type,const QVariant &value);
 
     void onRequestWaitLogin();
 

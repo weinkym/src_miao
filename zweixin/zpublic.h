@@ -18,6 +18,15 @@ struct Z_WX_COOKIE_PARAM
     Z_WX_COOKIE_PARAM():ret(0),isgrayscale(0){};
 };
 
+struct ZBaseRequestParam
+{
+    QString skey;
+    QString sid;
+    QString uin;
+    QString deviceID;
+    QString pass_ticket;
+};
+
 enum HttpRequestType
 {
     TYPE_REQUEST_LOGIN_UUID = 0,
@@ -28,6 +37,7 @@ enum HttpRequestType
     TYPE_REQUEST_AVATAR,
     TYPE_REQUEST_STATUS_NOTIFY,
     TYPE_REQUEST_CONTACT,
+    TYPE_REQUEST_GROUP,
     TYPE_REQUEST_SYNC_CHECK,
     TYPE_REQUEST_WX_SYNC,
     TYPE_REQUEST_WX_SEND_MSG,
@@ -114,6 +124,28 @@ struct Z_WX_SyncKeyList
 
 namespace CPB
 {
+
+enum LOGIN_STATUS
+{
+    LOGIN_STATUS_ERROR,
+    LOGIN_STATUS_LOGINING,
+    LOGIN_STATUS_WATING_SCAN,
+    LOGIN_STATUS_SCAN_SUCCESSFUL,
+    LOGIN_STATUS_REQUEST_COOKIE,
+    LOGIN_STATUS_INITIALIZING,
+    LOGIN_STATUS_LOGIN_SUCCESSFUL,
+};
+
+enum DataUpdateType
+{
+    DATA_UPDATE_TYPE_CONTACT_LIST,
+    DATA_UPDATE_TYPE_GROUP_LIST,
+    DATA_UPDATE_TYPE_CONTACT_NAME,
+    DATA_UPDATE_TYPE_QR_CODE,
+    DATA_UPDATE_TYPE_LOGIN_STATUS,
+    DATA_UPDATE_TYPE_ERROR_HAPPEND,
+};
+
 enum RequestState
 {
     REQUEST_STATE_NORMAL,

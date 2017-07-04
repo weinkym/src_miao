@@ -3,15 +3,6 @@
 
 #include "zrequestaction.h"
 
-struct ZBaseRequestParam
-{
-    QString skey;
-    QString sid;
-    QString uin;
-    QString deviceID;
-    QString pass_ticket;
-};
-
 class ZPublicAction : public ZRequestAction
 {
     Q_OBJECT
@@ -24,6 +15,8 @@ public:
     static ZPublicAction *createAvatarAction(const QString &url);
     static ZPublicAction *createStatusNotify(const ZBaseRequestParam &baseRequestParam,const QString &fromUserName,const QString &toUserName);
     static ZPublicAction *createGetContact(const ZBaseRequestParam &baseRequestParam);
+    static ZPublicAction *createGetGroup(const ZBaseRequestParam &baseRequestParam,const QStringList &groupNameList);
+    static ZPublicAction *createSendMessage(const ZBaseRequestParam &baseRequestParam,const QString &fromUserName,const QString &toUserName,const QString &message);
 
 protected:
     ZPublicAction(HttpRequestType type);
@@ -38,6 +31,8 @@ private:
     QString m_url;
     QString m_fromUserName;
     QString m_toUserName;
+    QString m_message;
+    QStringList m_groupNameList;
     ZBaseRequestParam m_baseRequestParam;
     int m_tip;
 };

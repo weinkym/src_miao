@@ -2,16 +2,18 @@
 #include <QDomDocument>
 #include "ui_zloginwidget.h"
 #include "zpublic.h"
+#include "cloginmanager.h"
 
 ZLoginWidget::ZLoginWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::zloginwidget)
 {
     ui->setupUi(this);
-    m_tip = 1;
-    m_timer.setInterval(1000);
-    m_timer.setSingleShot(true);
-    connect(&m_timer,SIGNAL(timeout()),this,SLOT(onRequestWaitLogin()));
+//    m_tip = 1;
+//    m_timer.setInterval(1000);
+//    m_timer.setSingleShot(true);
+//    connect(&m_timer,SIGNAL(timeout()),this,SLOT(onRequestWaitLogin()));
+    connect(CLoginManager::getInstance(),SIGNAL(sigDateUpdate(int,QVariant)),this,SLOT(onDateUpdate(int,QVariant)));
 }
 
 ZLoginWidget::~ZLoginWidget()
@@ -169,92 +171,125 @@ bool ZLoginWidget::parseCookieData(const QByteArray &byteArray)
 void ZLoginWidget::onRequestFinished(const CPB::RequestReplyData &response)
 {
     LOG_FUNCTION;
-    if(response.statusCode > 200)
-    {
-        LOG_TEST(QString("request is error").arg(QString(response.replyData)));
+//    if(response.statusCode > 200)
+//    {
+//        LOG_TEST(QString("request is error").arg(QString(response.replyData)));
 
-        if(response.statusCode == 408 && response.type == TYPE_REQUEST_WAIT_LOGIN)
-        {
-            requestUuid();
-        }
-        return;
-    }
-    switch (response.type)
-    {
-    case HttpRequestType::TYPE_REQUEST_LOGIN_UUID:
-    {
-        m_uuid = parseUuid(response.replyData);
-        requestQrCode(m_uuid);
-        break;
-    }
-    case HttpRequestType::TYPE_REQUEST_QR_CODE:
-    {
-        QImage image = QImage::fromData(response.replyData);
+//        if(response.statusCode == 408 && response.type == TYPE_REQUEST_WAIT_LOGIN)
+//        {
+//            requestUuid();
+//        }
+//        return;
+//    }
+//    switch (response.type)
+//    {
+//    case HttpRequestType::TYPE_REQUEST_LOGIN_UUID:
+//    {
+//        m_uuid = parseUuid(response.replyData);
+//        requestQrCode(m_uuid);
+//        break;
+//    }
+//    case HttpRequestType::TYPE_REQUEST_QR_CODE:
+//    {
+//        QImage image = QImage::fromData(response.replyData);
+//        ui->labelImage->setPixmap(QPixmap::fromImage(image).scaled(ui->labelImage->size()));
+//        requestWaitLogin(m_uuid,1);
+////        requestWaitLogin(m_uuid,0);
+//        break;
+//    }
+//    case HttpRequestType::TYPE_REQUEST_WAIT_LOGIN:
+//    {
+//        QString res = response.replyData;
+//        if(res.isEmpty())
+//        {
+//            if( !m_timer.isActive())
+//            {
+//                m_timer.start();
+//            }
+////            requestWaitLogin(m_uuid,0);
+//        }
+//        else if(res.contains("window.code=201"))
+//        {
+//            m_tip = 0;
+//            ui->labelStatus->setText(QString("扫描成功"));
+//            if(!m_timer.isActive())
+//            {
+//                m_timer.start();
+//            }
+//        }
+//        else if(res.contains("window.code=200"))
+//        {
+//            ui->labelStatus->setText(QString("登陆成功"));
+//            bool ok = parseRedirectUri(response.replyData);
+//            if(ok)
+//            {
+//                requestCookie(m_uuid,m_ticket,m_scan);
+//            }
+//            else
+//            {
+//                ui->labelStatus->setText(QString("解析错误"));
+//            }
+//        }
 
+//        break;
+//    }
+//    case HttpRequestType::TYPE_REQUEST_COOKIE:
+//    {
+//        bool ok = parseCookieData(response.replyData);
+//        emit sigLoginFinished(ok);
+//        if(ok)
+//        {
+//            this->close();
+//        }
+//        else
+//        {
+//            ui->labelStatus->setText("login error");
+//        }
+//        break;
+//    }
+//    default:
+//        break;
+//    }
+    //    LOG_TEST(QString(response.replyData));
+}
 
-        ui->labelImage->setPixmap(QPixmap::fromImage(image).scaled(ui->labelImage->size()));
-        requestWaitLogin(m_uuid,1);
-//        requestWaitLogin(m_uuid,0);
-        break;
-    }
-    case HttpRequestType::TYPE_REQUEST_WAIT_LOGIN:
+void ZLoginWidget::onDateUpdate(int type, const QVariant &value)
+{
+    if(type == CPB::DATA_UPDATE_TYPE_QR_CODE)
     {
-        QString res = response.replyData;
-        if(res.isEmpty())
-        {
-            if( !m_timer.isActive())
-            {
-                m_timer.start();
-            }
-//            requestWaitLogin(m_uuid,0);
-        }
-        else if(res.contains("window.code=201"))
-        {
-            m_tip = 0;
-            ui->labelStatus->setText(QString("扫描成功"));
-            if(!m_timer.isActive())
-            {
-                m_timer.start();
-            }
-        }
-        else if(res.contains("window.code=200"))
-        {
-            ui->labelStatus->setText(QString("登陆成功"));
-            bool ok = parseRedirectUri(response.replyData);
-            if(ok)
-            {
-                requestCookie(m_uuid,m_ticket,m_scan);
-            }
-            else
-            {
-                ui->labelStatus->setText(QString("解析错误"));
-            }
-        }
-
-        break;
+        ui->labelImage->setPixmap(QPixmap::fromImage(value.value<QImage>()).scaled(ui->labelImage->size()));
     }
-    case HttpRequestType::TYPE_REQUEST_COOKIE:
+    else if(type == CPB::DATA_UPDATE_TYPE_LOGIN_STATUS)
     {
-        bool ok = parseCookieData(response.replyData);
-        emit sigLoginFinished(ok);
-        if(ok)
+        int status = value.toInt();
+        ui->labelStatus->setText(QString::number(status));
+        switch (status)
         {
-            this->close();
-        }
-        else
+        case CPB::LOGIN_STATUS_ERROR:
         {
-            ui->labelStatus->setText("login error");
+            emit sigLoginFinished(false);
+            break;
         }
-        break;
+        case CPB::LOGIN_STATUS_LOGINING:
+        case CPB::LOGIN_STATUS_SCAN_SUCCESSFUL:
+        case CPB::LOGIN_STATUS_REQUEST_COOKIE:
+        case CPB::LOGIN_STATUS_INITIALIZING:
+        {
+            break;
+        }
+        case CPB::LOGIN_STATUS_LOGIN_SUCCESSFUL:
+        {
+            emit sigLoginFinished(true);
+            break;
+        }
+        default:
+            break;
+        }
     }
-    default:
-        break;
-    }
-    LOG_TEST(QString(response.replyData));
 }
 
 void ZLoginWidget::onRequestWaitLogin()
 {
     LOG_FUNCTION;
-    requestWaitLogin(m_uuid,m_tip);
+//    requestWaitLogin(m_uuid,m_tip);
 }

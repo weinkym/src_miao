@@ -5,7 +5,7 @@
 QTextEdit* g_log_textEdit = NULL;
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
  {
-    if(g_log_textEdit)
+    if(g_log_textEdit/* && type == QtWarningMsg*/)
     {
         g_log_textEdit->append(QString("Debug: %1 (%2:%3, %4)").arg(msg).arg(context.file).arg(context.line).arg(context.function));
     }
@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
 {
    qInstallMessageHandler(myMessageOutput);
    QApplication a(argc, argv);
+   qsrand(QTime::currentTime().msec());
    g_log_textEdit = new QTextEdit;
    g_log_textEdit->show();
     MainWindow w;
