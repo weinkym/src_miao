@@ -159,7 +159,7 @@ QNetworkRequest ZPublicAction::createRequest() const
     }
     case TYPE_REQUEST_WX_INIT:
     {
-        QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r=-%1&pass_ticket=%2").arg(QDateTime::currentDateTime().toTime_t()).arg(m_baseRequestParam.pass_ticket);
+        QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r=-%1&lang=zh_CN&pass_ticket=%2").arg(QDateTime::currentDateTime().toTime_t()).arg(m_baseRequestParam.pass_ticket);
 
         QNetworkRequest request(QUrl(head.toLatin1()));
         request.setHeader(QNetworkRequest::ContentTypeHeader,"Content-Type: application/json; charset=UTF-8");

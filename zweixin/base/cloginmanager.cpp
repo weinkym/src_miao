@@ -202,13 +202,28 @@ bool CLoginManager::parseInitData(const QByteArray &byteArray)
         for(auto d:objList)
         {
             Z_WX_USER_DATA obj = Z_WX_USER_DATA::parseMap(d.toMap());
-            if(obj.UserName.startsWith("@@"))
+            if(obj.UserName.startsWith("@@") && !m_groupNameList.contains(obj.UserName))
             {
                 m_groupNameList.append(obj.UserName);
             }
         }
-        LOG_TEST(QString("m_syncKeyList.itemList.count = %1").arg(m_syncKeyList.itemList.count()));
+        LOG_TEST(QString("m_groupNameList.count = %1").arg(m_groupNameList.count()));
     }
+    key = "ChatSet";
+    if(objMap.contains(key))
+    {
+        QString keyString = objMap.value(key).toString();
+        QStringList keyList = keyString.split(",");
+        for(auto d:keyList)
+        {
+            if(d.startsWith("@@") && !m_groupNameList.contains(d))
+            {
+                m_groupNameList.append(d);
+            }
+        }
+
+    }
+    LOG_TEST(QString("m_groupNameList.count = %1").arg(m_groupNameList.count()));
     return true;
 }
 
