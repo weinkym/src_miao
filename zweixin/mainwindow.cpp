@@ -139,6 +139,8 @@ void MainWindow::onRequestFinished(const CPB::RequestReplyData &response)
 
 void MainWindow::on_btnTest01_clicked()
 {
+    CContactManager::getInstance()->requestWXSync(CLoginManager::getInstance()->m_baseRequestParam,CLoginManager::getInstance()->m_syncKeyList);
+
     QListWidgetItem *item = ui->listWidgetContact->currentItem();
     ZContackItemWidget *itemWidget = qobject_cast<ZContackItemWidget*>(ui->listWidgetContact->itemWidget(item));
     if(itemWidget == NULL)

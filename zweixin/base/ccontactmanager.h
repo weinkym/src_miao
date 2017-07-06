@@ -12,6 +12,7 @@ public:
     void sendMessage(const QString &toUserName,const QString &message);
     void requestContact(const ZBaseRequestParam &baseRequestParam);
     void requestContactGroup(const ZBaseRequestParam &baseRequestParam,const QStringList &groupNameList);
+    void requestWXSync(const ZBaseRequestParam &baseRequestParam,const Z_WX_SyncKeyList &syncKeyList);
 
 protected:
     CContactManager(QObject *parent = NULL);

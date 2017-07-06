@@ -31,8 +31,15 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 
 int main(int argc, char *argv[])
 {
-   qInstallMessageHandler(myMessageOutput);
+//   qInstallMessageHandler(myMessageOutput);
    QApplication a(argc, argv);
+//   qlonglong value = -233199616;
+//   value = ~(value);
+
+//   QTime time = QTime::currentTime();
+//   qDebug()<<"sfsdf"<<value<<QDateTime::currentDateTime().toTime_t();
+//   return -1;
+
    qsrand(QTime::currentTime().msec());
    g_log_textEdit = new QTextEdit;
    g_log_textEdit->show();

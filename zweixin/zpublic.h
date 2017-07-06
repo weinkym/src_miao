@@ -43,7 +43,10 @@ enum HttpRequestType
     TYPE_REQUEST_WX_SEND_MSG,
     TYPE_REQUEST_UNDEFINED
 };
-
+struct Z_WX_MSG_DATA
+{
+    //
+};
 struct Z_WX_USER_DATA
 {
     QString UserName;
@@ -75,36 +78,6 @@ struct Z_WX_USER_DATA
     int UniFriend;
     int ChatRoomId;
     int KeyWord;
-//    "Uin": 0,
-//    "UserName": 用户名称，一个"@"为好友，两个"@"为群组
-//    "NickName": 昵称
-//    "HeadImgUrl":头像图片链接地址
-//    "ContactFlag": 1-好友， 2-群组， 3-公众号
-//    "MemberCount": 成员数量，只有在群组信息中才有效,
-//    "MemberList": 成员列表,
-//    "RemarkName": 备注名称
-//    "HideInputBarFlag": 0,
-//    "Sex": 性别，0-未设置（公众号、保密），1-男，2-女
-//    "Signature": 公众号的功能介绍 or 好友的个性签名
-//    "VerifyFlag": 0,
-//    "OwnerUin": 0,
-//    "PYInitial": 用户名拼音缩写
-//    "PYQuanPin": 用户名拼音全拼
-//    "RemarkPYInitial":备注拼音缩写
-//    "RemarkPYQuanPin": 备注拼音全拼
-//    "StarFriend": 是否为星标朋友  0-否  1-是
-//    "AppAccountFlag": 0,
-//    "Statues": 0,
-//    "AttrStatus": 119911,
-//    "Province": 省
-//    "City": 市
-//    "Alias":
-//    "SnsFlag": 17,
-//    "UniFriend": 0,
-//    "DisplayName": "",
-//    "ChatRoomId": 0,
-//    "KeyWord":
-//    "EncryChatRoomId": ""
     QList<Z_WX_USER_DATA> MemberList;
     static Z_WX_USER_DATA parseMap(const QVariantMap &objMap);
 };

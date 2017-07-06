@@ -83,6 +83,14 @@ ZPublicAction *ZPublicAction::createSendMessage(const ZBaseRequestParam &baseReq
     return action;
 }
 
+ZPublicAction *ZPublicAction::createWXSync(const ZBaseRequestParam &baseRequestParam, const Z_WX_SyncKeyList &syncKeyList)
+{
+    ZPublicAction *action = new ZPublicAction(TYPE_REQUEST_WX_SYNC);
+    action->m_baseRequestParam = baseRequestParam;
+    action->m_syncKeyList = syncKeyList;
+    return action;
+}
+
 ZPublicAction::ZPublicAction(HttpRequestType type)
     :ZRequestAction(type)
 {
@@ -105,6 +113,7 @@ ZRequestAction::Operation ZPublicAction::getOperation()
     case TYPE_REQUEST_STATUS_NOTIFY:
     case TYPE_REQUEST_WX_SEND_MSG:
     case TYPE_REQUEST_GROUP:
+    case TYPE_REQUEST_WX_SYNC:
         return PostByteArray;
         break;
     default:
@@ -208,6 +217,15 @@ QNetworkRequest ZPublicAction::createRequest() const
         request.setHeader(QNetworkRequest::ContentTypeHeader,"Content-Type: application/json; charset=UTF-8");
         return request;
         break;
+    }
+    case TYPE_REQUEST_WX_SYNC:
+    {
+        QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxsync?sid=%1&skey=%2&lang=zh_CN&pass_ticket=%3")
+                .arg(m_baseRequestParam.sid).arg(m_baseRequestParam.skey).arg(m_baseRequestParam.pass_ticket);
+        ;
+        QNetworkRequest request(QUrl(head.toLatin1()));
+        request.setHeader(QNetworkRequest::ContentTypeHeader,"Content-Type: application/json; charset=UTF-8");
+        return request;
         break;
     }
 
@@ -315,6 +333,38 @@ QByteArray ZPublicAction::getByteArray() const
 
         QJsonDocument objDoc(obj);
         array = objDoc.toJson();
+        break;
+    }
+    case TYPE_REQUEST_WX_SYNC:
+    {
+        QJsonObject obj;
+        QJsonObject objBaseRequest;
+        objBaseRequest.insert("Uin",m_baseRequestParam.uin);
+        objBaseRequest.insert("Sid",m_baseRequestParam.sid);
+        objBaseRequest.insert("Skey",m_baseRequestParam.skey);
+        objBaseRequest.insert("DeviceID",m_baseRequestParam.deviceID);
+        obj.insert("BaseRequest", objBaseRequest);
+
+        QJsonObject objSyncKey;
+        objSyncKey.insert("Count",m_syncKeyList.itemList.count());
+
+        QJsonArray jsonArray;
+        for(auto d:m_syncKeyList.itemList)
+        {
+            QJsonObject tempObj;
+            tempObj.insert("Key",d.Key);
+            tempObj.insert("Val",d.Val);
+            jsonArray.append(tempObj);
+        }
+        objSyncKey.insert("List",jsonArray);
+        obj.insert("SyncKey", objSyncKey);
+
+        int timet = QDateTime::currentDateTime().toTime_t();
+        obj.insert("rr", ~(timet));
+
+        QJsonDocument objDoc(obj);
+        array = objDoc.toJson();
+        break;
     }
     default:
         break;

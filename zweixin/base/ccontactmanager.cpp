@@ -36,6 +36,11 @@ void CContactManager::requestContactGroup(const ZBaseRequestParam &baseRequestPa
     connectAction(ZPublicAction::createGetGroup(baseRequestParam,groupNameList));
 }
 
+void CContactManager::requestWXSync(const ZBaseRequestParam &baseRequestParam, const Z_WX_SyncKeyList &syncKeyList)
+{
+    connectAction(ZPublicAction::createWXSync(baseRequestParam,syncKeyList));
+}
+
 CContactManager::CContactManager(QObject *parent)
     :CBaseObject(parent)
 {
