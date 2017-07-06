@@ -83,6 +83,14 @@ ZPublicAction *ZPublicAction::createSendMessage(const ZBaseRequestParam &baseReq
     return action;
 }
 
+ZPublicAction *ZPublicAction::createSyncCheck(const ZBaseRequestParam &baseRequestParam, const Z_WX_SyncKeyList &syncKeyList)
+{
+    ZPublicAction *action = new ZPublicAction(TYPE_REQUEST_SYNC_CHECK);
+    action->m_baseRequestParam = baseRequestParam;
+    action->m_syncKeyList = syncKeyList;
+    return action;
+}
+
 ZPublicAction *ZPublicAction::createWXSync(const ZBaseRequestParam &baseRequestParam, const Z_WX_SyncKeyList &syncKeyList)
 {
     ZPublicAction *action = new ZPublicAction(TYPE_REQUEST_WX_SYNC);
@@ -106,6 +114,7 @@ ZRequestAction::Operation ZPublicAction::getOperation()
     case TYPE_REQUEST_COOKIE:
     case TYPE_REQUEST_AVATAR:
     case TYPE_REQUEST_CONTACT:
+    case TYPE_REQUEST_SYNC_CHECK:
         return Get;
         break;
     case TYPE_REQUEST_QR_CODE:
@@ -218,11 +227,39 @@ QNetworkRequest ZPublicAction::createRequest() const
         return request;
         break;
     }
+    case TYPE_REQUEST_SYNC_CHECK:
+    {
+        QDateTime dateTime = QDateTime::currentDateTime();
+        qlonglong r = dateTime.toTime_t() * (qlonglong)1000 + dateTime.time().msec();
+        static qlonglong g_synckey_key = 0;
+        static bool isFirst = true;
+        if(isFirst)
+        {
+            isFirst = false;
+            g_synckey_key = r - 5000;
+        }
+        else
+        {
+            g_synckey_key += 1;
+        }
+       QStringList synckeyList;
+       for(auto obj:m_syncKeyList.itemList)
+       {
+           synckeyList.append(QString("%1_%2").arg(obj.Key).arg(obj.Val));
+       }
+       QString synckey = synckeyList.join("|");
+        QString head=QString("https://webpush.wx.qq.com/cgi-bin/mmwebwx-bin/synccheck?r=%1&skey=%2&sid=%3&uin=%4&deviceid=%5&synckey=%6&_=%7")
+                .arg(r).arg(m_baseRequestParam.skey).arg(m_baseRequestParam.sid).arg(m_baseRequestParam.uin).arg(m_baseRequestParam.deviceID)
+                .arg(synckey).arg(g_synckey_key);
+        QNetworkRequest request(QUrl(head.toLatin1()));
+        request.setHeader(QNetworkRequest::ContentTypeHeader,"Content-Type: application/json; charset=UTF-8");
+        return request;
+        break;
+    }
     case TYPE_REQUEST_WX_SYNC:
     {
         QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxsync?sid=%1&skey=%2&lang=zh_CN&pass_ticket=%3")
                 .arg(m_baseRequestParam.sid).arg(m_baseRequestParam.skey).arg(m_baseRequestParam.pass_ticket);
-        ;
         QNetworkRequest request(QUrl(head.toLatin1()));
         request.setHeader(QNetworkRequest::ContentTypeHeader,"Content-Type: application/json; charset=UTF-8");
         return request;

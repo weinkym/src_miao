@@ -52,6 +52,13 @@ void CContactManager::doRequestFinished(const CPB::RequestReplyData &response)
     if(response.statusCode > 200)
     {
         LOG_TEST(QString("request is error").arg(QString(response.replyData)));
+        if(response.type == TYPE_REQUEST_WX_SYNC)
+        {
+            QTimer::singleShot(1000, [this]()
+            {
+                this->requestWXSync(CLoginManager::getInstance()->m_baseRequestParam,CLoginManager::getInstance()->m_syncKeyList);
+            });
+        }
         return;
     }
 
@@ -106,6 +113,34 @@ void CContactManager::doRequestFinished(const CPB::RequestReplyData &response)
         }
         emit sigDateUpdate(CPB::DATA_UPDATE_TYPE_GROUP_LIST,"");
         LOG_TEST(QString("m_contackMap.count = %1").arg(m_groupMap.count()));
+        //TODO
+        LOG_TEST(QString("CLoginManager::getInstance()->requestSyncCheck()"));
+        CLoginManager::getInstance()->requestSyncCheck();
+        break;
+    }
+    case TYPE_REQUEST_WX_SYNC:
+    {
+        QJsonParseError errorString;
+        QJsonDocument doc = QJsonDocument::fromJson(response.replyData,&errorString);
+        LOG_TEST(QString("errorString = %1").arg(errorString.errorString()));
+        QVariantMap objMap = doc.toVariant().toMap();
+        LOG_TEST(QString("objMap.keys()=%1").arg(QStringList(objMap.keys()).join("-")));
+        {
+            QVariantList AddMsgList = objMap.value("AddMsgList").toList();
+            for(auto d:AddMsgList)
+            {
+                Z_WX_MSG_DATA msg = Z_WX_MSG_DATA::parseMap(d.toMap());
+                LOG_TEST(QString("msg:id=%1,MsgType=%2,content=%3,appinfo.AppID=%4,RecommendInfo.UserName=%5")
+                         .arg(msg.NewMsgId).arg(msg.MsgType).arg(msg.Content).arg(msg.AppInfo.AppID).arg(msg.RecommendInfo.UserName));
+            }
+        }
+        CLoginManager::getInstance()->m_syncKeyList = Z_WX_SyncKeyList::parseList(objMap.value("SyncCheckKey").toMap().value("List").toList());
+        if(CLoginManager::getInstance()->m_syncKeyList.itemList.isEmpty())
+        {
+            LOG_ERROR(QString("SyncCheckKey parse is error"));
+            exit(-12);;
+        }
+        CLoginManager::getInstance()->requestSyncCheck();
         break;
     }
     default:

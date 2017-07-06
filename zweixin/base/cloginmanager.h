@@ -12,6 +12,7 @@ public:
     static CLoginManager *getInstance();
     ~CLoginManager();
     void start();
+    void requestSyncCheck();
 
 protected:
     CLoginManager(QObject *parent = NULL);
@@ -52,6 +53,7 @@ public:
     Z_WX_SyncKeyList m_syncKeyList;
     QStringList m_groupNameList;
     bool m_isStarting;
+    bool m_isSyncChecking;
 };
 
 #endif // CLOGINMANAGER_H

@@ -17,7 +17,9 @@ public:
     static ZPublicAction *createGetContact(const ZBaseRequestParam &baseRequestParam);
     static ZPublicAction *createGetGroup(const ZBaseRequestParam &baseRequestParam,const QStringList &groupNameList);
     static ZPublicAction *createSendMessage(const ZBaseRequestParam &baseRequestParam,const QString &fromUserName,const QString &toUserName,const QString &message);
+    static ZPublicAction *createSyncCheck(const ZBaseRequestParam &baseRequestParam,const Z_WX_SyncKeyList &syncKeyList);
     static ZPublicAction *createWXSync(const ZBaseRequestParam &baseRequestParam,const Z_WX_SyncKeyList &syncKeyList);
+
 
 protected:
     ZPublicAction(HttpRequestType type);

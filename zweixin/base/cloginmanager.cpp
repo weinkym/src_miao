@@ -56,6 +56,19 @@ void CLoginManager::requestStatusNotify()
     connectAction(ZPublicAction::createStatusNotify(m_baseRequestParam,m_userData.UserName,m_userData.UserName));
 }
 
+void CLoginManager::requestSyncCheck()
+{
+    if(m_isSyncChecking)
+    {
+        return;
+    }
+    m_isSyncChecking = true;
+    QTimer::singleShot(1000, [this]()
+    {
+        this->connectAction(ZPublicAction::createSyncCheck(m_baseRequestParam,m_syncKeyList));
+    });
+}
+
 void CLoginManager::onRequestWaitLogin()
 {
     connectAction(ZPublicAction::createWaitLoginAction(m_uuid,m_tip));
@@ -65,6 +78,7 @@ CLoginManager::CLoginManager(QObject *parent)
     :CBaseObject(parent)
 {
     m_isStarting = false;
+    m_isSyncChecking = false;
     m_tip = 1;
     m_status = CPB::LOGIN_STATUS_LOGINING;
     m_timer.setInterval(1000);
@@ -246,6 +260,11 @@ QString CLoginManager::parseUrlParam(const QString &url, const QString &param)
 
 void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
 {
+    if(response.type == TYPE_REQUEST_SYNC_CHECK)
+    {
+        m_isSyncChecking = false;
+    }
+
     if(response.statusCode > 200)
     {
         LOG_TEST(QString("request is error").arg(QString(response.replyData)));
@@ -253,6 +272,10 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
         if(response.statusCode == 408 && response.type == TYPE_REQUEST_WAIT_LOGIN)
         {
             requestUuid();
+        }
+        if(response.type == TYPE_REQUEST_SYNC_CHECK)
+        {
+           requestSyncCheck();
         }
         return;
     }
@@ -357,6 +380,57 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
     {
         CContactManager::getInstance()->requestContact(m_baseRequestParam);
         CContactManager::getInstance()->requestContactGroup(m_baseRequestParam,m_groupNameList);
+        break;
+    }
+    case TYPE_REQUEST_SYNC_CHECK:
+    {
+        QString replyData(response.replyData);
+        int indexLeft = replyData.indexOf("{");
+        int indexRight = replyData.indexOf("}");
+        QString dataJson = replyData.mid(indexLeft+1,indexRight - indexLeft-1);
+        dataJson.remove("\"");
+        dataJson = dataJson.simplified();
+        qDebug()<<"dataJson"<<dataJson;
+        QStringList dataList = dataJson.split(",");
+        int retcode = -1;
+        int selector = -1;
+        foreach(QString obj,dataList)
+        {
+            QStringList keyValueList = obj.split(":");
+            if(keyValueList.count() == 2)
+            {
+                QString key = keyValueList.first();
+                QString value = keyValueList.last();
+                qDebug()<<key<<value;
+                if(key == "retcode")
+                {
+                    retcode = value.toInt();
+                }
+                if(key == "selector")
+                {
+                    selector = value.toInt();
+                }
+            }
+        }
+        qDebug()<<retcode<<selector;
+
+        if(retcode == 0)
+        {
+            if(selector == 2)
+            {
+                CContactManager::getInstance()->requestWXSync(m_baseRequestParam,m_syncKeyList);
+            }
+            else
+            {
+                requestSyncCheck();
+            }
+        }
+        else
+        {
+            LOG_ERROR(QString("retcode=%1").arg(retcode));
+            exit(retcode);
+        }
+
         break;
     }
     default:

@@ -6,6 +6,7 @@
 
 #define Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,key) if(objMap.contains(#key)){ obj.key = objMap.value(#key).toString();}
 #define Z_DEFINE_PARSE_VALUE_FOR_INT(obj,objMap,key) if(objMap.contains(#key)){ obj.key = objMap.value(#key).toInt();}
+#define Z_DEFINE_PARSE_VALUE_FOR_LONGLONG(obj,objMap,key) if(objMap.contains(#key)){ obj.key = objMap.value(#key).toLongLong();}
 
 struct Z_WX_COOKIE_PARAM
 {
@@ -43,9 +44,64 @@ enum HttpRequestType
     TYPE_REQUEST_WX_SEND_MSG,
     TYPE_REQUEST_UNDEFINED
 };
+
+struct Z_WX_AppInfo
+{
+    int Type;
+    QString AppID;
+    static Z_WX_AppInfo parseMap(const QVariantMap &objMap);
+};
+
+struct Z_WX_RecommendInfo
+{
+    int OpCode;
+    int QQNum;
+    int Scene;
+    int VerifyFlag;
+    int AttrStatus;
+    int Sex;
+    QString UserName;
+    QString NickName;
+    QString Province;
+    QString City;
+    QString Content;
+    QString Signature;
+    QString Alias;
+    QString Ticket;
+    static Z_WX_RecommendInfo parseMap(const QVariantMap &objMap);
+};
+
 struct Z_WX_MSG_DATA
 {
-    //
+    int VoiceLength;
+    int PlayLength;
+    int AppMsgType;
+    int ForwardFlag;
+    int HasProductId;
+    int ImgHeight;
+    int ImgWidth;
+    int SubMsgType;
+    int ImgStatus;
+    int StatusNotifyCode;
+    int Status;
+    int MsgType;
+    qlonglong CreateTime;
+    qlonglong NewMsgId;
+    QString OriContent;
+    QString Content;
+    QString FileName;
+    QString FileSize;
+    QString MediaId;
+    QString Url;
+    QString Ticket;
+    QString ToUserName;
+    QString StatusNotifyUserName;
+    QString FromUserName;
+    QString MsgId;
+
+    Z_WX_AppInfo AppInfo;
+    Z_WX_RecommendInfo RecommendInfo;
+    static Z_WX_MSG_DATA parseMap(const QVariantMap &objMap);
 };
 struct Z_WX_USER_DATA
 {
