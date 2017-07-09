@@ -133,3 +133,38 @@ Z_WX_RecommendInfo Z_WX_RecommendInfo::parseMap(const QVariantMap &objMap)
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,Ticket);
     return obj;
 }
+
+CPB::ZEventData::ZEventData()
+{
+    type = EVENT_TYPE_NODEFINED;
+}
+
+CPB::ZEventData CPB::ZEventData::parseMap(const QVariantMap &objMap)
+{
+    ZEventData obj;
+    Z_DEFINE_PARSE_VALUE_FOR_INT(obj,objMap,type);
+    obj.bodyMap = objMap.value("body").toMap();
+    return obj;
+}
+
+CPB::AutoSendEventData::AutoSendEventData()
+{
+     type = AUTO_SEND_EVENT_TYPE_NODEFINED;
+     dateTime = 0;
+}
+
+CPB::AutoSendEventData CPB::AutoSendEventData::parseMap(const QVariantMap &objMap)
+{
+    AutoSendEventData obj;
+    Z_DEFINE_PARSE_VALUE_FOR_INT(obj,objMap,type);
+    Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,content);
+
+    Z_DEFINE_PARSE_VALUE_FOR_LONGLONG(obj,objMap,dateTime);
+
+    Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,toUserName);
+    Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,uuid);
+
+    obj.bodyMap = objMap.value("body").toMap();
+
+    return obj;
+}

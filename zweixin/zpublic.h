@@ -205,6 +205,40 @@ struct RequestReplyData
     QDateTime endTime;
     QByteArray replyData;
 };
+
+enum EventType
+{
+    EVENT_TYPE_NODEFINED,
+    EVENT_TYPE_AUTO_SEND,
+};
+
+struct ZEventData
+{
+    int type;
+    QVariantMap bodyMap;
+    ZEventData();
+    static ZEventData parseMap(const QVariantMap &objMap);
+};
+
+enum AutoSendEventType
+{
+    AUTO_SEND_EVENT_TYPE_NODEFINED,
+    AUTO_SEND_EVENT_TYPE_DAY,
+    AUTO_SEND_EVENT_TYPE_HOUR,
+    AUTO_SEND_EVENT_TYPE_NORMAL,
+};
+
+struct AutoSendEventData
+{
+    int type;
+    qlonglong dateTime;
+    QString content;
+    QString toUserName;
+    QString uuid;
+    QVariantMap bodyMap;
+    AutoSendEventData();
+    static AutoSendEventData parseMap(const QVariantMap &objMap);
+};
 }
 class Zpublic
 {

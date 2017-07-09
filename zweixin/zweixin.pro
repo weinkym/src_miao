@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     zcontackitemwidget.cpp \
     base/ccontactmanager.cpp \
     base/cbaseobject.cpp \
-    base/cloginmanager.cpp
+    base/cloginmanager.cpp \
+    base/cmessageinterface.cpp
 
 HEADERS  += mainwindow.h \
     zloginwidget.h \
@@ -39,7 +40,8 @@ HEADERS  += mainwindow.h \
     zcontackitemwidget.h \
     base/ccontactmanager.h \
     base/cbaseobject.h \
-    base/cloginmanager.h
+    base/cloginmanager.h \
+    base/cmessageinterface.h
 
 FORMS    += mainwindow.ui \
     zloginwidget.ui \
