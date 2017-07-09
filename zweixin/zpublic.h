@@ -7,6 +7,10 @@
 #define Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,key) if(objMap.contains(#key)){ obj.key = objMap.value(#key).toString();}
 #define Z_DEFINE_PARSE_VALUE_FOR_INT(obj,objMap,key) if(objMap.contains(#key)){ obj.key = objMap.value(#key).toInt();}
 #define Z_DEFINE_PARSE_VALUE_FOR_LONGLONG(obj,objMap,key) if(objMap.contains(#key)){ obj.key = objMap.value(#key).toLongLong();}
+#define Z_DEFINE_PARSE_VALUE_FOR_MAP(obj,objMap,key) if(objMap.contains(#key)){ obj.key = objMap.value(#key).toMap();}
+
+
+#define Z_DEFINE_INSERT_VARIANTMAP(objMap,key) { objMap.insert((#key),key);}
 
 struct Z_WX_COOKIE_PARAM
 {
@@ -215,8 +219,9 @@ enum EventType
 struct ZEventData
 {
     int type;
-    QVariantMap bodyMap;
+    QVariantMap body;
     ZEventData();
+    QVariantMap toVariantMap();
     static ZEventData parseMap(const QVariantMap &objMap);
 };
 
@@ -235,8 +240,9 @@ struct AutoSendEventData
     QString content;
     QString toUserName;
     QString uuid;
-    QVariantMap bodyMap;
+    QVariantMap body;
     AutoSendEventData();
+    QVariantMap toVariantMap();
     static AutoSendEventData parseMap(const QVariantMap &objMap);
 };
 }

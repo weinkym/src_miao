@@ -139,11 +139,20 @@ CPB::ZEventData::ZEventData()
     type = EVENT_TYPE_NODEFINED;
 }
 
+QVariantMap CPB::ZEventData::toVariantMap()
+{
+    QVariantMap objMap;
+    Z_DEFINE_INSERT_VARIANTMAP(objMap,type);
+    Z_DEFINE_INSERT_VARIANTMAP(objMap,body);
+    return objMap;
+
+}
+
 CPB::ZEventData CPB::ZEventData::parseMap(const QVariantMap &objMap)
 {
     ZEventData obj;
     Z_DEFINE_PARSE_VALUE_FOR_INT(obj,objMap,type);
-    obj.bodyMap = objMap.value("body").toMap();
+    Z_DEFINE_PARSE_VALUE_FOR_MAP(obj,objMap,body);
     return obj;
 }
 
@@ -151,6 +160,20 @@ CPB::AutoSendEventData::AutoSendEventData()
 {
      type = AUTO_SEND_EVENT_TYPE_NODEFINED;
      dateTime = 0;
+}
+
+QVariantMap CPB::AutoSendEventData::toVariantMap()
+{
+    QVariantMap objMap;
+    Z_DEFINE_INSERT_VARIANTMAP(objMap,type);
+    Z_DEFINE_INSERT_VARIANTMAP(objMap,content);
+    Z_DEFINE_INSERT_VARIANTMAP(objMap,dateTime);
+    Z_DEFINE_INSERT_VARIANTMAP(objMap,toUserName);
+    Z_DEFINE_INSERT_VARIANTMAP(objMap,uuid);
+
+    Z_DEFINE_INSERT_VARIANTMAP(objMap,body);
+    return objMap;
+
 }
 
 CPB::AutoSendEventData CPB::AutoSendEventData::parseMap(const QVariantMap &objMap)
@@ -164,7 +187,7 @@ CPB::AutoSendEventData CPB::AutoSendEventData::parseMap(const QVariantMap &objMa
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,toUserName);
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,uuid);
 
-    obj.bodyMap = objMap.value("body").toMap();
+    Z_DEFINE_PARSE_VALUE_FOR_MAP(obj,objMap,body);
 
     return obj;
 }
