@@ -228,6 +228,7 @@ struct ZEventData
 enum AutoSendEventType
 {
     AUTO_SEND_EVENT_TYPE_NODEFINED,
+    AUTO_SEND_EVENT_TYPE_MONTH,
     AUTO_SEND_EVENT_TYPE_DAY,
     AUTO_SEND_EVENT_TYPE_HOUR,
     AUTO_SEND_EVENT_TYPE_NORMAL,
@@ -250,6 +251,8 @@ class Zpublic
 {
 public:
     static QList<QStringList> regexCapture(const QString &source,const QString &pattern);
+    static QString getDataPath(const QString &finderName,bool autoCreatePath);
+    static QString getApplicationName();
 };
 
 #endif // ZPUBLIC_H

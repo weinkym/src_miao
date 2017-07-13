@@ -3,6 +3,8 @@
 #include <QVariant>
 #include <QMap>
 #include <QList>
+#include <QStandardPaths>
+#include <QDir>
 
 QList<QStringList> Zpublic::regexCapture(const QString &source, const QString &pattern)
 {
@@ -20,6 +22,27 @@ QList<QStringList> Zpublic::regexCapture(const QString &source, const QString &p
         result.append(capList);
     }
     return result;
+}
+
+QString Zpublic::getDataPath(const QString &finderName, bool autoCreatePath)
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    if(path.isEmpty())
+    {
+         path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    }
+    path = path+"/" + getApplicationName() + "/"+finderName;
+    if(autoCreatePath)
+    {
+        QDir dir(path);
+        dir.mkpath(path);
+    }
+    return path;
+}
+
+QString Zpublic::getApplicationName()
+{
+    return QString("zweixin");
 }
 
 Z_WX_USER_DATA Z_WX_USER_DATA::parseMap(const QVariantMap &objMap)

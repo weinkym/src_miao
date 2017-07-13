@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network xml
+QT       += core gui network xml sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     base/ccontactmanager.cpp \
     base/cbaseobject.cpp \
     base/cloginmanager.cpp \
-    base/cmessageinterface.cpp
+    base/cmessageinterface.cpp \
+    base/csqliteaccessinterface.cpp
 
 HEADERS  += mainwindow.h \
     zloginwidget.h \
@@ -41,7 +42,8 @@ HEADERS  += mainwindow.h \
     base/ccontactmanager.h \
     base/cbaseobject.h \
     base/cloginmanager.h \
-    base/cmessageinterface.h
+    base/cmessageinterface.h \
+    base/csqliteaccessinterface.h
 
 FORMS    += mainwindow.ui \
     zloginwidget.ui \

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QTextEdit>
+#include "csqliteaccessinterface.h"
 
 QTextEdit* g_log_textEdit = NULL;
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -33,16 +34,16 @@ int main(int argc, char *argv[])
 {
 //   qInstallMessageHandler(myMessageOutput);
    QApplication a(argc, argv);
-//   qlonglong value = -233199616;
-//   value = ~(value);
 
-//   QTime time = QTime::currentTime();
-//   qDebug()<<"sfsdf"<<value<<QDateTime::currentDateTime().toTime_t();
-//   return -1;
-
+   //
+   {
+       qDebug()<<CSqliteAccessInterface::getInstance()->isValid();
+       return -1;
+   }
    qsrand(QTime::currentTime().msec());
    g_log_textEdit = new QTextEdit;
    g_log_textEdit->show();
+
     MainWindow w;
     w.hide();
     w.showLogin();
