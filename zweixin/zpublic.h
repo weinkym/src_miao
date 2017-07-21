@@ -3,6 +3,10 @@
 #include "zgolbal.h"
 #include <QUuid>
 #include <QDateTime>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QSqlError>
+#include <QSqlDatabase>
 
 #define Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,key) if(objMap.contains(#key)){ obj.key = objMap.value(#key).toString();}
 #define Z_DEFINE_PARSE_VALUE_FOR_INT(obj,objMap,key) if(objMap.contains(#key)){ obj.key = objMap.value(#key).toInt();}
@@ -234,6 +238,27 @@ enum AutoSendEventType
     AUTO_SEND_EVENT_TYPE_NORMAL,
 };
 
+enum FieldType
+{
+    TypeInteger,
+    TypeString,
+    TypeDouble
+};
+
+struct Field
+{
+    QString keyInDb;
+    FieldType type;
+};
+
+struct BindValueParam
+{
+    BindValueParam():paramType(QSql::In){};
+    QSql::ParamType paramType;
+    QString prepareString;
+    QMap<QString,QVariant> bindValueMap;
+};
+
 struct AutoSendEventData
 {
     int type;
@@ -241,10 +266,11 @@ struct AutoSendEventData
     QString content;
     QString toUserName;
     QString uuid;
-    QVariantMap body;
+    QString body;
     AutoSendEventData();
-    QVariantMap toVariantMap();
+    QVariantMap toVariantMap() const;
     static AutoSendEventData parseMap(const QVariantMap &objMap);
+    static QMap<QString, Field> getFieldMap();
 };
 }
 class Zpublic
@@ -253,6 +279,7 @@ public:
     static QList<QStringList> regexCapture(const QString &source,const QString &pattern);
     static QString getDataPath(const QString &finderName,bool autoCreatePath);
     static QString getApplicationName();
+    static QString getMessageInsertSql(const CPB::AutoSendEventData &msg);
 };
 
 #endif // ZPUBLIC_H

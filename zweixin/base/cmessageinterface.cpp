@@ -10,6 +10,16 @@ CMessageInterface *CMessageInterface::getInstance()
     return m_instance;
 }
 
+void CMessageInterface::addMessage(const CPB::AutoSendEventData &msg)
+{
+    if(m_messageMap.contains(msg.uuid))
+    {
+        return;
+    }
+    m_messageMap.insert(msg.uuid,msg);
+    //
+}
+
 CMessageInterface::CMessageInterface(QObject *parent)
     :QObject(parent)
     ,m_timer(NULL)

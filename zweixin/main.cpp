@@ -38,6 +38,15 @@ int main(int argc, char *argv[])
    //
    {
        qDebug()<<CSqliteAccessInterface::getInstance()->isValid();
+       CPB::AutoSendEventData msg;
+       msg.uuid = QUuid::createUuid().toString();
+       msg.type = 0;
+       msg.content = "ASFASDFADSFSF";
+       msg.toUserName = "ASFASDFADSFSF";
+       msg.body = "ASFASDFADSFSF";
+       msg.dateTime = QDateTime::currentDateTime().toTime_t();
+
+       CSqliteAccessInterface::getInstance()->insertMessage(msg);
        return -1;
    }
    qsrand(QTime::currentTime().msec());

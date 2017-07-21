@@ -2,6 +2,7 @@
 #define CSQLITEACCESSINTERFACE_H
 
 #include <QSqlDatabase>
+#include "zpublic.h"
 
 class CSqliteAccessInterface
 {
@@ -10,8 +11,11 @@ public:
     ~CSqliteAccessInterface();
     bool isValid();
 
+    bool insertMessage(const CPB::AutoSendEventData &msg);
+
 private:
     CSqliteAccessInterface();
+    bool getInsertSql(QList<CPB::BindValueParam> &paramList,const QVariantList &model,const QString &tableName,const QMap<QString,CPB::Field> &fileMap);
     void close();
     void initDb();
 
@@ -20,6 +24,7 @@ private:
     bool execQuery(const QStringList &sqlList,QString *errorString = NULL);
     bool execStringQuery(const QString &sql, QList<QSqlRecord> *result,QString *errorString = NULL);
     bool execQueryList(const QList<QSqlQuery> &sqlQueryList, QString *errorString);
+    bool execQuery(const QList<CPB::BindValueParam> &paramList, QString *errorString = NULL);
 
 private:
     static CSqliteAccessInterface *m_instance;

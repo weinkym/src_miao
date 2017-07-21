@@ -45,6 +45,11 @@ QString Zpublic::getApplicationName()
     return QString("zweixin");
 }
 
+QString Zpublic::getMessageInsertSql(const CPB::AutoSendEventData &msg)
+{
+    return QString("");
+}
+
 Z_WX_USER_DATA Z_WX_USER_DATA::parseMap(const QVariantMap &objMap)
 {
     Z_WX_USER_DATA obj;
@@ -185,7 +190,7 @@ CPB::AutoSendEventData::AutoSendEventData()
      dateTime = 0;
 }
 
-QVariantMap CPB::AutoSendEventData::toVariantMap()
+QVariantMap CPB::AutoSendEventData::toVariantMap() const
 {
     QVariantMap objMap;
     Z_DEFINE_INSERT_VARIANTMAP(objMap,type);
@@ -210,7 +215,21 @@ CPB::AutoSendEventData CPB::AutoSendEventData::parseMap(const QVariantMap &objMa
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,toUserName);
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,uuid);
 
-    Z_DEFINE_PARSE_VALUE_FOR_MAP(obj,objMap,body);
+    Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,body);
+//    Z_DEFINE_PARSE_VALUE_FOR_MAP(obj,objMap,body);
 
     return obj;
+}
+
+QMap<QString, CPB::Field> CPB::AutoSendEventData::getFieldMap()
+{
+    QMap<QString, CPB::Field> fieldMap;
+    fieldMap.insert("type",Field{"type", TypeInteger});
+    fieldMap.insert("dateTime",Field{"dateTime", TypeInteger});
+    fieldMap.insert("content",Field{"content", TypeString});
+    fieldMap.insert("toUserName",Field{"toUserName", TypeString});
+    fieldMap.insert("uuid",Field{"uuid", TypeString});
+    fieldMap.insert("body",Field{"body", TypeString});
+
+    return fieldMap;
 }

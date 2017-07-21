@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     base/cbaseobject.cpp \
     base/cloginmanager.cpp \
     base/cmessageinterface.cpp \
-    base/csqliteaccessinterface.cpp
+    base/csqliteaccessinterface.cpp \
+    base/cmodelmap.cpp
 
 HEADERS  += mainwindow.h \
     zloginwidget.h \
@@ -43,7 +44,8 @@ HEADERS  += mainwindow.h \
     base/cbaseobject.h \
     base/cloginmanager.h \
     base/cmessageinterface.h \
-    base/csqliteaccessinterface.h
+    base/csqliteaccessinterface.h \
+    base/cmodelmap.h
 
 FORMS    += mainwindow.ui \
     zloginwidget.ui \

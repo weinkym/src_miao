@@ -6,19 +6,20 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QDir>
+#include "zgolbal.h"
 
 const char* const COMMAND_CREATE_TABLE_PREFIX = "CREATE TABLE IF NOT EXISTS ";
 const char* const CREATE_DEPARTMENT_TABLE_QT = "message_table (\
-    id UNSIGNED BIGINT NOT NULL,\
-    parent_id BIGINT NOT NULL,\
-    name VARCHAR (128) DEFAULT \"\" NOT NULL,\
-    avatar_url VARCHAR (255) DEFAULT \"\" NOT NULL,\
-    creator_id UNSIGNED BIGINT NOT NULL DEFAULT 0,\
-    order_field UNSIGNED INTEGER DEFAULT 0 NOT NULL,\
-    is_full  UNSIGNED TINYINT DEFAULT 0 NOT NULL,\
-    message_forbidden UNSIGNED TINYINT DEFAULT 0 NOT NULL,\
-    is_disbanded UNSIGNED TINYINT DEFAULT 0 NOT NULL,\
-    PRIMARY KEY(id)\
+        id UNSIGNED BIGINT NOT NULL,\
+parent_id BIGINT NOT NULL,\
+name VARCHAR (128) DEFAULT \"\" NOT NULL,\
+avatar_url VARCHAR (255) DEFAULT \"\" NOT NULL,\
+creator_id UNSIGNED BIGINT NOT NULL DEFAULT 0,\
+order_field UNSIGNED INTEGER DEFAULT 0 NOT NULL,\
+is_full  UNSIGNED TINYINT DEFAULT 0 NOT NULL,\
+message_forbidden UNSIGNED TINYINT DEFAULT 0 NOT NULL,\
+is_disbanded UNSIGNED TINYINT DEFAULT 0 NOT NULL,\
+PRIMARY KEY(id)\
 );";
 
 const char* const CREATE_AUTO_SEND_MESSAGE = "AUTO_SEND_MESSAGE (\
@@ -27,16 +28,17 @@ dateTime UNSIGNED BIGINT NOT NULL,\
 content VARCHAR (512) NOT NULL, \
 body TEXT DEFAULT \"\"  NOT NULL,\
 uuid VARCHAR (64) NOT NULL, \
+toUserName VARCHAR (64) NOT NULL, \
 PRIMARY KEY (uuid)\
 );";
 
 
-int type;
-qlonglong dateTime;
-QString content;
-QString toUserName;
-QString uuid;
-QVariantMap body;
+//int type;
+//qlonglong dateTime;
+//QString content;
+//QString toUserName;
+//QString uuid;
+//QVariantMap body;
 
 CSqliteAccessInterface *CSqliteAccessInterface::m_instance = NULL;
 
@@ -49,6 +51,40 @@ CSqliteAccessInterface::CSqliteAccessInterface()
         m_db.setHostName("ZWeiXinLocalStorageHost");
         initDb();
     }
+}
+
+
+bool CSqliteAccessInterface::getInsertSql(QList<CPB::BindValueParam> &paramList, const QVariantList &model, const QString &tableName, const QMap<QString, CPB::Field> &fileMap)
+{
+    QString sqlTemplate = "REPLACE INTO " + tableName + " (%1) values(%2)";
+    foreach(QVariant v, model)
+    {
+        QVariantMap map = v.toMap();
+        QStringList sqlField;
+        QStringList sqlValue;
+        foreach(QString key, map.keys())
+        {
+
+            if(!fileMap.contains(key))
+            {
+                continue;
+            }
+            CPB::Field f = fileMap.value(key);
+            sqlField.push_back(f.keyInDb);
+            sqlValue.push_back(":" + f.keyInDb);
+        }
+        QString statement = sqlTemplate.arg(sqlField.join(",")).arg(sqlValue.join(","));
+        CPB::BindValueParam param;
+        param.prepareString = statement;
+        foreach(QString key, fileMap.keys())
+        {
+            CPB::Field f = fileMap.value(key);
+            param.bindValueMap.insert(":" + f.keyInDb, map.value(f.keyInDb));
+        }
+        paramList.push_back(param);
+    }
+    LOG_INFO(QString("paramList.count=%1").arg(paramList.count()));
+    return true;
 }
 
 CSqliteAccessInterface *CSqliteAccessInterface::getInstance()
@@ -68,6 +104,21 @@ CSqliteAccessInterface::~CSqliteAccessInterface()
 bool CSqliteAccessInterface::isValid()
 {
     return m_db.isValid() && m_db.isOpen();
+}
+
+bool CSqliteAccessInterface::insertMessage(const CPB::AutoSendEventData &msg)
+{
+    QVariantList model;
+    model.append(msg.toVariantMap());
+    QList<CPB::BindValueParam> paramList;
+    bool ret = getInsertSql(paramList,model,"AUTO_SEND_MESSAGE",CPB::AutoSendEventData::getFieldMap());
+    if(!ret)
+    {
+        LOG_ERROR(QString("getInsertSql fail"));
+        return false;
+    }
+    QString errorString;
+   /* m_db.*/execQuery(paramList, &errorString);
 }
 
 void CSqliteAccessInterface::close()
@@ -229,5 +280,47 @@ bool CSqliteAccessInterface::execQueryList(const QList<QSqlQuery> &sqlQueryList,
 //        doError(needResetDb);
         return false;
     }
+}
+
+bool CSqliteAccessInterface::execQuery(const QList<CPB::BindValueParam> &paramList, QString *errorString)
+{
+    QList<QSqlQuery> sqlQueryList;
+    foreach(const CPB::BindValueParam &param, paramList)
+    {
+        QSqlQuery query(m_db);
+        LOG_INFO(QString("prepare sql = %1").arg(param.prepareString));
+        if(!query.prepare(param.prepareString))
+        {
+            LOG_WARNING(QString("prepare sql fail, sql = %1").arg(param.prepareString));
+            LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().text()));
+            LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().driverText()));
+            LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().databaseText()));
+            LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().nativeErrorCode()));
+            LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().type()));
+//            doError(needResetDb);
+//            QString driverText() const;
+//            QString databaseText() const;
+//            ErrorType type() const;
+//        #if QT_DEPRECATED_SINCE(5, 3)
+//            QT_DEPRECATED int number() const;
+//        #endif
+//            QString nativeErrorCode() const;
+//            QString text() const;
+            continue;
+        }
+        query.setForwardOnly(true);
+        QMapIterator<QString,QVariant>iter(param.bindValueMap);
+        int count = 0;
+        while(iter.hasNext())
+        {
+            count++;
+            iter.next();
+            query.bindValue(iter.key(),iter.value());
+        }
+        LOG_TEST(QString("bindValue Count=%1").arg(count));
+        sqlQueryList.append(query);
+    }
+
+    return execQueryList(sqlQueryList,errorString);
 }
 
