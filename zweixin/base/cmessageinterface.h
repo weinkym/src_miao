@@ -10,6 +10,8 @@ class CMessageInterface : QObject
 
 public:
     static CMessageInterface *getInstance();
+    void init();
+
     void addMessage(const CPB::AutoSendEventData &msg);
 
 protected:
@@ -20,8 +22,9 @@ protected slots:
 
 private:
     static CMessageInterface *m_instance;
-    QMap<QString,CPB::AutoSendEventData> m_messageMap;
+    bool m_initialized;
     QTimer *m_timer;
+    QMap<QString,CPB::AutoSendEventData> m_messageMap;
 };
 
 #endif // CMESSAGEINTERFACE_H

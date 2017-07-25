@@ -5,6 +5,8 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <QSqlField>
+
 #include <QDir>
 #include "zgolbal.h"
 
@@ -101,6 +103,11 @@ CSqliteAccessInterface::~CSqliteAccessInterface()
     close();
 }
 
+QString CSqliteAccessInterface::messageTableName()
+{
+    return QString("AUTO_SEND_MESSAGE");
+}
+
 bool CSqliteAccessInterface::isValid()
 {
     return m_db.isValid() && m_db.isOpen();
@@ -111,14 +118,71 @@ bool CSqliteAccessInterface::insertMessage(const CPB::AutoSendEventData &msg)
     QVariantList model;
     model.append(msg.toVariantMap());
     QList<CPB::BindValueParam> paramList;
-    bool ret = getInsertSql(paramList,model,"AUTO_SEND_MESSAGE",CPB::AutoSendEventData::getFieldMap());
+    bool ret = getInsertSql(paramList,model,CSqliteAccessInterface::messageTableName(),CPB::AutoSendEventData::getFieldMap());
     if(!ret)
     {
         LOG_ERROR(QString("getInsertSql fail"));
         return false;
     }
     QString errorString;
-   /* m_db.*/execQuery(paramList, &errorString);
+    /* m_db.*/execQuery(paramList, &errorString);
+}
+
+bool CSqliteAccessInterface::queryAllMessage(QVariantList &model, QString *errorString)
+{
+    LOG_FUNCTION;
+    if(!isValid())
+    {
+        return false;
+    }
+    QString sql = "SELECT * FROM " + CSqliteAccessInterface::messageTableName();
+    LOG_INFO(QString("execQuerySql, sql = %1").arg(sql));
+    QList<QSqlRecord> record;
+    QString tempErrorString;
+    bool ret = this->execQuery(sql, record, &tempErrorString);
+    if(errorString)
+    {
+        *errorString = tempErrorString;
+    }
+    if(!ret)
+    {
+        LOG_ERROR(QString("execQuerySql fail, sql = %1, err = %2").arg(sql).arg(tempErrorString));
+        return false;
+    }
+
+    foreach(auto r, record)
+    {
+        QVariantMap map;
+        for(int i = 0; i < r.count(); ++i)
+        {
+            map.insert(r.field(i).name(), r.value(i));
+            if(i == 0)
+            {
+                LOG_INFO(QString("r.field(i).name() = %1").arg(r.field(i).name()));
+            }
+        }
+        model.push_back(map);
+    }
+    return true;
+}
+
+bool CSqliteAccessInterface::deleteMessage(const QString &uuid)
+{
+    LOG_FUNCTION;
+    if(!isValid())
+    {
+        return false;
+    }
+    QString sql = QString("DELETE FROM %1 where uuid=\"%2\"").arg(CSqliteAccessInterface::messageTableName()).arg(uuid);
+
+    QString tempErrorString;
+    bool ret = this->execQuery(sql, &tempErrorString);
+    if(!ret)
+    {
+        LOG_ERROR(QString("execQuerySql fail, sql = %1, err = %2").arg(sql).arg(tempErrorString));
+        return false;
+    }
+    return true;
 }
 
 void CSqliteAccessInterface::close()
@@ -172,6 +236,7 @@ bool CSqliteAccessInterface::execQuery(const QStringList &sqlList, QString *erro
 bool CSqliteAccessInterface::execStringQuery(const QString &sql, QList<QSqlRecord> *result, QString *errorString)
 {
     QMutexLocker lock(&m_mutex);
+    LOG_WARNING(QString("execSql=%1").arg(sql));
     if(!isValid())
     {
         return false;

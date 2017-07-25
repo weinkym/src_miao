@@ -9,9 +9,12 @@ class CSqliteAccessInterface
 public:
     static CSqliteAccessInterface *getInstance();
     ~CSqliteAccessInterface();
+    static QString messageTableName();
     bool isValid();
 
     bool insertMessage(const CPB::AutoSendEventData &msg);
+    bool queryAllMessage(QVariantList &model, QString *errorString = nullptr);
+    bool deleteMessage(const QString &uuid);
 
 private:
     CSqliteAccessInterface();
