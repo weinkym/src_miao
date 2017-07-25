@@ -5,6 +5,19 @@
 #include <QList>
 #include <QStandardPaths>
 #include <QDir>
+#include <QMetaEnum>
+
+QMap<QString, int> Zpublic::getEnumAutoSendEventTypeMap()
+{
+    QMetaEnum me = QMetaEnum::fromType<Zpublic::AutoSendEventType>();
+//    int index = staticMetaObject.indexOfEnumerator("[AutoSendEventType]");
+//    QMetaEnum me = staticMetaObject.enumerator(index);
+//    const QMetaObject mo = Zpublic::staticMetaObject;
+//    int index = mo.indexOfEnumerator("AutoSendEventType");
+//    QMetaEnum me = mo.enumerator(index);
+//   QMetaEnum me = QMetaEnum::fromType();
+    LOG_INFO(QString("me count = %1").arg(me.keyCount()))
+}
 
 QList<QStringList> Zpublic::regexCapture(const QString &source, const QString &pattern)
 {
@@ -186,7 +199,7 @@ CPB::ZEventData CPB::ZEventData::parseMap(const QVariantMap &objMap)
 
 CPB::AutoSendEventData::AutoSendEventData()
 {
-     type = AUTO_SEND_EVENT_TYPE_NODEFINED;
+     type = Zpublic::AUTO_SEND_EVENT_TYPE_NODEFINED;
      dateTime = 0;
 }
 

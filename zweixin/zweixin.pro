@@ -29,7 +29,9 @@ SOURCES += main.cpp\
     base/cloginmanager.cpp \
     base/cmessageinterface.cpp \
     base/csqliteaccessinterface.cpp \
-    base/cmodelmap.cpp
+    base/cmodelmap.cpp \
+    zinputmessagedialog.cpp \
+    zcontactlistwidget.cpp
 
 HEADERS  += mainwindow.h \
     zloginwidget.h \
@@ -45,8 +47,12 @@ HEADERS  += mainwindow.h \
     base/cloginmanager.h \
     base/cmessageinterface.h \
     base/csqliteaccessinterface.h \
-    base/cmodelmap.h
+    base/cmodelmap.h \
+    zinputmessagedialog.h \
+    zcontactlistwidget.h
 
 FORMS    += mainwindow.ui \
     zloginwidget.ui \
-    zcontackitemwidget.ui
+    zcontackitemwidget.ui \
+    zinputmessagedialog.ui \
+    zcontactlistwidget.ui

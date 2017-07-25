@@ -229,15 +229,6 @@ struct ZEventData
     static ZEventData parseMap(const QVariantMap &objMap);
 };
 
-enum AutoSendEventType
-{
-    AUTO_SEND_EVENT_TYPE_NODEFINED,
-    AUTO_SEND_EVENT_TYPE_MONTH,
-    AUTO_SEND_EVENT_TYPE_DAY,
-    AUTO_SEND_EVENT_TYPE_HOUR,
-    AUTO_SEND_EVENT_TYPE_NORMAL,
-};
-
 enum FieldType
 {
     TypeInteger,
@@ -245,11 +236,13 @@ enum FieldType
     TypeDouble
 };
 
+
 struct Field
 {
     QString keyInDb;
     FieldType type;
 };
+
 
 struct BindValueParam
 {
@@ -273,9 +266,20 @@ struct AutoSendEventData
     static QMap<QString, Field> getFieldMap();
 };
 }
-class Zpublic
+class Zpublic : public QObject
 {
+    Q_OBJECT
 public:
+    enum AutoSendEventType
+    {
+        AUTO_SEND_EVENT_TYPE_NODEFINED,
+        AUTO_SEND_EVENT_TYPE_MONTH,
+        AUTO_SEND_EVENT_TYPE_DAY,
+        AUTO_SEND_EVENT_TYPE_HOUR,
+        AUTO_SEND_EVENT_TYPE_NORMAL,
+    };
+    Q_ENUM(AutoSendEventType)
+    QMap<QString,int> getEnumAutoSendEventTypeMap();
     static QList<QStringList> regexCapture(const QString &source,const QString &pattern);
     static QString getDataPath(const QString &finderName,bool autoCreatePath);
     static QString getApplicationName();
