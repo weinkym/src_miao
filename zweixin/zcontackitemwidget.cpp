@@ -31,3 +31,8 @@ QSharedPointer<Z_WX_USER_DATA> ZContackItemWidget::getContact()
 {
     return m_contact;
 }
+
+bool ZContackItemWidget::isContain(const QString &key)
+{
+    return m_contact.data()->NickName.contains(key);
+}

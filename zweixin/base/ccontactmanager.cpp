@@ -44,7 +44,13 @@ void CContactManager::requestWXSync(const ZBaseRequestParam &baseRequestParam, c
 CContactManager::CContactManager(QObject *parent)
     :CBaseObject(parent)
 {
-    //
+    for(int i = 0; i <100; ++i)
+    {
+        QSharedPointer<Z_WX_USER_DATA> pObj(new Z_WX_USER_DATA);
+        pObj.data()->UserName = QUuid::createUuid().toString();
+        pObj.data()->NickName = QString("TEMP%1").arg(i);
+        m_contackMap.insert(pObj.data()->UserName,pObj);
+    }
 }
 
 void CContactManager::doRequestFinished(const CPB::RequestReplyData &response)

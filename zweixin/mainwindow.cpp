@@ -6,6 +6,7 @@
 #include "zcontackitemwidget.h"
 #include "ccontactmanager.h"
 #include "cloginmanager.h"
+#include "zinputmessagedialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -140,6 +141,8 @@ void MainWindow::onRequestFinished(const CPB::RequestReplyData &response)
 void MainWindow::on_btnTest01_clicked()
 {
 
+    onTest();
+    return;
     QListWidgetItem *item = ui->listWidgetContact->currentItem();
     ZContackItemWidget *itemWidget = qobject_cast<ZContackItemWidget*>(ui->listWidgetContact->itemWidget(item));
     if(itemWidget == NULL)
@@ -184,6 +187,9 @@ void MainWindow::onLoginFinished(bool ok)
 void MainWindow::onTest()
 {
     LOG_FUNCTION;
+    ZInputMessageDialog dlg;
+    dlg.resetContacts(CContactManager::getInstance()->m_contackMap.values());
+    dlg.exec();
 //    ui->labelAvatar->setPixmap(QPixmap::fromImage(m_userAvatar.m_image));
 }
 

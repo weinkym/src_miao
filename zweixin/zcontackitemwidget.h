@@ -16,6 +16,7 @@ public:
     explicit ZContackItemWidget(const QSharedPointer<Z_WX_USER_DATA> contact,QWidget *parent = 0);
     ~ZContackItemWidget();
     QSharedPointer<Z_WX_USER_DATA> getContact();
+    bool isContain(const QString &key);
 
 private:
     Ui::ZContackItemWidget *ui;

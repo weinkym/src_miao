@@ -5,6 +5,8 @@
 #include "cmessageinterface.h"
 #include "zinputmessagedialog.h"
 #include <QMetaEnum>
+#include "ccontactmanager.h"
+#include "zcontactlistwidget.h"
 
 QTextEdit* g_log_textEdit = NULL;
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -37,35 +39,15 @@ int main(int argc, char *argv[])
 {
 //   qInstallMessageHandler(myMessageOutput);
    QApplication a(argc, argv);
-
-   //
-//   {
-//       qDebug()<<CSqliteAccessInterface::getInstance()->isValid();
-//       CPB::AutoSendEventData msg;
-//       msg.uuid = QUuid::createUuid().toString();
-//       msg.type = 0;
-//       msg.content = "ASFASDFADSFSF";
-//       msg.toUserName = "ASFASDFADSFSF";
-//       msg.body = "ASFASDFADSFSF";
-//       msg.dateTime = QDateTime::currentDateTime().toTime_t();
-
-//       CSqliteAccessInterface::getInstance()->insertMessage(msg);
-
-//       CMessageInterface::getInstance()->init();
-//       CSqliteAccessInterface::getInstance()->deleteMessage(msg.uuid);
-//       return -1;
-//   }
    {
 //       QMetaEnum me = QMetaEnum::fromType<Zpublic::AutoSendEventType>();
-
 //       LOG_INFO(QString("me count = %1").arg(me.keyCount()))
-
-
 //        return -1;
+//       ZInputMessageDialog dlg;
+//       dlg.resetContacts(CContactManager::getInstance()->m_contackMap.values());
+//       dlg.show();
 
-       ZInputMessageDialog dlg;
-       dlg.show();
-       return a.exec();
+//       return a.exec();
    }
    qsrand(QTime::currentTime().msec());
    g_log_textEdit = new QTextEdit;

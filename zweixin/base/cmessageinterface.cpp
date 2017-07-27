@@ -41,6 +41,7 @@ void CMessageInterface::addMessage(const CPB::AutoSendEventData &msg)
         return;
     }
     m_messageMap.insert(msg.uuid,msg);
+    CSqliteAccessInterface::getInstance()->insertMessage(msg);
 }
 
 CMessageInterface::CMessageInterface(QObject *parent)
