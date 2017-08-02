@@ -26,7 +26,8 @@ PRIMARY KEY(id)\
 
 const char* const CREATE_AUTO_SEND_MESSAGE = "AUTO_SEND_MESSAGE (\
         type  UNSIGNED TINYINT DEFAULT 0 NOT NULL,\
-dateTime UNSIGNED BIGINT NOT NULL,\
+dateTime  UNSIGNED TINYINT DEFAULT 0 NOT NULL,\
+lastSendDateTime  UNSIGNED TINYINT DEFAULT 0,\
 content VARCHAR (512) NOT NULL, \
 body TEXT DEFAULT \"\"  NOT NULL,\
 uuid VARCHAR (64) NOT NULL, \
@@ -150,17 +151,19 @@ bool CSqliteAccessInterface::queryAllMessage(QVariantList &model, QString *error
         return false;
     }
 
+    bool isFirst = true;
     foreach(auto r, record)
     {
         QVariantMap map;
         for(int i = 0; i < r.count(); ++i)
         {
             map.insert(r.field(i).name(), r.value(i));
-            if(i == 0)
+            if(isFirst)
             {
                 LOG_INFO(QString("r.field(i).name() = %1").arg(r.field(i).name()));
             }
         }
+        isFirst = true;
         model.push_back(map);
     }
     return true;

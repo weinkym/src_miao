@@ -427,8 +427,10 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
         }
         else
         {
+            //TODO 目前发现1101能发消息
             LOG_ERROR(QString("retcode=%1").arg(retcode));
-            exit(retcode);
+//            exit(retcode);
+            requestSyncCheck();
         }
 
         break;

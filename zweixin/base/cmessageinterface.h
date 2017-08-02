@@ -22,9 +22,10 @@ protected slots:
 
 private:
     static CMessageInterface *m_instance;
+    static const int m_intervalSeconds = 300;
     bool m_initialized;
     QTimer *m_timer;
-    QMap<QString,CPB::AutoSendEventData> m_messageMap;
+    QMap<QString,CPB::AutoSendEventData>m_messageMap;
 };
 
 #endif // CMESSAGEINTERFACE_H

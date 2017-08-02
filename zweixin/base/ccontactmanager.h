@@ -13,6 +13,7 @@ public:
     void requestContact(const ZBaseRequestParam &baseRequestParam);
     void requestContactGroup(const ZBaseRequestParam &baseRequestParam,const QStringList &groupNameList);
     void requestWXSync(const ZBaseRequestParam &baseRequestParam,const Z_WX_SyncKeyList &syncKeyList);
+    QString getUserName(const QString &nickName);
 
 protected:
     CContactManager(QObject *parent = NULL);
@@ -22,7 +23,6 @@ protected:
 
 public:
     static CContactManager *m_instance;
-
     QMap<QString,QSharedPointer<Z_WX_USER_DATA> >m_contackMap;
     QMap<QString,QSharedPointer<Z_WX_USER_DATA> >m_groupMap;
 };

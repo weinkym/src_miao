@@ -2,6 +2,7 @@
 #include "zpublicaction.h"
 #include <QJsonDocument>
 #include "cloginmanager.h"
+#include "cmessageinterface.h"
 
 CContactManager * CContactManager::m_instance = NULL;
 
@@ -21,6 +22,11 @@ CContactManager::~CContactManager()
 
 void CContactManager::sendMessage(const QString &toUserName, const QString &message)
 {
+    if(!m_contackMap.contains(toUserName) && !m_groupMap.contains(toUserName))
+    {
+        LOG_WARNING(QString("toUserName=%1 not found").arg(toUserName));
+        return;
+    }
     ZPublicAction *action = ZPublicAction::createSendMessage(CLoginManager::getInstance()->m_baseRequestParam,CLoginManager::getInstance()->m_userData.UserName,
                                                              toUserName,message);
     connectAction(action);
@@ -39,6 +45,33 @@ void CContactManager::requestContactGroup(const ZBaseRequestParam &baseRequestPa
 void CContactManager::requestWXSync(const ZBaseRequestParam &baseRequestParam, const Z_WX_SyncKeyList &syncKeyList)
 {
     connectAction(ZPublicAction::createWXSync(baseRequestParam,syncKeyList));
+}
+
+QString CContactManager::getUserName(const QString &nickName)
+{
+    {
+    QMapIterator<QString,QSharedPointer<Z_WX_USER_DATA> > iter(m_contackMap);
+    while(iter.hasNext())
+    {
+        iter.next();
+        if(iter.value().data()->NickName == nickName)
+        {
+            return iter.key();
+        }
+    }
+    }
+    {
+    QMapIterator<QString,QSharedPointer<Z_WX_USER_DATA> > iter(m_groupMap);
+    while(iter.hasNext())
+    {
+        iter.next();
+        if(iter.value().data()->NickName == nickName)
+        {
+            return iter.key();
+        }
+    }
+    }
+    return "";
 }
 
 CContactManager::CContactManager(QObject *parent)
@@ -94,7 +127,8 @@ void CContactManager::doRequestFinished(const CPB::RequestReplyData &response)
         }
         emit sigDateUpdate(CPB::DATA_UPDATE_TYPE_CONTACT_LIST,"");
         LOG_TEST(QString("m_contackMap.count = %1").arg(m_contackMap.count()));
-        break;
+       CMessageInterface::getInstance()->init();
+       break;
     }
     case TYPE_REQUEST_GROUP:
     {

@@ -35,7 +35,7 @@ exists($${GLOBAL_PRF}) {
 }
 
 mac {
-    QMAKE_INFO_PLIST = $${TARGET}.plist
+#    QMAKE_INFO_PLIST = $${TARGET}.plist
 }
 
 LIB_PATH=../../lib/$${PLATEFORM_NAME}/$${DEBUG_RELEASE_NAME}

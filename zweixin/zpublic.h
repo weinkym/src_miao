@@ -256,6 +256,7 @@ struct AutoSendEventData
 {
     int type;
     qlonglong dateTime;
+    qlonglong lastSendDateTime;
     QString content;
     QString toUserName;
     QString uuid;

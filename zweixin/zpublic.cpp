@@ -201,6 +201,7 @@ CPB::AutoSendEventData::AutoSendEventData()
 {
      type = Zpublic::AUTO_SEND_EVENT_TYPE_NODEFINED;
      dateTime = 0;
+     lastSendDateTime = 0;
 }
 
 QVariantMap CPB::AutoSendEventData::toVariantMap() const
@@ -209,6 +210,7 @@ QVariantMap CPB::AutoSendEventData::toVariantMap() const
     Z_DEFINE_INSERT_VARIANTMAP(objMap,type);
     Z_DEFINE_INSERT_VARIANTMAP(objMap,content);
     Z_DEFINE_INSERT_VARIANTMAP(objMap,dateTime);
+    Z_DEFINE_INSERT_VARIANTMAP(objMap,lastSendDateTime);
     Z_DEFINE_INSERT_VARIANTMAP(objMap,toUserName);
     Z_DEFINE_INSERT_VARIANTMAP(objMap,uuid);
 
@@ -224,6 +226,7 @@ CPB::AutoSendEventData CPB::AutoSendEventData::parseMap(const QVariantMap &objMa
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,content);
 
     Z_DEFINE_PARSE_VALUE_FOR_LONGLONG(obj,objMap,dateTime);
+    Z_DEFINE_PARSE_VALUE_FOR_LONGLONG(obj,objMap,lastSendDateTime);
 
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,toUserName);
     Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,uuid);
@@ -239,6 +242,7 @@ QMap<QString, CPB::Field> CPB::AutoSendEventData::getFieldMap()
     QMap<QString, CPB::Field> fieldMap;
     fieldMap.insert("type",Field{"type", TypeInteger});
     fieldMap.insert("dateTime",Field{"dateTime", TypeInteger});
+    fieldMap.insert("lastSendDateTime",Field{"lastSendDateTime", TypeInteger});
     fieldMap.insert("content",Field{"content", TypeString});
     fieldMap.insert("toUserName",Field{"toUserName", TypeString});
     fieldMap.insert("uuid",Field{"uuid", TypeString});
