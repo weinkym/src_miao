@@ -4,6 +4,7 @@ win32{
 PLATEFORM_NAME=win
 }
 mac{
+QT += macextras
 PLATEFORM_NAME=mac
 }
 DEBUG_RELEASE_NAME=release
