@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>shader/basicShader.fs</file>
+        <file>shader/basicShader.vs</file>
+        <file>shader/image.jpg</file>
+    </qresource>
+</RCC>

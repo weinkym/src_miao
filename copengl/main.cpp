@@ -12,6 +12,10 @@
 #include "cutilinterface.h"
 #include <QTimer>
 #include <QDebug>
+#include "mesh.h"
+#include "shader.h"
+
+#include "texture.h"
 
 const int n = 360;
 const GLfloat R = 0.8f;
@@ -56,27 +60,30 @@ void drawEllpsse(const QRectF& randRect,const QRectF &rect)
     glEnd();
 }
 
+Mesh *g_mesh = 0;
+Shader *g_shader = 0;
+Texture *g_texture = 0;
 void myDisplay(void)
 {
     int i;
     glClear(GL_COLOR_BUFFER_BIT);
-//    glClearColor(1.0f,1.0f,1.0f,1.0f);
+//    glClearColor(1.0f,0.0f,0.0f,1.0f);
     glLineWidth(3);
     glPointSize(3);
-    glEnable(GL_BLEND);
-    glEnable(GL_LINE_SMOOTH);
-    glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST);  // Antialias the lines
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glColor3f(0.5f, 0.0f, 0.5f);
+//    glEnable(GL_BLEND);
+//    glEnable(GL_LINE_SMOOTH);
+//    glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST);  // Antialias the lines
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    glColor3f(0.5f, 0.0f, 0.5f);
 
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glBegin(GL_LINE_STRIP);
-    glVertex2f(g_rect.x(),g_rect.y());
-    glVertex2f(g_rect.right(),g_rect.y());
-    glVertex2f(g_rect.right(),g_rect.bottom());
-    glVertex2f(g_rect.left(),g_rect.bottom());
-    glVertex2f(g_rect.x(),g_rect.y());
-    glEnd();
+//    glColor3f(0.0f, 1.0f, 0.0f);
+//    glBegin(GL_LINE_STRIP);
+//    glVertex2f(g_rect.x(),g_rect.y());
+//    glVertex2f(g_rect.right(),g_rect.y());
+//    glVertex2f(g_rect.right(),g_rect.bottom());
+//    glVertex2f(g_rect.left(),g_rect.bottom());
+//    glVertex2f(g_rect.x(),g_rect.y());
+//    glEnd();
 
 //    if(g_count++ % 2 == 0)
 //    {
@@ -112,8 +119,14 @@ void myDisplay(void)
 //        drawEllpsse(g_rect,rect2);
 //    }
 
-    drawEllpsse(QRectF(-0.25,-0.25,0.5,0.5),QRectF(-0.25,-0.25,0.5,0.8));
+//    drawEllpsse(QRectF(-0.25,-0.25,0.5,0.5),QRectF(-0.25,-0.25,0.5,0.8));
 
+    g_shader->bind();
+    g_texture->Bind();
+    g_mesh->draw();
+
+//    glColor4f(0.5f, 0.5f, 0.5f,0.5f);
+//    drawEllpsse(QRectF(-1,-1,2,2),QRectF(-0.5,-0.5,1,1));
     glFlush();
 }
 
@@ -131,8 +144,25 @@ int main(int argc, char* argv[])
     glutInitWindowPosition(100, 100);
     glutInitWindowSize(800, 800);
     glutCreateWindow(QString("第一个OpenGL程序").toLocal8Bit().data());
+
+    const  GLubyte * name = glGetString(GL_VENDOR);
+       const  GLubyte * biaoshifu = glGetString(GL_RENDERER);
+       const  GLubyte * OpenGLVersion = glGetString(GL_VERSION);
+       const  GLubyte * gluVersion = gluGetString(GLU_VERSION);
+       qDebug()<< QStringLiteral("OpenGL实现厂商的名字" )<< QString((char *)name);
+       qDebug()<< QStringLiteral("渲染器标识符" )<< QString((char *)biaoshifu);
+       qDebug()<< QStringLiteral("OpenGL实现的版本号：" )<< QString((char *)OpenGLVersion);
+       qDebug()<< QStringLiteral("GLU工具库版本：" )<< QString((char *)gluVersion);
+
+    Vertex vertexs[] = {Vertex(glm::vec3(-0.5,-0.5,0),glm::vec2(0,1.0)),
+                       Vertex(glm::vec3(0,0.5,0),glm::vec2(0.5,0.0)),
+                       Vertex(glm::vec3(0.5,-0.5,0),glm::vec2(1.0,1.0))};
+    g_mesh =new Mesh(vertexs,sizeof(vertexs) / sizeof(vertexs[0]));
+    g_shader = new Shader("");
+
+    g_texture = new Texture("");
     glutDisplayFunc(&myDisplay);
-    initData();
+//    initData();
 //    glutTimerFunc(2000, timerFunction, 1);
     glutMainLoop();
     return 0;
