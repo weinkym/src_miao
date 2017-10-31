@@ -75,6 +75,7 @@ private:
     TS_DATA::LanguageType m_languageType;
     QMap<QString,QString> m_notFoundString;
     QStringList m_exceptKeyList;
+    QStringList m_allKeyList;
 };
 
 #endif // CXMLREADER_H

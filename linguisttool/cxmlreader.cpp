@@ -8,6 +8,8 @@ CXmlReader::CXmlReader()
 {
     m_exceptKeyList.append("CheckBox");
     m_exceptKeyList.append("TextLabel");
+    m_exceptKeyList.append("labelText");
+
 
     m_exceptKeyList.append(".MainWindow");
     m_exceptKeyList.append("0%");
@@ -137,7 +139,9 @@ bool CXmlReader::convert(const QString &sourceFilePath, const QString &languageD
         return false;
     }
     bool isOk = false;
+    m_allKeyList.clear();
     isOk = initLanguageMap(languageDataFilePath);
+    m_allKeyList = m_languageDataMap.keys();
     if(!isOk)
     {
         log(QString("initLanguageMap is false path=%1").arg(languageDataFilePath));
@@ -149,6 +153,7 @@ bool CXmlReader::convert(const QString &sourceFilePath, const QString &languageD
         log(QString("initLanguageOBSMap is false path=%1").arg(obsFilePath));
         return false;
     }
+
 //    return false;
     //
     isOk = read(sourceFilePath);
@@ -173,6 +178,7 @@ bool CXmlReader::convert(const QString &sourceFilePath, const QString &languageD
             break;
         }
     }
+    log(QString("not found count = %1 ,keys = %2,").arg(m_allKeyList.count()).arg(m_allKeyList.join("----")));
     return isOk;
 }
 
@@ -223,6 +229,10 @@ QString CXmlReader::getCurrentLanguage()
 
 QString CXmlReader::getLanguageString(const QString &key)
 {
+    if(m_allKeyList.contains(key))
+    {
+        m_allKeyList.removeAll(key);
+    }
     if(m_languageDataMap.contains(key))
     {
         switch (m_languageType)
