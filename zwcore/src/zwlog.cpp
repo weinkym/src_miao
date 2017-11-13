@@ -16,7 +16,7 @@ struct ZWLogSettings
         ,file_path("")
         ,log_type_separator_begin("【")
         ,log_type_separator_end("】")
-        ,types(LOG_TYPE_FILE | LOG_TYPE_DATE_TIME | LOG_TYPE_LINE | LOG_TYPE_FUNCTION)
+        ,types(LOG_TYPE_FILE | LOG_TYPE_DATE_TIME | LOG_TYPE_LINE | LOG_TYPE_FUNCTION | LOG_TYPE_LEVEL_STRING)
     {
     }
     ZW_LOG_LEVEL test_log_level;
