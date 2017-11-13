@@ -14,6 +14,7 @@ public:
     void requestContactGroup(const ZBaseRequestParam &baseRequestParam,const QStringList &groupNameList);
     void requestWXSync(const ZBaseRequestParam &baseRequestParam,const Z_WX_SyncKeyList &syncKeyList);
     QString getUserName(const QString &nickName);
+    QString getNickName(const QString &userName);
 
 protected:
     CContactManager(QObject *parent = NULL);

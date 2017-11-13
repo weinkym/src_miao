@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 //       QMetaEnum me = QMetaEnum::fromType<Zpublic::AutoSendEventType>();
 //       LOG_INFO(QString("me count = %1").arg(me.keyCount()))
 //        return -1;
-       CMessageInterface::getInstance()->init();
+//       CMessageInterface::getInstance()->init();
 //       ZInputMessageDialog dlg;
 //       dlg.resetContacts(CContactManager::getInstance()->m_contackMap.values());
 //       dlg.show();

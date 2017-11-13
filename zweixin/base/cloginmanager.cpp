@@ -432,10 +432,10 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
         }
         else
         {
-            //TODO 目前发现1101能发消息
+            //TODO 目前发现1101能发消息 收不到消息
             ZW_LOG_CRITICAL(QString("retcode=%1").arg(retcode));
-//            exit(retcode);
-            requestSyncCheck();
+            exit(retcode);
+//            requestSyncCheck();
         }
 
         break;

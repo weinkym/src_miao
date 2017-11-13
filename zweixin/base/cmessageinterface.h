@@ -16,6 +16,8 @@ public:
     void setSendNickNames(const QStringList &sendNickNames);
     void start();
     void stop();
+    bool containNickName(const QString &nickName);
+    void sendStatusMessage();
 
 protected:
     CMessageInterface(QObject *parent = NULL);

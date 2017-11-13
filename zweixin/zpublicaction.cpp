@@ -169,7 +169,7 @@ QNetworkRequest ZPublicAction::createRequest() const
     }
     case TYPE_REQUEST_COOKIE:
     {
-        QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxnewloginpage?ticket=%1&uuid=%2&lang=zh_CN&scan=%3&fun=new")
+        QString head=QString("https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxnewloginpage?ticket=%1&uuid=%2&lang=zh_CN&scan=%3&fun=new&version=v2")
                 .arg(m_ticket).arg(m_uuid).arg(m_scan);
 
         QNetworkRequest request(QUrl(head.toLatin1()));

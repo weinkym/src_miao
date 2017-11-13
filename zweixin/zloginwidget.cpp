@@ -48,9 +48,9 @@ void ZLoginWidget::requestWaitLogin(const QString &uuid, int tip)
 void ZLoginWidget::requestCookie(const QString &uuid, const QString &ticket, const QString &scan)
 {
     ZW_LOG_FUNCTION;
-    ZRequestAction *action = ZPublicAction::createCookieAction(uuid,ticket,scan);
-    connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
-    action->trigger();
+//    ZRequestAction *action = ZPublicAction::createCookieAction(uuid,ticket,scan);
+//    connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
+//    action->trigger();
 }
 
 QString ZLoginWidget::parseUuid(const QByteArray &byteArray)

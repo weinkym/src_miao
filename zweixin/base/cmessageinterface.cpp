@@ -46,7 +46,7 @@ void CMessageInterface::addMessage(const CPB::AutoSendEventData &msg)
         ZW_LOG_WARNING(QString("addMessage is exist uuid=%1").arg(msg.uuid));
         return;
     }
-    ZW_LOG_INFO(QString("addMessage uuid=%1,content=%1").arg(msg.uuid).arg(msg.content));
+    ZW_LOG_INFO(QString("addMessage uuid=%1,content=%2").arg(msg.uuid).arg(msg.content));
     m_messageMap.insert(msg.uuid,msg);
     CSqliteAccessInterface::getInstance()->insertMessage(msg);
 }
@@ -56,12 +56,13 @@ void CMessageInterface::deleteMessage(const QString &uuid)
     ZW_LOG_FUNCTION;
     if(m_messageMap.contains(uuid))
     {
+        ZW_LOG_INFO(QString("remove message uuid=%1").arg(uuid));
         m_messageMap.remove(uuid);
         CSqliteAccessInterface::getInstance()->deleteMessage(uuid);
     }
     else
     {
-        ZW_LOG_WARNING(QString("deleteMessage is exist uuid=%1").arg(uuid));
+        ZW_LOG_WARNING(QString("deleteMessage is not exist uuid=%1").arg(uuid));
     }
 }
 
@@ -87,6 +88,11 @@ void CMessageInterface::stop()
     }
 }
 
+bool CMessageInterface::containNickName(const QString &nickName)
+{
+    return m_sendNickNames.contains(nickName);
+}
+
 CMessageInterface::CMessageInterface(QObject *parent)
     :QObject(parent)
     ,m_initialized(false)
@@ -95,7 +101,7 @@ CMessageInterface::CMessageInterface(QObject *parent)
     m_timer = new QTimer(this);
 //    m_timer->setInterval(m_intervalSeconds * 1000);
     m_sendNickNames.append("TT123456");
-    m_timer->setInterval(5 * 1000);
+    m_timer->setInterval(1 * 60 * 1000);
     connect(m_timer,SIGNAL(timeout()),this,SLOT(onTimerout()));
 }
 
@@ -155,6 +161,26 @@ void CMessageInterface::onTimerout()
                     ZW_LOG_WARNING(QString("sendmessage nickName=%1 toUserName is empty").arg(nickName));
                 }
             }
+        }
+    }
+}
+
+void CMessageInterface::sendStatusMessage()
+{
+    ZW_LOG_FUNCTION;
+    QString content=QString("check_status sendNickNames=%1").arg(m_sendNickNames.join("--"));
+    foreach (const QString &nickName, m_sendNickNames)
+    {
+        QString toUserName = CContactManager::getInstance()->getUserName(nickName);
+        if(!toUserName.isEmpty())
+        {
+            ZW_LOG_INFO(QString("sendmessage to nickName %1").arg(nickName));
+            ZW_LOG_INFO(QString("sendmessage to toUserName %1").arg(toUserName));
+            CContactManager::getInstance()->sendMessage(toUserName,content);
+        }
+        else
+        {
+            ZW_LOG_WARNING(QString("sendmessage nickName=%1 toUserName is empty").arg(nickName));
         }
     }
 }

@@ -74,6 +74,20 @@ QString CContactManager::getUserName(const QString &nickName)
     return "";
 }
 
+QString CContactManager::getNickName(const QString &userName)
+{
+    if(m_contackMap.contains(userName))
+    {
+        return m_contackMap.value(userName).data()->NickName;
+    }
+    if(m_groupMap.contains(userName))
+    {
+        return m_groupMap.value(userName).data()->NickName;
+    }
+    ZW_LOG_WARNING(QString("can not found userName=%1").arg(userName));
+    return "";
+}
+
 CContactManager::CContactManager(QObject *parent)
     :CBaseObject(parent)
 {
@@ -170,8 +184,53 @@ void CContactManager::doRequestFinished(const CPB::RequestReplyData &response)
             for(auto d:AddMsgList)
             {
                 Z_WX_MSG_DATA msg = Z_WX_MSG_DATA::parseMap(d.toMap());
-                ZW_LOG_DEBUG(QString("msg:id=%1,MsgType=%2,content=%3,appinfo.AppID=%4,RecommendInfo.UserName=%5")
-                         .arg(msg.NewMsgId).arg(msg.MsgType).arg(msg.Content).arg(msg.AppInfo.AppID).arg(msg.RecommendInfo.UserName));
+                QString name = CContactManager::getInstance()->getNickName(msg.ToUserName);
+                ZW_LOG_DEBUG(QString("msg:id=%1,MsgType=%2,content=%3,appinfo.AppID=%4,RecommendInfo.UserName=%5,name=%6")
+                         .arg(msg.NewMsgId).arg(msg.MsgType).arg(msg.Content).arg(msg.AppInfo.AppID)
+                             .arg(msg.RecommendInfo.UserName).arg(name));
+                if(msg.MsgType == 1 && CMessageInterface::getInstance()->containNickName(name))
+                {
+                    if(msg.Content == "TYPE_CHECK_STATUS")
+                    {
+                        QTimer::singleShot(1000, [this]()
+                        {
+                            CMessageInterface::getInstance()->sendStatusMessage();
+                        });
+                        break;
+                    }
+                    CMessageInterface::getInstance()->deleteMessage(msg.Content);
+                    QJsonDocument doc = QJsonDocument::fromJson(msg.Content.toLocal8Bit(),&errorString);
+                    if(errorString.error == QJsonParseError::NoError)
+                    {
+                        QVariantMap objMap = doc.toVariant().toMap();
+                        ZW_LOG_INFO(QString("objMap.keys=%1").arg(QStringList(objMap.keys()).join("--")));
+                        if(objMap.contains("send_nick_name_list"))
+                        {
+                            QVariantList objList = objMap.value("send_nick_name_list").toList();
+                            if(!objList.isEmpty())
+                            {
+                                QStringList nickNameList;
+                                for(auto obj:objList)
+                                {
+                                    QString nickName = obj.toString();
+                                    if(!nickName.isEmpty())
+                                    {
+                                        nickNameList.append(nickName);
+                                    }
+                                }
+                                CMessageInterface::getInstance()->setSendNickNames(nickNameList);
+                            }
+                            break;
+                        }
+                        bool valid = false;
+                        CPB::AutoSendEventData msg = CPB::AutoSendEventData::parseMap(objMap,valid);
+                        if(valid)
+                        {
+                            msg.uuid = QUuid::createUuid().toString();
+                            CMessageInterface::getInstance()->addMessage(msg);
+                        }
+                    }
+                }
             }
         }
         CLoginManager::getInstance()->m_syncKeyList = Z_WX_SyncKeyList::parseList(objMap.value("SyncCheckKey").toMap().value("List").toList());

@@ -264,6 +264,7 @@ struct AutoSendEventData
     AutoSendEventData();
     QVariantMap toVariantMap() const;
     static AutoSendEventData parseMap(const QVariantMap &objMap);
+    static AutoSendEventData parseMap(const QVariantMap &objMap,bool &valid);
     static QMap<QString, Field> getFieldMap();
 };
 }

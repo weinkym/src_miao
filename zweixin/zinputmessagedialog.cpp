@@ -55,8 +55,8 @@ void ZInputMessageDialog::on_btnAdd_clicked()
         CPB::AutoSendEventData  msg;
         msg.toUserName = "userName";
         msg.content=ui->textEditContent->toPlainText();
-//        msg.type = ui->comboBox->currentData();
-        msg.type = Zpublic::AUTO_SEND_EVENT_TYPE_DATE_TIME;
+        msg.type = ui->comboBox->currentData().toInt();
+//        msg.type = Zpublic::AUTO_SEND_EVENT_TYPE_DATE_TIME;
 //        int days = QString(fieldList.at(1)).toInt();
 //        msg.type=QString(fieldList.at(2)).toInt();
 //        QDate date(1900,1,1);

@@ -237,6 +237,35 @@ CPB::AutoSendEventData CPB::AutoSendEventData::parseMap(const QVariantMap &objMa
     return obj;
 }
 
+CPB::AutoSendEventData CPB::AutoSendEventData::parseMap(const QVariantMap &objMap, bool &valid)
+{
+    AutoSendEventData obj;
+
+    if(objMap.contains("type") && objMap.contains("content")
+            && objMap.contains("dateTime"))
+    {
+        Z_DEFINE_PARSE_VALUE_FOR_INT(obj,objMap,type);
+        Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,content);
+        QDateTime dateTime = QDateTime::fromString(objMap.value("dateTime").toString(),"yyyyMMdd hh:mm:ss");
+        if(dateTime.isValid() && !dateTime.isNull())
+        {
+            valid = true;
+            obj.dateTime = dateTime.toTime_t();
+        }
+        else
+        {
+            ZW_LOG_WARNING(QString("dateTime is error value=%1").arg(objMap.value("dateTime").toString()));
+        }
+    }
+    else
+    {
+        ZW_LOG_WARNING(QString("keys not complete"));
+        valid = false;
+    }
+
+    return obj;
+}
+
 QMap<QString, CPB::Field> CPB::AutoSendEventData::getFieldMap()
 {
     QMap<QString, CPB::Field> fieldMap;
