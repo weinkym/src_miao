@@ -15,6 +15,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
+    ZW_LOG::setLogFilePath("/Users/miaozw/Documents/TEMP/test.log");
     ZW_LOG_DEBUG("asdfasdfadsf");
-    ZW_LOG_TEST;
 }
