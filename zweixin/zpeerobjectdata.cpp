@@ -19,10 +19,10 @@ void ZPeerObjectData::requestAvatar()
 
 void ZPeerObjectData::onRequestFinished(const CPB::RequestReplyData &response)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     bool ok = m_image.loadFromData(response.replyData);
-    LOG_TEST(QString("ok = %1").arg(ok?"true":"false"));
-    LOG_TEST(QString("response.data.size = %1").arg(response.replyData.size()));
-    LOG_TEST(QString("image.size = %1").arg(m_image.size().width()));
+    ZW_LOG_DEBUG(QString("ok = %1").arg(ok?"true":"false"));
+    ZW_LOG_DEBUG(QString("response.data.size = %1").arg(response.replyData.size()));
+    ZW_LOG_DEBUG(QString("image.size = %1").arg(m_image.size().width()));
     emit sigUpdate();
 }

@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = zweixin
 TEMPLATE = app
 
+include(../zwcore/zwcore.pri)
+
 INCLUDEPATH += ./base
 INCLUDEPATH += ./widget
 INCLUDEPATH += ./network

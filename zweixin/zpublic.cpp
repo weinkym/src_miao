@@ -16,7 +16,7 @@ QMap<QString, int> Zpublic::getEnumAutoSendEventTypeMap()
 //    int index = mo.indexOfEnumerator("AutoSendEventType");
 //    QMetaEnum me = mo.enumerator(index);
 //   QMetaEnum me = QMetaEnum::fromType();
-    LOG_INFO(QString("me count = %1").arg(me.keyCount()))
+    ZW_LOG_INFO(QString("me count = %1").arg(me.keyCount()));
 }
 
 QList<QStringList> Zpublic::regexCapture(const QString &source, const QString &pattern)

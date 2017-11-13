@@ -19,7 +19,7 @@ ZRequestAccessManager::ZRequestAccessManager(QObject *parent) :
     m_access(NULL),
     m_isYxtLogining(false)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     m_access = new QNetworkAccessManager();
     connect(m_access, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(onIgnoreSSlErrors(QNetworkReply*,QList<QSslError>)));
     connect(m_access, SIGNAL(networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility)),
@@ -42,7 +42,7 @@ bool ZRequestAccessManager::setCookie(const QVariant &cookieListVariant, const Q
                 cookie.setDomain(domain);
                 if (cookieJar->updateCookie(cookie) == false)
                 {
-                    LOG_ERROR(QString("update cookie failed. The cookie is not effect."));
+                    ZW_LOG_CRITICAL(QString("update cookie failed. The cookie is not effect."));
                     ret = false;
                     break;
                 }
@@ -57,7 +57,7 @@ bool ZRequestAccessManager::setCookie(const QVariant &cookieListVariant, const Q
                 cookie.setDomain(domain);
                 if (cookieJar->insertCookie(cookie) == false)
                 {
-                    LOG_ERROR(QString("Insert cookie failed. The cookie is not effect."));
+                    ZW_LOG_CRITICAL(QString("Insert cookie failed. The cookie is not effect."));
                     ret = false;
                     break;
                 }
@@ -69,7 +69,7 @@ bool ZRequestAccessManager::setCookie(const QVariant &cookieListVariant, const Q
     }
     else
     {
-        LOG_ERROR(QString("Set bad cookie list. Cookie list are empty."));
+        ZW_LOG_CRITICAL(QString("Set bad cookie list. Cookie list are empty."));
         ret = false;
     }
 
@@ -82,7 +82,7 @@ void ZRequestAccessManager::refreshYxtToken()
     //如果正在发起登录，忽略
     if(m_isYxtLogining)
     {
-        LOG_ERROR(QString("Login is processing, call login too much times"));
+        ZW_LOG_CRITICAL(QString("Login is processing, call login too much times"));
         return;
     }
     else
@@ -109,20 +109,20 @@ void ZRequestAccessManager::onNetworkAccessibilityChanged(QNetworkAccessManager:
     bool networkAccessibility = false;
     if (status == QNetworkAccessManager::UnknownAccessibility)
     {
-        LOG_WARNING(QString("Unknown network accessibility."));
+        ZW_LOG_WARNING(QString("Unknown network accessibility."));
     }
     else if (status == QNetworkAccessManager::NotAccessible)
     {
-        LOG_WARNING(QString("network is not accessible"));
+        ZW_LOG_WARNING(QString("network is not accessible"));
     }
     else if (status == QNetworkAccessManager::Accessible)
     {
         networkAccessibility = true;
-        LOG_WARNING(QString("network is recovered"));
+        ZW_LOG_WARNING(QString("network is recovered"));
     }
     else
     {
-        LOG_ERROR(QString("Got a bad network status, look out."));
+        ZW_LOG_CRITICAL(QString("Got a bad network status, look out."));
     }
 
     emit sigUpdateNetworkAccessibility(networkAccessibility);
@@ -132,57 +132,57 @@ void ZRequestAccessManager::onIgnoreSSlErrors(QNetworkReply* reply, QList<QSslEr
 {
     for (int i = 0; i < sslErrors.size(); ++i)
     {
-        LOG_ERROR(QString("Get ssl error [%1]").arg(sslErrors[i].errorString()));
+        ZW_LOG_CRITICAL(QString("Get ssl error [%1]").arg(sslErrors[i].errorString()));
     }
     reply->ignoreSslErrors(sslErrors);
 }
 
 void ZRequestAccessManager::postByteArray(ZRequestAction *action)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     if(action == NULL)
     {
-        LOG_WARNING(QString("action is null"));
+        ZW_LOG_WARNING(QString("action is null"));
         return;
     }
     QByteArray array = action->getByteArray();
     QNetworkRequest request = action->createRequest();
 
     QString logInfo = QString("[Http Request][POST]url: ") + request.url().toString();
-    LOG_INFO(logInfo);
+    ZW_LOG_INFO(logInfo);
     QNetworkReply *reply = m_access->post(request, array);
     action->setReply(reply);
 }
 
 void ZRequestAccessManager::putByteArray(ZRequestAction *action)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     if(action == NULL)
     {
-        LOG_WARNING(QString("action is null"));
+        ZW_LOG_WARNING(QString("action is null"));
         return;
     }
     QByteArray array = action->getByteArray();
     QNetworkRequest request = action->createRequest();
 
     QString logInfo = QString("[Http Request][PUT]url: ") + request.url().toString();
-    LOG_INFO(logInfo);
+    ZW_LOG_INFO(logInfo);
     QNetworkReply *reply = m_access->put(request, array);
     action->setReply(reply);
 }
 
 void ZRequestAccessManager::postWithttachment(ZRequestAction *action)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     if(action == NULL)
     {
-        LOG_WARNING(QString("action is null"));
+        ZW_LOG_WARNING(QString("action is null"));
         return;
     }
     QNetworkRequest request = action->createRequest();
     QHttpMultiPart *multiPart = action->getMultiPart();
 
-    LOG_INFO(QString("[Http Request][Post]post url: %1").arg(request.url().toString()));
+    ZW_LOG_INFO(QString("[Http Request][Post]post url: %1").arg(request.url().toString()));
     QNetworkReply *reply = m_access->post(request,multiPart);
 
     action->setReply(reply);
@@ -190,10 +190,10 @@ void ZRequestAccessManager::postWithttachment(ZRequestAction *action)
 
 void ZRequestAccessManager::get(ZRequestAction *action)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     if(action == NULL)
     {
-        LOG_WARNING(QString("action is null"));
+        ZW_LOG_WARNING(QString("action is null"));
         return;
     }
     QNetworkRequest request = action->createRequest();
@@ -202,21 +202,21 @@ void ZRequestAccessManager::get(ZRequestAction *action)
     if(!url.startsWith("http"))
     {
         QString typeString = QString::number(action->getType());
-        LOG_ERROR(QString("[Http Request][Get]url not start with http, url is:%1,action type:%2,className:%3")
+        ZW_LOG_CRITICAL(QString("[Http Request][Get]url not start with http, url is:%1,action type:%2,className:%3")
                   .arg(url).arg(typeString).arg(action->metaObject()->className()));
         return;
     }
-    LOG_INFO(QString("[Http Request][Get]get url: %1").arg(request.url().toString()));
+    ZW_LOG_INFO(QString("[Http Request][Get]get url: %1").arg(request.url().toString()));
     QNetworkReply *reply = m_access->get(request);
     action->setReply(reply);
 }
 
 void ZRequestAccessManager::patchByteArray(ZRequestAction *action)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     if(action == NULL)
     {
-        LOG_WARNING(QString("action is null"));
+        ZW_LOG_WARNING(QString("action is null"));
         return;
     }
     QNetworkRequest request = action->createRequest();
@@ -226,7 +226,7 @@ void ZRequestAccessManager::patchByteArray(ZRequestAction *action)
     buffer->setData(array);
 
     QString patchString = array;
-    LOG_TEST(QString("[Http Request][Patch]array:%1  url:%2").arg(patchString).arg( request.url().toString()));
+    ZW_LOG_DEBUG(QString("[Http Request][Patch]array:%1  url:%2").arg(patchString).arg( request.url().toString()));
     QNetworkReply *reply = m_access->sendCustomRequest(request, QByteArray("PATCH"), buffer);
     action->setReply(reply);
     buffer->setParent(reply);
@@ -236,7 +236,7 @@ void ZRequestAccessManager::patchMulti(ZRequestAction *action)
 {
     if(action == NULL)
     {
-        LOG_WARNING(QString("action is null"));
+        ZW_LOG_WARNING(QString("action is null"));
         return;
     }
     QNetworkRequest request = action->createRequest();
@@ -245,7 +245,7 @@ void ZRequestAccessManager::patchMulti(ZRequestAction *action)
     QBuffer *buffer = new QBuffer;
     buffer->setData(array);
 
-    LOG_INFO(QString("[Http Request][Patch]patchMulti url: ") + request.url().toString());
+    ZW_LOG_INFO(QString("[Http Request][Patch]patchMulti url: ") + request.url().toString());
     QNetworkReply *reply = m_access->sendCustomRequest(request, QByteArray("PATCH"), buffer);
     action->setReply(reply);
     buffer->setParent(reply);
@@ -255,11 +255,11 @@ void ZRequestAccessManager::deleteResource(ZRequestAction *action)
 {
     if(action == NULL)
     {
-        LOG_ERROR(QString("action is null"));
+        ZW_LOG_CRITICAL(QString("action is null"));
         return;
     }
     QNetworkRequest request = action->createRequest();
-    LOG_INFO(QString("[Http Request][Delete]url: ") + request.url().toString());
+    ZW_LOG_INFO(QString("[Http Request][Delete]url: ") + request.url().toString());
     QNetworkReply *reply = m_access->deleteResource(request);
     action->setReply(reply);
 }

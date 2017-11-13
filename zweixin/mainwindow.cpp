@@ -43,7 +43,7 @@ void MainWindow::requestInit()
 
 void MainWindow::requestStatusNotify()
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
 //    ZPublicAction *action = ZPublicAction::createStatusNotify(m_baseRequestParam,m_userData.UserName,m_userData.UserName);
 //    connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
 //    action->trigger();
@@ -51,7 +51,7 @@ void MainWindow::requestStatusNotify()
 
 void MainWindow::requestContact()
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
 //    ZPublicAction *action = ZPublicAction::createGetContact(m_baseRequestParam);
 //    connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
 //    action->trigger();
@@ -108,7 +108,7 @@ bool MainWindow::parseInitData(const QByteArray &byteArray)
 
 void MainWindow::onRequestFinished(const CPB::RequestReplyData &response)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
 //    if(response.statusCode > 200)
 //    {
 //        LOG_TEST(QString("request is error").arg(QString(response.replyData)));
@@ -164,7 +164,7 @@ void MainWindow::on_btnTest01_clicked()
 
 void MainWindow::onLoginFinished(bool ok)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     this->show();
     if(!ok)
     {
@@ -186,7 +186,7 @@ void MainWindow::onLoginFinished(bool ok)
 
 void MainWindow::onTest()
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     ZInputMessageDialog dlg;
     dlg.resetContacts(CContactManager::getInstance()->m_contackMap.values());
     dlg.exec();

@@ -23,7 +23,7 @@ ZLoginWidget::~ZLoginWidget()
 
 void ZLoginWidget::requestUuid()
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     ZRequestAction *action = ZPublicAction::createLoginUuidAction();
     connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
     action->trigger();
@@ -31,7 +31,7 @@ void ZLoginWidget::requestUuid()
 
 void ZLoginWidget::requestQrCode(const QString &uuid)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     ZRequestAction *action = ZPublicAction::createQrCodeAction(uuid);
     connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
     action->trigger();
@@ -39,7 +39,7 @@ void ZLoginWidget::requestQrCode(const QString &uuid)
 
 void ZLoginWidget::requestWaitLogin(const QString &uuid, int tip)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     ZRequestAction *action = ZPublicAction::createWaitLoginAction(uuid,tip);
     connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
     action->trigger();
@@ -47,7 +47,7 @@ void ZLoginWidget::requestWaitLogin(const QString &uuid, int tip)
 
 void ZLoginWidget::requestCookie(const QString &uuid, const QString &ticket, const QString &scan)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     ZRequestAction *action = ZPublicAction::createCookieAction(uuid,ticket,scan);
     connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));
     action->trigger();
@@ -55,10 +55,10 @@ void ZLoginWidget::requestCookie(const QString &uuid, const QString &ticket, con
 
 QString ZLoginWidget::parseUuid(const QByteArray &byteArray)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     QString uuid;
     QString tempData = QString(byteArray).simplified();
-    LOG_TEST(QString("TTTTTTTV:tempData=%1").arg(tempData));
+    ZW_LOG_DEBUG(QString("TTTTTTTV:tempData=%1").arg(tempData));
     QString key = "code=200";
 //    if(tempData.contains(key))
     {
@@ -68,12 +68,12 @@ QString ZLoginWidget::parseUuid(const QByteArray &byteArray)
         {
             uuid = tempData.mid(index1+1,index2-index1-1);
         }
-        LOG_TEST(QString("TTTTTTTV:index1=%1").arg(index1));
-        LOG_TEST(QString("TTTTTTTV:index2=%1").arg(index2));
+        ZW_LOG_DEBUG(QString("TTTTTTTV:index1=%1").arg(index1));
+        ZW_LOG_DEBUG(QString("TTTTTTTV:index2=%1").arg(index2));
 
 //        QString tempStr =
     }
-    LOG_TEST(QString("TTTTTTTV:uuid=%1").arg(uuid));
+    ZW_LOG_DEBUG(QString("TTTTTTTV:uuid=%1").arg(uuid));
     return uuid;
 }
 
@@ -81,19 +81,19 @@ bool ZLoginWidget::parseRedirectUri(const QByteArray &byteArray)
 {
     //(window.redirect_uri)=\"([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?
     QList<QStringList> redirecttUrlData = Zpublic::regexCapture(QString(byteArray),"(window.redirect_uri)=\\\"([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?");
-    LOG_TEST(QString("redirecttUrlData.count()=%1").arg(redirecttUrlData.count()));
+    ZW_LOG_DEBUG(QString("redirecttUrlData.count()=%1").arg(redirecttUrlData.count()));
     if(redirecttUrlData.count() != 1)
     {
         return false;
     }
     QStringList redirectUrlCapture = redirecttUrlData.first();
-    LOG_TEST(QString("redirectUrlCapture.count()=%1").arg(redirectUrlCapture.count()));
+    ZW_LOG_DEBUG(QString("redirectUrlCapture.count()=%1").arg(redirectUrlCapture.count()));
     if(redirectUrlCapture.count() <= 2)
     {
         return false;
     }
     QString redirectUrl = redirectUrlCapture.at(2);
-    LOG_TEST(QString("redirectUrl=%1").arg(redirectUrl));
+    ZW_LOG_DEBUG(QString("redirectUrl=%1").arg(redirectUrl));
 
     m_scan = parseUrlParam(redirectUrl,"scan");
     m_ticket = parseUrlParam(redirectUrl,"ticket");
@@ -124,7 +124,7 @@ bool ZLoginWidget::parseCookieData(const QByteArray &byteArray)
     bool ok = doc.setContent(byteArray,&errorString);
     if(!ok)
     {
-        LOG_ERROR(errorString);
+        ZW_LOG_CRITICAL(errorString);
         return false;
     }
     QDomElement root = doc.documentElement();
@@ -135,7 +135,7 @@ bool ZLoginWidget::parseCookieData(const QByteArray &byteArray)
     {
         QDomNode domNode = domNodeList.at(i);
         QDomElement element = domNode.toElement();
-        LOG_TEST(QString("nodeName=%1,%2,%3").arg(element.tagName()).arg(element.nodeName()).arg(element.text()));
+        ZW_LOG_DEBUG(QString("nodeName=%1,%2,%3").arg(element.tagName()).arg(element.nodeName()).arg(element.text()));
         if(element.tagName() == "isgrayscale")
         {
             m_cookieParam.isgrayscale = element.text().toInt();
@@ -170,7 +170,7 @@ bool ZLoginWidget::parseCookieData(const QByteArray &byteArray)
 
 void ZLoginWidget::onRequestFinished(const CPB::RequestReplyData &response)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
 //    if(response.statusCode > 200)
 //    {
 //        LOG_TEST(QString("request is error").arg(QString(response.replyData)));
@@ -290,6 +290,6 @@ void ZLoginWidget::onDateUpdate(int type, const QVariant &value)
 
 void ZLoginWidget::onRequestWaitLogin()
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
 //    requestWaitLogin(m_uuid,m_tip);
 }

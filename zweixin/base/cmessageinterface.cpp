@@ -33,7 +33,7 @@ void CMessageInterface::init()
         CPB::AutoSendEventData obj = CPB::AutoSendEventData::parseMap(v.toMap());
         m_messageMap.insert(obj.uuid,obj);
     }
-    LOG_INFO(QString("message count = %1").arg(m_messageMap.count()));
+    ZW_LOG_INFO(QString("message count = %1").arg(m_messageMap.count()));
     m_timer->start();
 }
 
@@ -60,7 +60,7 @@ CMessageInterface::CMessageInterface(QObject *parent)
 
 void CMessageInterface::onTimerout()
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
 //    init();
     //===========
     QDateTime currentDateTime = QDateTime::currentDateTime();
@@ -73,7 +73,7 @@ void CMessageInterface::onTimerout()
 //        LOG_INFO(QString("currentDateTime = %1,dateTime=%2")
 //                 .arg(currentDateTime.toString("yyyyMMdd hh:mm:ss"))
 //                 .arg(dateTime.toString("yyyyMMdd hh:mm:ss")));
-        LOG_INFO(QString("TTTTTTTTTTT"));
+        ZW_LOG_INFO(QString("TTTTTTTTTTT"));
         bool needSend = false;
         switch (iter.value().type)
         {
@@ -103,7 +103,7 @@ void CMessageInterface::onTimerout()
         if(needSend)
         {
             QString content = QString("%1:%2").arg(iter.key()).arg(iter.value().content);
-            LOG_INFO(QString("content = %1").arg(content));
+            ZW_LOG_INFO(QString("content = %1").arg(content));
             QString toUserName = CContactManager::getInstance()->getUserName("TT123456");
             CContactManager::getInstance()->sendMessage(toUserName,content);
         }

@@ -357,7 +357,7 @@ QByteArray ZPublicAction::getByteArray() const
         quint64 id = QDateTime::currentDateTime().toTime_t();
         id<<4;
         id += qrand() %10000;
-        LOG_DEBUG(QString("client id = %1").arg(id));
+        ZW_LOG_DEBUG(QString("client id = %1").arg(id));
 
         objMsg.insert("ClientMsgId",QJsonValue::fromVariant(id));
         objMsg.insert("Content",m_message);

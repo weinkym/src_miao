@@ -1,11 +1,12 @@
 #ifndef ZGOLBAL_H
 #define ZGOLBAL_H
 #include <QDebug>
+#include "zwlog.h"
 
-#define LOG_FUNCTION qDebug()<<Q_FUNC_INFO;
-#define LOG_ERROR(x) qDebug()<<x;
-#define LOG_WARNING(x) qDebug()<<x;
-#define LOG_INFO(x) qDebug()<<x;
-#define LOG_DEBUG(x) qDebug()<<x;
-#define LOG_TEST(x) qDebug()<<x;
+//#define ZW_LOG_FUNCTION qDebug()<<Q_FUNC_INFO;
+//#define ZW_LOG_CRITICAL(x) qDebug()<<x;
+//#define ZW_LOG_WARNING(x) qDebug()<<x;
+//#define ZW_LOG_INFO(x) qDebug()<<x;
+//#define ZW_LOG_DEBUG(x) qDebug()<<x;
+//#define ZW_LOG_DEBUG(x) qDebug()<<x;
 #endif // ZGOLBAL_H

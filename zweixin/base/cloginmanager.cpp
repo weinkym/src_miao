@@ -88,10 +88,10 @@ CLoginManager::CLoginManager(QObject *parent)
 
 QString CLoginManager::parseUuid(const QByteArray &byteArray)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     QString uuid;
     QString tempData = QString(byteArray).simplified();
-    LOG_TEST(QString("TTTTTTTV:tempData=%1").arg(tempData));
+    ZW_LOG_DEBUG(QString("TTTTTTTV:tempData=%1").arg(tempData));
     QString key = "code=200";
 //    if(tempData.contains(key))
     {
@@ -101,12 +101,12 @@ QString CLoginManager::parseUuid(const QByteArray &byteArray)
         {
             uuid = tempData.mid(index1+1,index2-index1-1);
         }
-        LOG_TEST(QString("TTTTTTTV:index1=%1").arg(index1));
-        LOG_TEST(QString("TTTTTTTV:index2=%1").arg(index2));
+        ZW_LOG_DEBUG(QString("TTTTTTTV:index1=%1").arg(index1));
+        ZW_LOG_DEBUG(QString("TTTTTTTV:index2=%1").arg(index2));
 
 //        QString tempStr =
     }
-    LOG_TEST(QString("TTTTTTTV:uuid=%1").arg(uuid));
+    ZW_LOG_DEBUG(QString("TTTTTTTV:uuid=%1").arg(uuid));
     return uuid;
 }
 
@@ -117,7 +117,7 @@ bool CLoginManager::parseCookieData(const QByteArray &byteArray, Z_WX_COOKIE_PAR
     bool ok = doc.setContent(byteArray,&errorString);
     if(!ok)
     {
-        LOG_ERROR(errorString);
+        ZW_LOG_CRITICAL(errorString);
         return false;
     }
     QDomElement root = doc.documentElement();
@@ -128,7 +128,7 @@ bool CLoginManager::parseCookieData(const QByteArray &byteArray, Z_WX_COOKIE_PAR
     {
         QDomNode domNode = domNodeList.at(i);
         QDomElement element = domNode.toElement();
-        LOG_TEST(QString("nodeName=%1,%2,%3").arg(element.tagName()).arg(element.nodeName()).arg(element.text()));
+        ZW_LOG_DEBUG(QString("nodeName=%1,%2,%3").arg(element.tagName()).arg(element.nodeName()).arg(element.text()));
         if(element.tagName() == "isgrayscale")
         {
             param.isgrayscale = element.text().toInt();
@@ -165,19 +165,19 @@ bool CLoginManager::parseRedirectUri(const QByteArray &byteArray)
 {
     //(window.redirect_uri)=\"([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?
     QList<QStringList> redirecttUrlData = Zpublic::regexCapture(QString(byteArray),"(window.redirect_uri)=\\\"([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?");
-    LOG_TEST(QString("redirecttUrlData.count()=%1").arg(redirecttUrlData.count()));
+    ZW_LOG_DEBUG(QString("redirecttUrlData.count()=%1").arg(redirecttUrlData.count()));
     if(redirecttUrlData.count() != 1)
     {
         return false;
     }
     QStringList redirectUrlCapture = redirecttUrlData.first();
-    LOG_TEST(QString("redirectUrlCapture.count()=%1").arg(redirectUrlCapture.count()));
+    ZW_LOG_DEBUG(QString("redirectUrlCapture.count()=%1").arg(redirectUrlCapture.count()));
     if(redirectUrlCapture.count() <= 2)
     {
         return false;
     }
     QString redirectUrl = redirectUrlCapture.at(2);
-    LOG_TEST(QString("redirectUrl=%1").arg(redirectUrl));
+    ZW_LOG_DEBUG(QString("redirectUrl=%1").arg(redirectUrl));
 
     m_scan = parseUrlParam(redirectUrl,"scan");
     m_ticket = parseUrlParam(redirectUrl,"ticket");
@@ -188,14 +188,14 @@ bool CLoginManager::parseInitData(const QByteArray &byteArray)
 {
     QJsonParseError errorString;
     QJsonDocument doc = QJsonDocument::fromJson(byteArray,&errorString);
-    LOG_TEST(QString("errorString = %1").arg(errorString.errorString()));
+    ZW_LOG_DEBUG(QString("errorString = %1").arg(errorString.errorString()));
     QVariantMap objMap = doc.toVariant().toMap();
-    LOG_TEST(QString("objMap.keys()=%1").arg(QStringList(objMap.keys()).join("-")));
+    ZW_LOG_DEBUG(QString("objMap.keys()=%1").arg(QStringList(objMap.keys()).join("-")));
     QString key = "User";
     if(objMap.contains(key))
     {
         QVariantMap userObjMap = objMap.value(key).toMap();
-        LOG_TEST(QString("userObjMap.keys()=%1").arg(QStringList(userObjMap.keys()).join("-")));
+        ZW_LOG_DEBUG(QString("userObjMap.keys()=%1").arg(QStringList(userObjMap.keys()).join("-")));
         m_userData = Z_WX_USER_DATA::parseMap(userObjMap);
 //        m_userAvatar.m_url = m_userData.HeadImgUrl;
 //        m_userAvatar.m_userName = m_userData.NickName;
@@ -207,7 +207,7 @@ bool CLoginManager::parseInitData(const QByteArray &byteArray)
     if(objMap.contains(key))
     {
         m_syncKeyList = Z_WX_SyncKeyList::parseList(objMap.value(key).toMap().value("List").toList());
-        LOG_TEST(QString("m_syncKeyList.itemList.count = %1").arg(m_syncKeyList.itemList.count()));
+        ZW_LOG_DEBUG(QString("m_syncKeyList.itemList.count = %1").arg(m_syncKeyList.itemList.count()));
     }
     key = "ContactList";
     if(objMap.contains(key))
@@ -221,7 +221,7 @@ bool CLoginManager::parseInitData(const QByteArray &byteArray)
                 m_groupNameList.append(obj.UserName);
             }
         }
-        LOG_TEST(QString("m_groupNameList.count = %1").arg(m_groupNameList.count()));
+        ZW_LOG_DEBUG(QString("m_groupNameList.count = %1").arg(m_groupNameList.count()));
     }
     key = "ChatSet";
     if(objMap.contains(key))
@@ -237,7 +237,7 @@ bool CLoginManager::parseInitData(const QByteArray &byteArray)
         }
 
     }
-    LOG_TEST(QString("m_groupNameList.count = %1").arg(m_groupNameList.count()));
+    ZW_LOG_DEBUG(QString("m_groupNameList.count = %1").arg(m_groupNameList.count()));
     return true;
 }
 
@@ -267,7 +267,7 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
 
     if(response.statusCode > 200)
     {
-        LOG_TEST(QString("request is error").arg(QString(response.replyData)));
+        ZW_LOG_DEBUG(QString("request is error").arg(QString(response.replyData)));
 
         if(response.statusCode == 408 && response.type == TYPE_REQUEST_WAIT_LOGIN)
         {
@@ -428,7 +428,7 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
         else
         {
             //TODO 目前发现1101能发消息
-            LOG_ERROR(QString("retcode=%1").arg(retcode));
+            ZW_LOG_CRITICAL(QString("retcode=%1").arg(retcode));
 //            exit(retcode);
             requestSyncCheck();
         }
@@ -438,7 +438,7 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
     default:
         break;
     }
-    LOG_TEST(QString(response.replyData));
+    ZW_LOG_DEBUG(QString(response.replyData));
     return;
 }
 

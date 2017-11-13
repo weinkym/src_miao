@@ -79,7 +79,7 @@ void ZRequestAction::trigger()
         accessManager->putByteArray(this);
         break;
     default:
-        LOG_ERROR(QString("Bad action with type = [%1]").arg(operation));
+        ZW_LOG_CRITICAL(QString("Bad action with type = [%1]").arg(operation));
         break;
     }
 }
@@ -94,7 +94,7 @@ void ZRequestAction::setReply(QNetworkReply *reply)
 {
     if(reply == NULL)
     {
-        LOG_ERROR("param reply is NULL");
+        ZW_LOG_CRITICAL("param reply is NULL");
         return;
     }
     if(m_networkReply)
@@ -169,7 +169,7 @@ QHttpMultiPart *ZRequestAction::getMultiPart()
 
 void ZRequestAction::onReplyError(QNetworkReply::NetworkError error)
 {
-    LOG_ERROR(QString("Get reply error no = [%1]").arg(error));
+    ZW_LOG_CRITICAL(QString("Get reply error no = [%1]").arg(error));
     if (error == QNetworkReply::UnknownNetworkError)
     {
         ZRequestAccessManager::getInstance()->recoverNetworkAccessible();
@@ -177,17 +177,17 @@ void ZRequestAction::onReplyError(QNetworkReply::NetworkError error)
 
     if(m_networkReply == NULL)
     {
-        LOG_ERROR(QString("Bad network reply."));
+        ZW_LOG_CRITICAL(QString("Bad network reply."));
         return;
     }
 }
 
 void ZRequestAction::onHttpTimeout()
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     if(m_networkReply == NULL)
     {
-        LOG_ERROR(QString("Http timeout, bad network reply"));
+        ZW_LOG_CRITICAL(QString("Http timeout, bad network reply"));
         return;
     }
 
@@ -202,7 +202,7 @@ void ZRequestAction::onIgnoreSSlErrors(QList<QSslError> sslErrors)
 {
     for (int i = 0; i < sslErrors.size(); ++i)
     {
-        LOG_ERROR(QString("Get ssl error [%1]").arg(sslErrors[i].errorString()));
+        ZW_LOG_CRITICAL(QString("Get ssl error [%1]").arg(sslErrors[i].errorString()));
     }
 
     m_networkReply->ignoreSslErrors(sslErrors);
@@ -213,20 +213,20 @@ void ZRequestAction::onReplyFinished()
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
     if (reply == NULL)
     {
-        LOG_ERROR(QString("Get bad QNetworkReply = NLL"));
+        ZW_LOG_CRITICAL(QString("Get bad QNetworkReply = NLL"));
         return;
     }
 
     if(m_networkReply != reply)
     {
         //该网络请求已过期
-        LOG_WARNING(QString("This network request is overdue, action type:%1").arg(m_replayStatusData.type));
+        ZW_LOG_WARNING(QString("This network request is overdue, action type:%1").arg(m_replayStatusData.type));
         return;
     }
     m_timerTimeout->stop();
 
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    LOG_TEST(QString("statusCode=%1").arg(statusCode));
+    ZW_LOG_DEBUG(QString("statusCode=%1").arg(statusCode));
     m_replayStatusData.statusCode = statusCode;
 
     m_replayStatusData.endTime = QDateTime::currentDateTime();
@@ -237,9 +237,9 @@ void ZRequestAction::onReplyFinished()
     QString logInfo = QString("[HttpReturn] request url:%1  type(%2) consuming %3ms statusCode = %4 getByteArray = %5")
             .arg(urlString).arg(m_replayStatusData.type).arg(consuming).arg(statusCode).arg(QString(this->getByteArray()));
 
-    LOG_INFO(logInfo);
+    ZW_LOG_INFO(logInfo);
     m_replayStatusData.replyData = reply->readAll();
-    LOG_DEBUG(QString("[HttpReturn]request return data = %1").arg(QString(m_replayStatusData.replyData)));
+    ZW_LOG_DEBUG(QString("[HttpReturn]request return data = %1").arg(QString(m_replayStatusData.replyData)));
 
     if(m_replayStatusData.networkErrorCode == QNetworkReply::NoError)
     {
@@ -247,10 +247,10 @@ void ZRequestAction::onReplyFinished()
     }
     else
     {
-        LOG_ERROR(QString("type:%1,Network error:%2,url:%3").arg(m_replayStatusData.type).arg(m_replayStatusData.networkErrorCode).arg(urlString));
+        ZW_LOG_CRITICAL(QString("type:%1,Network error:%2,url:%3").arg(m_replayStatusData.type).arg(m_replayStatusData.networkErrorCode).arg(urlString));
         if(m_curRetryTime < m_maxRetryTime)
         {
-            LOG_WARNING(QString("Action trigger again, m_curRetryTime:%1,action type:%2").
+            ZW_LOG_WARNING(QString("Action trigger again, m_curRetryTime:%1,action type:%2").
                         arg(m_curRetryTime).arg(m_replayStatusData.type));
             m_curRetryTime++;
             trigger();
@@ -280,7 +280,7 @@ void ZRequestAction::onReplyFinished()
 
 int ZRequestAction::parseErrorCode(const QVariantMap &result)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     int errorCode = 0;
     if(result.contains("error"))
     {
@@ -295,7 +295,7 @@ int ZRequestAction::parseErrorCode(const QVariantMap &result)
         }
         else
         {
-            LOG_ERROR(QString("Bad result, set error code to  -999"));
+            ZW_LOG_CRITICAL(QString("Bad result, set error code to  -999"));
             errorCode = -999;
         }
     }

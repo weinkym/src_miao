@@ -86,7 +86,7 @@ bool CSqliteAccessInterface::getInsertSql(QList<CPB::BindValueParam> &paramList,
         }
         paramList.push_back(param);
     }
-    LOG_INFO(QString("paramList.count=%1").arg(paramList.count()));
+    ZW_LOG_INFO(QString("paramList.count=%1").arg(paramList.count()));
     return true;
 }
 
@@ -122,7 +122,7 @@ bool CSqliteAccessInterface::insertMessage(const CPB::AutoSendEventData &msg)
     bool ret = getInsertSql(paramList,model,CSqliteAccessInterface::messageTableName(),CPB::AutoSendEventData::getFieldMap());
     if(!ret)
     {
-        LOG_ERROR(QString("getInsertSql fail"));
+        ZW_LOG_CRITICAL(QString("getInsertSql fail"));
         return false;
     }
     QString errorString;
@@ -131,13 +131,13 @@ bool CSqliteAccessInterface::insertMessage(const CPB::AutoSendEventData &msg)
 
 bool CSqliteAccessInterface::queryAllMessage(QVariantList &model, QString *errorString)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     if(!isValid())
     {
         return false;
     }
     QString sql = "SELECT * FROM " + CSqliteAccessInterface::messageTableName();
-    LOG_INFO(QString("execQuerySql, sql = %1").arg(sql));
+    ZW_LOG_INFO(QString("execQuerySql, sql = %1").arg(sql));
     QList<QSqlRecord> record;
     QString tempErrorString;
     bool ret = this->execQuery(sql, record, &tempErrorString);
@@ -147,7 +147,7 @@ bool CSqliteAccessInterface::queryAllMessage(QVariantList &model, QString *error
     }
     if(!ret)
     {
-        LOG_ERROR(QString("execQuerySql fail, sql = %1, err = %2").arg(sql).arg(tempErrorString));
+        ZW_LOG_CRITICAL(QString("execQuerySql fail, sql = %1, err = %2").arg(sql).arg(tempErrorString));
         return false;
     }
 
@@ -160,7 +160,7 @@ bool CSqliteAccessInterface::queryAllMessage(QVariantList &model, QString *error
             map.insert(r.field(i).name(), r.value(i));
             if(isFirst)
             {
-                LOG_INFO(QString("r.field(i).name() = %1").arg(r.field(i).name()));
+                ZW_LOG_INFO(QString("r.field(i).name() = %1").arg(r.field(i).name()));
             }
         }
         isFirst = true;
@@ -171,7 +171,7 @@ bool CSqliteAccessInterface::queryAllMessage(QVariantList &model, QString *error
 
 bool CSqliteAccessInterface::deleteMessage(const QString &uuid)
 {
-    LOG_FUNCTION;
+    ZW_LOG_FUNCTION;
     if(!isValid())
     {
         return false;
@@ -182,7 +182,7 @@ bool CSqliteAccessInterface::deleteMessage(const QString &uuid)
     bool ret = this->execQuery(sql, &tempErrorString);
     if(!ret)
     {
-        LOG_ERROR(QString("execQuerySql fail, sql = %1, err = %2").arg(sql).arg(tempErrorString));
+        ZW_LOG_CRITICAL(QString("execQuerySql fail, sql = %1, err = %2").arg(sql).arg(tempErrorString));
         return false;
     }
     return true;
@@ -239,7 +239,7 @@ bool CSqliteAccessInterface::execQuery(const QStringList &sqlList, QString *erro
 bool CSqliteAccessInterface::execStringQuery(const QString &sql, QList<QSqlRecord> *result, QString *errorString)
 {
     QMutexLocker lock(&m_mutex);
-    LOG_WARNING(QString("execSql=%1").arg(sql));
+    ZW_LOG_WARNING(QString("execSql=%1").arg(sql));
     if(!isValid())
     {
         return false;
@@ -260,7 +260,7 @@ bool CSqliteAccessInterface::execStringQuery(const QString &sql, QList<QSqlRecor
             {
                 *errorString = lastError;
             }
-            LOG_WARNING(QString("execSql=%1,errorString=%2").arg(lastQuery).arg(lastError));
+            ZW_LOG_WARNING(QString("execSql=%1,errorString=%2").arg(lastQuery).arg(lastError));
             return false;
         }
         if(result)
@@ -269,7 +269,7 @@ bool CSqliteAccessInterface::execStringQuery(const QString &sql, QList<QSqlRecor
             {
                 result->append(query.record());
             }
-            LOG_INFO(QString("result->count()=%1").arg(result->count()));
+            ZW_LOG_INFO(QString("result->count()=%1").arg(result->count()));
         }
         return true;
     }
@@ -280,7 +280,7 @@ bool CSqliteAccessInterface::execStringQuery(const QString &sql, QList<QSqlRecor
         {
             *errorString = lastError;
         }
-        LOG_WARNING(QString("execSql=%1  errorString=%2").arg(lastQuery).arg(lastError));
+        ZW_LOG_WARNING(QString("execSql=%1  errorString=%2").arg(lastQuery).arg(lastError));
 //        doError(needResetDb);
         return false;
     }
@@ -303,7 +303,7 @@ bool CSqliteAccessInterface::execQueryList(const QList<QSqlQuery> &sqlQueryList,
         foreach(QSqlQuery query, sqlQueryList)
         {
             lastQuery = query.lastQuery();
-            LOG_INFO(QString("executedQuery = %1").arg(lastQuery));
+            ZW_LOG_INFO(QString("executedQuery = %1").arg(lastQuery));
             retValue = query.exec();
             if(!retValue)
             {
@@ -329,7 +329,7 @@ bool CSqliteAccessInterface::execQueryList(const QList<QSqlQuery> &sqlQueryList,
             {
                 *errorString = lastError;
             }
-            LOG_WARNING(QString("execSql=%1  errorString=%2").arg(lastQuery).arg(lastError));
+            ZW_LOG_WARNING(QString("execSql=%1  errorString=%2").arg(lastQuery).arg(lastError));
         }
         return retValue;
     }
@@ -338,13 +338,13 @@ bool CSqliteAccessInterface::execQueryList(const QList<QSqlQuery> &sqlQueryList,
         QString lastError = m_db.lastError().text();
         if(!m_db.rollback())
         {
-            LOG_WARNING(QString("rollback errorString=%2").arg(m_db.lastError().text()));
+            ZW_LOG_WARNING(QString("rollback errorString=%2").arg(m_db.lastError().text()));
         }
         if(errorString)
         {
             *errorString = lastError;
         }
-        LOG_WARNING(QString("execSql=%1  errorString=%2").arg(lastQuery).arg(lastError));
+        ZW_LOG_WARNING(QString("execSql=%1  errorString=%2").arg(lastQuery).arg(lastError));
 //        doError(needResetDb);
         return false;
     }
@@ -356,15 +356,15 @@ bool CSqliteAccessInterface::execQuery(const QList<CPB::BindValueParam> &paramLi
     foreach(const CPB::BindValueParam &param, paramList)
     {
         QSqlQuery query(m_db);
-        LOG_INFO(QString("prepare sql = %1").arg(param.prepareString));
+        ZW_LOG_INFO(QString("prepare sql = %1").arg(param.prepareString));
         if(!query.prepare(param.prepareString))
         {
-            LOG_WARNING(QString("prepare sql fail, sql = %1").arg(param.prepareString));
-            LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().text()));
-            LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().driverText()));
-            LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().databaseText()));
-            LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().nativeErrorCode()));
-            LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().type()));
+            ZW_LOG_WARNING(QString("prepare sql fail, sql = %1").arg(param.prepareString));
+            ZW_LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().text()));
+            ZW_LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().driverText()));
+            ZW_LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().databaseText()));
+            ZW_LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().nativeErrorCode()));
+            ZW_LOG_WARNING(QString("m_db.lastError() = %1").arg(query.lastError().type()));
 //            doError(needResetDb);
 //            QString driverText() const;
 //            QString databaseText() const;
@@ -385,7 +385,7 @@ bool CSqliteAccessInterface::execQuery(const QList<CPB::BindValueParam> &paramLi
             iter.next();
             query.bindValue(iter.key(),iter.value());
         }
-        LOG_TEST(QString("bindValue Count=%1").arg(count));
+        ZW_LOG_DEBUG(QString("bindValue Count=%1").arg(count));
         sqlQueryList.append(query);
     }
 
