@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include "zwlog.h"
+#include "zwcore.h"
+
 
 namespace Ui {
 class MainWindow;

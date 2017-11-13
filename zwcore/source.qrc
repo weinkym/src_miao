@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>other/hanzipinyin.txt</file>
+    </qresource>
+</RCC>
