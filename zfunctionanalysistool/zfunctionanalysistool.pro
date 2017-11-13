@@ -25,9 +25,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    zanalyzer.cpp
+    zanalyzer.cpp \
+    zlogutil.cpp
 
 HEADERS  += mainwindow.h \
-    zanalyzer.h
+    zanalyzer.h \
+    zlogutil.h
 
 FORMS    += mainwindow.ui

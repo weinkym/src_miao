@@ -1,6 +1,7 @@
 #include "zanalyzer.h"
 #include <QFile>
 #include <QDebug>
+#include "zlogutil.h"
 
 ZAnalyzer::ZAnalyzer()
 {
@@ -55,8 +56,7 @@ void ZAnalyzer::analye(const QString &fileName)
             QString key = funName+"_"+threadIdString;
             if(!m_dataMap.contains(key))
             {
-                qDebug()<<QString("key=%1 is not contains").arg(key);
-                //warning;
+                Z_LOG_WARNING(QString("key=%1 is not contains").arg(key));
             }
             else
             {
@@ -77,17 +77,16 @@ QStringList ZAnalyzer::getLineMatchContent(const QString &str)
     QStringList strList;
     QRegExp rx("\\[[^\\]]+\\]");
     int pos = 0;
-//    qDebug()<<__LINE__;
+//    Z_LOG_LINE;
+
     while((pos = rx.indexIn(str, pos)) != -1)
     {
-//        qDebug()<<rx.capturedTexts().at(0);
         QString capturedText = rx.capturedTexts().at(0);
         capturedText = capturedText.mid(1,capturedText.length()-2);
-//        qDebug()<<capturedText;
+        Z_LOG_DEBUG(capturedText);
         strList.append(capturedText);
         pos += rx.matchedLength();
     }
-//    qDebug()<<__LINE__;
     return strList;
 }
 
@@ -97,9 +96,14 @@ void ZAnalyzer::printData()
     while(iter.hasNext())
     {
         iter.next();
-        qDebug()<<QString("fun=%1,count=%2,time_consuming_all=%3,time_consuming_max=%4")
-                  .arg(iter.value().name).arg(iter.value().count).arg(iter.value().time_consuming_all).arg(iter.value().time_consuming_max);
-
+        QString logInfo = QString("fun=%1,count=%2,time_consuming_all=%3,time_consuming_max=%4")
+                .arg(iter.value().name).arg(iter.value().count).arg(iter.value().time_consuming_all)
+                  .arg(iter.value().time_consuming_max);
+        Z_LOG_WARNING(logInfo);
+        if(iter.value().count > 0)
+        {
+            Z_LOG_WARNING(logInfo);
+        }
     }
 }
 
