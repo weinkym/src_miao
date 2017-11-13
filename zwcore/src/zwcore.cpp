@@ -152,3 +152,8 @@ QString ZWCore::convertToPinyin(const QString &text, bool initial)
     }
     return resutlString;
 }
+
+QString ZWCore::getBoolString(bool boolValue)
+{
+    return boolValue ? "TRUE":"FALSE";
+}
