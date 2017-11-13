@@ -274,10 +274,8 @@ public:
     enum AutoSendEventType
     {
         AUTO_SEND_EVENT_TYPE_NODEFINED,
-        AUTO_SEND_EVENT_TYPE_MONTH,
-        AUTO_SEND_EVENT_TYPE_DAY,
-        AUTO_SEND_EVENT_TYPE_HOUR,
-        AUTO_SEND_EVENT_TYPE_NORMAL,
+        AUTO_SEND_EVENT_TYPE_DATE,
+        AUTO_SEND_EVENT_TYPE_DATE_TIME,
     };
     Q_ENUM(AutoSendEventType)
     QMap<QString,int> getEnumAutoSendEventTypeMap();

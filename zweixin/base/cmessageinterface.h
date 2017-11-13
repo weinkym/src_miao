@@ -11,8 +11,11 @@ class CMessageInterface : QObject
 public:
     static CMessageInterface *getInstance();
     void init();
-
     void addMessage(const CPB::AutoSendEventData &msg);
+    void deleteMessage(const QString &uuid);
+    void setSendNickNames(const QStringList &sendNickNames);
+    void start();
+    void stop();
 
 protected:
     CMessageInterface(QObject *parent = NULL);
@@ -25,6 +28,7 @@ private:
     static const int m_intervalSeconds = 300;
     bool m_initialized;
     QTimer *m_timer;
+    QStringList m_sendNickNames;
     QMap<QString,CPB::AutoSendEventData>m_messageMap;
 };
 

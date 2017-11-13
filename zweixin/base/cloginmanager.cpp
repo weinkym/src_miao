@@ -33,26 +33,31 @@ void CLoginManager::start()
 
 void CLoginManager::requestUuid()
 {
+    ZW_LOG_FUNCTION;
     connectAction(ZPublicAction::createLoginUuidAction());
 }
 
 void CLoginManager::requestQrCode()
 {
+    ZW_LOG_FUNCTION;
     connectAction(ZPublicAction::createQrCodeAction(m_uuid));
 }
 
 void CLoginManager::requestCookie()
 {
+    ZW_LOG_FUNCTION;
     connectAction(ZPublicAction::createCookieAction(m_uuid,m_ticket,m_scan));
 }
 
 void CLoginManager::requestInit()
 {
+    ZW_LOG_FUNCTION;
     connectAction(ZPublicAction::createWxInitAction(m_baseRequestParam));
 }
 
 void CLoginManager::requestStatusNotify()
 {
+    ZW_LOG_FUNCTION;
     connectAction(ZPublicAction::createStatusNotify(m_baseRequestParam,m_userData.UserName,m_userData.UserName));
 }
 
