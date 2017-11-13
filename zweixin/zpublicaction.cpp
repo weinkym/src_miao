@@ -138,7 +138,8 @@ QNetworkRequest ZPublicAction::createRequest() const
     {
     case TYPE_REQUEST_LOGIN_UUID:
     {
-        QString head=QString("https://login.weixin.qq.com/jslogin?appid=wx782c26e4c19acffb&fun=new&lang=zh_CN&_=%1").arg(QDateTime::currentDateTime().toTime_t());
+        QString head=QString("https://login.weixin.qq.com/jslogin?appid=wx782c26e4c19acffb&redirect_uri:https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxnewloginpage&fun=new&lang=zh_CN&_=%1")
+                .arg(QDateTime::currentDateTime().toTime_t());
 //        QNetworkRequest request(QUrl("https://login.weixin.qq.com/jslogin?"
 //                                     "appid=wx782c26e4c19acffb&redirect_uri=https%3A%2F%2Fwx.qq.com%2Fcgi-bin%2Fmmwebwx-bin%2Fwebwxnewloginpage"
 //                                     "&fun=new&lang=zh_CN&_={t}"));
