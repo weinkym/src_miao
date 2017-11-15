@@ -1,6 +1,6 @@
 macx: PLATEFORM_NAME = "mac"
 else:win32: PLATEFORM_NAME = "win"
-else:linux-*: PLATEFORM_NAME = "linux-$${ARCHITECTURE}"
+else:linux-*: PLATEFORM_NAME = "linux"
 else: PLATEFORM_NAME = "unknown"
 
 DEBUG_RELEASE_NAME=release
