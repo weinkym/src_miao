@@ -2,6 +2,7 @@
 #define CSQLITEACCESSINTERFACE_H
 
 #include <QSqlDatabase>
+#include <QMutex>
 #include "zpublic.h"
 
 class CSqliteAccessInterface
