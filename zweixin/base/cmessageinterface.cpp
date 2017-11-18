@@ -175,9 +175,9 @@ void CMessageInterface::sendStatusMessage()
     {
         iter.next();
         QDateTime dateTime = QDateTime::fromTime_t(iter.value().dateTime);
-        messageList.append("message_content="+iter.value().content+
+        messageList.append("(@@@@message_content="+iter.value().content+
                            "dateTime="+dateTime.toString("yyyyMMdd hh:mm:sss")+
-                           "type="+iter.value().type+"\n");
+                           "type="+QString::number(iter.value().type)+"@@@@)\n");
 
     }
     content.append("\n"+messageList);
