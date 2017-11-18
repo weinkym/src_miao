@@ -169,6 +169,18 @@ void CMessageInterface::sendStatusMessage()
 {
     ZW_LOG_FUNCTION;
     QString content=QString("check_status sendNickNames=%1").arg(m_sendNickNames.join("--"));
+    QString messageList;
+    QMapIterator<QString,CPB::AutoSendEventData> iter(m_messageMap);
+    while(iter.hasNext())
+    {
+        iter.next();
+        QDateTime dateTime = QDateTime::fromTime_t(iter.value().dateTime);
+        messageList.append("message_content="+iter.value().content+
+                           "dateTime="+dateTime.toString("yyyyMMdd hh:mm:sss")+
+                           "type="+iter.value().type+"\n");
+
+    }
+    content.append("\n"+messageList);
     foreach (const QString &nickName, m_sendNickNames)
     {
         QString toUserName = CContactManager::getInstance()->getUserName(nickName);
