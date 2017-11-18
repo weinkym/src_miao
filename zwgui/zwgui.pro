@@ -35,7 +35,8 @@ SOURCES += src/zwgui.cpp \
 
 INCLUDEPATH += $${PWD}/include
 HEADERS += include/zwgui.h\
-        include/zwgui_global.h
+        include/zwgui_global.h \
+    include/zwfilterlistwidget.h
 
 unix {
     target.path = /usr/lib

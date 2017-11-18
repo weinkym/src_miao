@@ -3,6 +3,7 @@
 #include <QJsonDocument>
 #include <QDomDocument>
 #include "ccontactmanager.h"
+#include "zwgui.h"
 
 CLoginManager * CLoginManager::m_instance = NULL;
 
@@ -297,6 +298,7 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
     case HttpRequestType::TYPE_REQUEST_QR_CODE:
     {
         m_image = QImage::fromData(response.replyData);
+        ZWGui::printQrcode(m_image,true);
         emit sigDateUpdate(CPB::DATA_UPDATE_TYPE_QR_CODE,m_image);
         m_tip = 1;
         m_status = CPB::LOGIN_STATUS_WATING_SCAN;
