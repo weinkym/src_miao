@@ -9,18 +9,18 @@ class CContactManager : public CBaseObject
 public:
     static CContactManager *getInstance();
     ~CContactManager();
-    void sendMessage(const QString &toUserName,const QString &message);
+//    void sendMessage(const QString &toUserName,const QString &message);
     void requestContact(const ZBaseRequestParam &baseRequestParam);
     void requestContactGroup(const ZBaseRequestParam &baseRequestParam,const QStringList &groupNameList);
     void requestWXSync(const ZBaseRequestParam &baseRequestParam,const Z_WX_SyncKeyList &syncKeyList);
     QString getUserName(const QString &nickName);
     QString getNickName(const QString &userName);
+    bool isUserValid(const QString &userName);
 
 protected:
     CContactManager(QObject *parent = NULL);
-
-protected:
     void doRequestFinished(const CPB::RequestReplyData &response);
+    void doWXMessage(const Z_WX_MSG_DATA &msg);
 
 public:
     static CContactManager *m_instance;

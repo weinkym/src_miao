@@ -3,8 +3,9 @@
 #include <QObject>
 #include <QTimer>
 #include "zpublic.h"
+#include "cbaseobject.h"
 
-class CMessageInterface : QObject
+class CMessageInterface : CBaseObject
 {
     Q_OBJECT
 
@@ -18,9 +19,12 @@ public:
     void stop();
     bool containNickName(const QString &nickName);
     void sendStatusMessage();
+    void sendMessage(const QString &content);
+    void sendMessage(const QString &toUserName,const QString &content);
 
 protected:
     CMessageInterface(QObject *parent = NULL);
+    void doRequestFinished(const CPB::RequestReplyData &response);
 
 protected slots:
     void onTimerout();

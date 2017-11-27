@@ -3,6 +3,8 @@
 #include "zgolbal.h"
 #include "ccontactmanager.h"
 #include "zwcore.h"
+#include "zpublicaction.h"
+#include "cloginmanager.h"
 
 CMessageInterface *CMessageInterface::m_instance = NULL;
 CMessageInterface *CMessageInterface::getInstance()
@@ -94,7 +96,7 @@ bool CMessageInterface::containNickName(const QString &nickName)
 }
 
 CMessageInterface::CMessageInterface(QObject *parent)
-    :QObject(parent)
+    :CBaseObject(parent)
     ,m_initialized(false)
     ,m_timer(NULL)
 {
@@ -103,6 +105,32 @@ CMessageInterface::CMessageInterface(QObject *parent)
     m_sendNickNames.append("TT123456");
     m_timer->setInterval(1 * 60 * 1000);
     connect(m_timer,SIGNAL(timeout()),this,SLOT(onTimerout()));
+}
+
+void CMessageInterface::doRequestFinished(const CPB::RequestReplyData &response)
+{
+    if(response.statusCode > 200)
+    {
+        ZW_LOG_WARNING(QString("request is error").arg(QString(response.replyData)));
+        if(response.type == TYPE_REQUEST_WX_SEND_MSG)
+        {
+            ZW_LOG_WARNING(QString("send message is error %1").arg(QString(response.replyData)));
+        }
+        return;
+    }
+
+    switch (response.type)
+    {
+    case TYPE_REQUEST_WX_SEND_MSG:
+    {
+        ZW_LOG_INFO(QString("send message is ok %1").arg(QString(response.replyData)));
+        break;
+    }
+
+    default:
+        break;
+    }
+    return;
 }
 
 void CMessageInterface::onTimerout()
@@ -147,20 +175,7 @@ void CMessageInterface::onTimerout()
         {
             QString content = QString("%1:%2").arg(iter.key()).arg(iter.value().content);
             ZW_LOG_INFO(QString("sendmessage content = %1").arg(content));
-            foreach (const QString &nickName, m_sendNickNames)
-            {
-                QString toUserName = CContactManager::getInstance()->getUserName(nickName);
-                if(!toUserName.isEmpty())
-                {
-                    ZW_LOG_INFO(QString("sendmessage to nickName %1").arg(nickName));
-                    ZW_LOG_INFO(QString("sendmessage to toUserName %1").arg(toUserName));
-                    CContactManager::getInstance()->sendMessage(toUserName,content);
-                }
-                else
-                {
-                    ZW_LOG_WARNING(QString("sendmessage nickName=%1 toUserName is empty").arg(nickName));
-                }
-            }
+            sendMessage(content);
         }
     }
 }
@@ -171,16 +186,22 @@ void CMessageInterface::sendStatusMessage()
     QString content=QString("check_status sendNickNames=%1").arg(m_sendNickNames.join("--"));
     QString messageList;
     QMapIterator<QString,CPB::AutoSendEventData> iter(m_messageMap);
+    int index = 1;
     while(iter.hasNext())
     {
         iter.next();
         QDateTime dateTime = QDateTime::fromTime_t(iter.value().dateTime);
-        messageList.append("(@@@@message_content="+iter.value().content+
-                           "dateTime="+dateTime.toString("yyyyMMdd hh:mm:sss")+
-                           "type="+QString::number(iter.value().type)+"@@@@)\n");
+        messageList.append("@=========="+QString::number(index++)+"\n【TEXT="+iter.value().content+
+                           "】\n【"+dateTime.toString("yyyyMMdd hh:mm:ss")+
+                           "】\n【type="+QString::number(iter.value().type)+"】@MSG)\n");
 
     }
     content.append("\n"+messageList);
+    this->sendMessage(content);
+}
+
+void CMessageInterface::sendMessage(const QString &content)
+{
     foreach (const QString &nickName, m_sendNickNames)
     {
         QString toUserName = CContactManager::getInstance()->getUserName(nickName);
@@ -188,11 +209,23 @@ void CMessageInterface::sendStatusMessage()
         {
             ZW_LOG_INFO(QString("sendmessage to nickName %1").arg(nickName));
             ZW_LOG_INFO(QString("sendmessage to toUserName %1").arg(toUserName));
-            CContactManager::getInstance()->sendMessage(toUserName,content);
+            this->sendMessage(toUserName,content);
         }
         else
         {
             ZW_LOG_WARNING(QString("sendmessage nickName=%1 toUserName is empty").arg(nickName));
         }
     }
+}
+
+void CMessageInterface::sendMessage(const QString &toUserName, const QString &content)
+{
+    if(CContactManager::getInstance()->isUserValid(toUserName))
+    {
+        ZW_LOG_WARNING(QString("toUserName=%1 not found").arg(toUserName));
+        return;
+    }
+    ZPublicAction *action = ZPublicAction::createSendMessage(CLoginManager::getInstance()->m_baseRequestParam,CLoginManager::getInstance()->m_userData.UserName,
+                                                             toUserName,content);
+    connectAction(action);
 }

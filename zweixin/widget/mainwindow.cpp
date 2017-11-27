@@ -7,6 +7,7 @@
 #include "ccontactmanager.h"
 #include "cloginmanager.h"
 #include "zinputmessagedialog.h"
+#include "cmessageinterface.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -154,8 +155,7 @@ void MainWindow::on_btnTest01_clicked()
     {
         return;
     }
-
-    CContactManager::getInstance()->sendMessage(toUser.data()->UserName,ui->textEditChat->toPlainText());
+    CMessageInterface::getInstance()->sendMessage(toUser.data()->UserName,ui->textEditChat->toPlainText());
 //    ZPublicAction *action = ZPublicAction::createSendMessage(m_baseRequestParam,m_userData.UserName,toUser.data()->UserName,ui->textEditChat->toPlainText());
     ui->textEditChat->clear();
 //    connect(action,SIGNAL(sigRequestFinished(CPB::RequestReplyData)),this,SLOT(onRequestFinished(CPB::RequestReplyData)));

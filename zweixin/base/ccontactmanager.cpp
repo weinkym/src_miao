@@ -20,17 +20,17 @@ CContactManager::~CContactManager()
 
 }
 
-void CContactManager::sendMessage(const QString &toUserName, const QString &message)
-{
-    if(!m_contackMap.contains(toUserName) && !m_groupMap.contains(toUserName))
-    {
-        ZW_LOG_WARNING(QString("toUserName=%1 not found").arg(toUserName));
-        return;
-    }
-    ZPublicAction *action = ZPublicAction::createSendMessage(CLoginManager::getInstance()->m_baseRequestParam,CLoginManager::getInstance()->m_userData.UserName,
-                                                             toUserName,message);
-    connectAction(action);
-}
+//void CContactManager::sendMessage(const QString &toUserName, const QString &message)
+//{
+//    if(!m_contackMap.contains(toUserName) && !m_groupMap.contains(toUserName))
+//    {
+//        ZW_LOG_WARNING(QString("toUserName=%1 not found").arg(toUserName));
+//        return;
+//    }
+//    ZPublicAction *action = ZPublicAction::createSendMessage(CLoginManager::getInstance()->m_baseRequestParam,CLoginManager::getInstance()->m_userData.UserName,
+//                                                             toUserName,message);
+//    connectAction(action);
+//}
 
 void CContactManager::requestContact(const ZBaseRequestParam &baseRequestParam)
 {
@@ -86,6 +86,11 @@ QString CContactManager::getNickName(const QString &userName)
     }
     ZW_LOG_WARNING(QString("can not found userName=%1").arg(userName));
     return "";
+}
+
+bool CContactManager::isUserValid(const QString &userName)
+{
+    return (m_contackMap.contains(userName) || m_groupMap.contains(userName));
 }
 
 CContactManager::CContactManager(QObject *parent)
@@ -184,53 +189,7 @@ void CContactManager::doRequestFinished(const CPB::RequestReplyData &response)
             for(auto d:AddMsgList)
             {
                 Z_WX_MSG_DATA msg = Z_WX_MSG_DATA::parseMap(d.toMap());
-                QString name = CContactManager::getInstance()->getNickName(msg.ToUserName);
-                ZW_LOG_DEBUG(QString("msg:id=%1,MsgType=%2,content=%3,appinfo.AppID=%4,RecommendInfo.UserName=%5,name=%6")
-                         .arg(msg.NewMsgId).arg(msg.MsgType).arg(msg.Content).arg(msg.AppInfo.AppID)
-                             .arg(msg.RecommendInfo.UserName).arg(name));
-                if(msg.MsgType == 1 && CMessageInterface::getInstance()->containNickName(name))
-                {
-                    if(msg.Content == "TYPE_CHECK_STATUS")
-                    {
-                        QTimer::singleShot(1000, [this]()
-                        {
-                            CMessageInterface::getInstance()->sendStatusMessage();
-                        });
-                        break;
-                    }
-                    CMessageInterface::getInstance()->deleteMessage(msg.Content);
-                    QJsonDocument doc = QJsonDocument::fromJson(msg.Content.toLocal8Bit(),&errorString);
-                    if(errorString.error == QJsonParseError::NoError)
-                    {
-                        QVariantMap objMap = doc.toVariant().toMap();
-                        ZW_LOG_INFO(QString("objMap.keys=%1").arg(QStringList(objMap.keys()).join("--")));
-                        if(objMap.contains("send_nick_name_list"))
-                        {
-                            QVariantList objList = objMap.value("send_nick_name_list").toList();
-                            if(!objList.isEmpty())
-                            {
-                                QStringList nickNameList;
-                                for(auto obj:objList)
-                                {
-                                    QString nickName = obj.toString();
-                                    if(!nickName.isEmpty())
-                                    {
-                                        nickNameList.append(nickName);
-                                    }
-                                }
-                                CMessageInterface::getInstance()->setSendNickNames(nickNameList);
-                            }
-                            break;
-                        }
-                        bool valid = false;
-                        CPB::AutoSendEventData msg = CPB::AutoSendEventData::parseMap(objMap,valid);
-                        if(valid)
-                        {
-                            msg.uuid = QUuid::createUuid().toString();
-                            CMessageInterface::getInstance()->addMessage(msg);
-                        }
-                    }
-                }
+                doWXMessage(msg);
             }
         }
         CLoginManager::getInstance()->m_syncKeyList = Z_WX_SyncKeyList::parseList(objMap.value("SyncCheckKey").toMap().value("List").toList());
@@ -246,5 +205,86 @@ void CContactManager::doRequestFinished(const CPB::RequestReplyData &response)
         break;
     }
     return;
+}
+
+void CContactManager::doWXMessage(const Z_WX_MSG_DATA &msg)
+{
+    QString name = CContactManager::getInstance()->getNickName(msg.ToUserName);
+    ZW_LOG_DEBUG(QString("msg:id=%1,MsgType=%2,content=%3,appinfo.AppID=%4,RecommendInfo.UserName=%5,name=%6")
+                 .arg(msg.NewMsgId).arg(msg.MsgType).arg(msg.Content).arg(msg.AppInfo.AppID)
+                 .arg(msg.RecommendInfo.UserName).arg(name));
+    if(msg.MsgType != 1)
+    {
+        return;
+    }
+    if(!CMessageInterface::getInstance()->containNickName(name))
+    {
+        return;
+    }
+
+    if(msg.Content == "TYPE_CHECK_STATUS")
+    {
+        QTimer::singleShot(1000, [this]()
+        {
+            CMessageInterface::getInstance()->sendStatusMessage();
+        });
+        return;
+    }
+    if(msg.Content == "TYPE_QUIT")
+    {
+        QTimer::singleShot(1000, [this]()
+        {
+            ZW_LOG_WARNING(QString("exit by TYPE_QUIT"));
+            exit(-1);
+        });
+        return;
+    }
+
+    CMessageInterface::getInstance()->deleteMessage(msg.Content);
+    QJsonParseError errorString;
+    QJsonDocument doc = QJsonDocument::fromJson(msg.Content.toLocal8Bit(),&errorString);
+    if(errorString.error != QJsonParseError::NoError)
+    {
+        ZW_LOG_CRITICAL(QString("QJsonParseError=%1,error=%2").arg(errorString.errorString()).arg(errorString.error));
+        return;
+    }
+    QVariantMap objMap = doc.toVariant().toMap();
+    ZW_LOG_INFO(QString("objMap.keys=%1").arg(QStringList(objMap.keys()).join("--")));
+    QString key("send_nick_name_list");
+    if(objMap.contains(key))
+    {
+        QVariantList objList = objMap.value(key).toList();
+        if(!objList.isEmpty())
+        {
+            QStringList nickNameList;
+            for(auto obj:objList)
+            {
+                QString nickName = obj.toString();
+                if(!nickName.isEmpty())
+                {
+                    nickNameList.append(nickName);
+                }
+            }
+            CMessageInterface::getInstance()->setSendNickNames(nickNameList);
+        }
+        return;
+    }
+    key = "add_message_list";
+    if(objMap.contains(key))
+    {
+        QVariantList objList = objMap.value(key).toList();
+        for(auto obj:objList)
+        {
+            QVariantMap objMap = obj.toMap();
+            bool valid = false;
+            CPB::AutoSendEventData msg = CPB::AutoSendEventData::parseMap(objMap,valid);
+            if(valid)
+            {
+                msg.uuid = QUuid::createUuid().toString();
+                CMessageInterface::getInstance()->addMessage(msg);
+            }
+        }
+        return;
+    }
 }
 
