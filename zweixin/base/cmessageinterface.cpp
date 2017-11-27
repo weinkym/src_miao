@@ -203,7 +203,7 @@ void CMessageInterface::sendStatusMessage()
 void CMessageInterface::sendMessage(const QString &content)
 {
     ZW_LOG_FUNCTION;
-    ZW_LOG(QString("send nickNames=%1").arg(m_sendNickNames.join("----"));
+    ZW_LOG_INFO(QString("send nickNames=%1").arg(m_sendNickNames.join("----")));
     foreach (const QString &nickName, m_sendNickNames)
     {
         QString toUserName = CContactManager::getInstance()->getUserName(nickName);
