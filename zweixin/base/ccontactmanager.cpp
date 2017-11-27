@@ -209,6 +209,7 @@ void CContactManager::doRequestFinished(const CPB::RequestReplyData &response)
 
 void CContactManager::doWXMessage(const Z_WX_MSG_DATA &msg)
 {
+    ZW_LOG_FUNCTION;
     QString name = CContactManager::getInstance()->getNickName(msg.ToUserName);
     ZW_LOG_DEBUG(QString("msg:id=%1,MsgType=%2,content=%3,appinfo.AppID=%4,RecommendInfo.UserName=%5,name=%6")
                  .arg(msg.NewMsgId).arg(msg.MsgType).arg(msg.Content).arg(msg.AppInfo.AppID)

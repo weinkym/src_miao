@@ -202,6 +202,8 @@ void CMessageInterface::sendStatusMessage()
 
 void CMessageInterface::sendMessage(const QString &content)
 {
+    ZW_LOG_FUNCTION;
+    ZW_LOG(QString("send nickNames=%1").arg(m_sendNickNames.join("----"));
     foreach (const QString &nickName, m_sendNickNames)
     {
         QString toUserName = CContactManager::getInstance()->getUserName(nickName);
@@ -220,7 +222,8 @@ void CMessageInterface::sendMessage(const QString &content)
 
 void CMessageInterface::sendMessage(const QString &toUserName, const QString &content)
 {
-    if(CContactManager::getInstance()->isUserValid(toUserName))
+    ZW_LOG_FUNCTION;
+    if(!CContactManager::getInstance()->isUserValid(toUserName))
     {
         ZW_LOG_WARNING(QString("toUserName=%1 not found").arg(toUserName));
         return;
