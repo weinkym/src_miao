@@ -183,18 +183,33 @@ void CMessageInterface::onTimerout()
 void CMessageInterface::sendStatusMessage()
 {
     ZW_LOG_FUNCTION;
-    QString content=QString("check_status sendNickNames=%1").arg(m_sendNickNames.join("--"));
+    QString content=QString("check_status sendNickNames=%1\n").arg(m_sendNickNames.join("--"));
     QString messageList;
     QMapIterator<QString,CPB::AutoSendEventData> iter(m_messageMap);
     int index = 1;
+    QMap<QDateTime,QString>orderMap;
     while(iter.hasNext())
     {
         iter.next();
         QDateTime dateTime = QDateTime::fromTime_t(iter.value().dateTime);
-        messageList.append("@=========="+QString::number(index++)+"\n【TEXT="+iter.value().content+
-                           "】\n【"+dateTime.toString("yyyyMMdd hh:mm:ss")+
-                           "】\n【type="+QString::number(iter.value().type)+"】@MSG)\n");
-
+        if(!orderMap.contains(dateTime))
+        {
+            orderMap.insert(dateTime,"");
+        }
+        QString &msg = orderMap[dateTime];
+        msg.append("@=========="+QString::number(index++)+"\n");
+        msg.append("【【"+dateTime.toString("yyyyMMdd hh:mm:ss")+"】】\n");
+        msg.append("【【"+iter.value().content+"】】\n");
+        msg.append("【【"+iter.value().uuid+"】】\n");
+        msg.append("【【type="+QString::number(iter.value().type)+"】】\n");
+    }
+    {
+        QMapIterator<QDateTime,QString> iter(orderMap);
+        while(iter.hasNext())
+        {
+            iter.next();
+            content.append(iter.value());
+        }
     }
     content.append("\n"+messageList);
     this->sendMessage(content);

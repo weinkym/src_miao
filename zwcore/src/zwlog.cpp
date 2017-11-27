@@ -134,11 +134,11 @@ void ZW_LOG::initLog(const QString &filePath)
     bool ok = g_log_settings.file.open(QIODevice::WriteOnly);
     if(ok)
     {
-        std::cout<<"open log is ok file="<<filePath.toLocal8Bit().data();
+        std::cout<<"open log is ok file="<<filePath.toLocal8Bit().data()<<std::endl;
     }
     else
     {
-        std::cerr<<"open log is error file="<<filePath.toLocal8Bit().data();
+        std::cerr<<"open log is error file="<<filePath.toLocal8Bit().data()<<std::endl;
     }
 }
 

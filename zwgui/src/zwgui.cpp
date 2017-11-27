@@ -93,6 +93,8 @@ bool ZWGui::printQrcode(const QImage &image, bool removeMagin,
     int j = startY;
     int maxX = removeMagin ? (valueRight+1):image.width();
     int maxY = removeMagin ? (valueBottom+1):image.height();
+    printf("\n");
+    printf("\e[0m");
     while(j < maxY)
     {
         i = startX;
