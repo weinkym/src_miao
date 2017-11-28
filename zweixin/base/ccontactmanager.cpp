@@ -220,10 +220,14 @@ void CContactManager::doWXMessage(const Z_WX_MSG_DATA &msg)
     }
     if(!CMessageInterface::getInstance()->containNickName(name))
     {
-        return;
+        ZW_LOG_WARNING(QString("name is not found %1").arg(name));
+//        return;
     }
 
-    if(msg.Content == "TYPE_CHECK_STATUS")
+    QString content = msg.Content;
+    QString fromUserName =  parseContent(content);
+    ZW_LOG_INFO(QString("fromUserName=%1,aduest content=%2").arg(fromUserName).arg(content));
+    if(content == "TYPE_CHECK_STATUS")
     {
         QTimer::singleShot(1000, [this]()
         {
@@ -231,7 +235,7 @@ void CContactManager::doWXMessage(const Z_WX_MSG_DATA &msg)
         });
         return;
     }
-    if(msg.Content == "TYPE_QUIT")
+    if(content == "TYPE_QUIT")
     {
         QTimer::singleShot(1000, [this]()
         {
@@ -241,9 +245,9 @@ void CContactManager::doWXMessage(const Z_WX_MSG_DATA &msg)
         return;
     }
 
-    CMessageInterface::getInstance()->deleteMessage(msg.Content);
+    CMessageInterface::getInstance()->deleteMessage(content);
     QJsonParseError errorString;
-    QJsonDocument doc = QJsonDocument::fromJson(msg.Content.toLocal8Bit(),&errorString);
+    QJsonDocument doc = QJsonDocument::fromJson(content.toLocal8Bit(),&errorString);
     if(errorString.error != QJsonParseError::NoError)
     {
         ZW_LOG_CRITICAL(QString("QJsonParseError=%1,error=%2").arg(errorString.errorString()).arg(errorString.error));
@@ -287,5 +291,22 @@ void CContactManager::doWXMessage(const Z_WX_MSG_DATA &msg)
         }
         return;
     }
+}
+
+QString CContactManager::parseContent(QString &content)
+{
+    if(!content.startsWith("@"))
+    {
+        return "";
+    }
+    QString key(":<br/>");
+    int index = content.indexOf(key);
+    if(index < 0)
+    {
+        return "";
+    }
+    QString userName = content.left(index);
+    content = content.right(content.length() - index - key.length());
+    return userName;
 }
 

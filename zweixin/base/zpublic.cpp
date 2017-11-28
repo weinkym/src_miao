@@ -273,9 +273,7 @@ QMap<QString, CPB::Field> CPB::AutoSendEventData::getFieldMap()
     fieldMap.insert("dateTime",Field{"dateTime", TypeInteger});
     fieldMap.insert("lastSendDateTime",Field{"lastSendDateTime", TypeInteger});
     fieldMap.insert("content",Field{"content", TypeString});
-    fieldMap.insert("toUserName",Field{"toUserName", TypeString});
     fieldMap.insert("uuid",Field{"uuid", TypeString});
-    fieldMap.insert("body",Field{"body", TypeString});
 
     return fieldMap;
 }

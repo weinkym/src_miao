@@ -21,6 +21,7 @@ protected:
     CContactManager(QObject *parent = NULL);
     void doRequestFinished(const CPB::RequestReplyData &response);
     void doWXMessage(const Z_WX_MSG_DATA &msg);
+    QString parseContent(QString &content);
 
 public:
     static CContactManager *m_instance;
