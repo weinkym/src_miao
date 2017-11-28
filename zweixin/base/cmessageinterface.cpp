@@ -186,7 +186,6 @@ void CMessageInterface::sendStatusMessage()
     QString content=QString("check_status sendNickNames=%1\n").arg(m_sendNickNames.join("--"));
     QString messageList;
     QMapIterator<QString,CPB::AutoSendEventData> iter(m_messageMap);
-    int index = 1;
     QMap<QDateTime,QString>orderMap;
     while(iter.hasNext())
     {
@@ -197,17 +196,18 @@ void CMessageInterface::sendStatusMessage()
             orderMap.insert(dateTime,"");
         }
         QString &msg = orderMap[dateTime];
-        msg.append("@=========="+QString::number(index++)+"\n");
         msg.append("【【"+dateTime.toString("yyyyMMdd hh:mm:ss")+"】】\n");
         msg.append("【【"+iter.value().content+"】】\n");
         msg.append("【【"+iter.value().uuid+"】】\n");
         msg.append("【【type="+QString::number(iter.value().type)+"】】\n");
     }
     {
+        int index = 1;
         QMapIterator<QDateTime,QString> iter(orderMap);
         while(iter.hasNext())
         {
             iter.next();
+            content.append("@=========="+QString::number(index++)+"\n");
             content.append(iter.value());
         }
     }

@@ -277,6 +277,7 @@ void CContactManager::doWXMessage(const Z_WX_MSG_DATA &msg)
     key = "add_message_list";
     if(objMap.contains(key))
     {
+        bool hasNewMessage = false;
         QVariantList objList = objMap.value(key).toList();
         for(auto obj:objList)
         {
@@ -287,7 +288,16 @@ void CContactManager::doWXMessage(const Z_WX_MSG_DATA &msg)
             {
                 msg.uuid = QUuid::createUuid().toString();
                 CMessageInterface::getInstance()->addMessage(msg);
+                hasNewMessage = true;
             }
+        }
+        if(hasNewMessage)
+        {
+            QTimer::singleShot(3000, [this]()
+            {
+                CMessageInterface::getInstance()->sendStatusMessage();
+            });
+            return;
         }
         return;
     }
