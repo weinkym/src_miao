@@ -18,6 +18,8 @@ QColor ZWGUISHARED_EXPORT getCursorPosColor();
 void ZWGUISHARED_EXPORT convertToMosaic(int mosaicSize,QImage &image);
 void ZWGUISHARED_EXPORT convertToGray(QImage &image,int percentageR,int percentageG,int percentageB);
 void ZWGUISHARED_EXPORT convertToGaussianBlur(QImage &image,int gaussianRadius,qreal deta);
+
+QPainterPath ZWGUISHARED_EXPORT createPath(const QList<QPointF> &points);
 }
 
 #endif // ZWGUI_H
