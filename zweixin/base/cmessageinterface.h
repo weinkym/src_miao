@@ -14,6 +14,7 @@ public:
     void init();
     void addMessage(const CPB::AutoSendEventData &msg);
     void deleteMessage(const QString &uuid);
+    void deleteAllMessage();
     void setSendNickNames(const QStringList &sendNickNames);
     void start();
     void stop();

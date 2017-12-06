@@ -16,6 +16,7 @@ public:
     bool insertMessage(const CPB::AutoSendEventData &msg);
     bool queryAllMessage(QVariantList &model, QString *errorString = nullptr);
     bool deleteMessage(const QString &uuid);
+    bool deleteAllMessage();
 
 private:
     CSqliteAccessInterface();

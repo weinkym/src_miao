@@ -186,6 +186,20 @@ bool CSqliteAccessInterface::deleteMessage(const QString &uuid)
     return true;
 }
 
+bool CSqliteAccessInterface::deleteAllMessage()
+{
+    QString sql = QString("DELETE FROM %1").arg(CSqliteAccessInterface::messageTableName());
+
+    QString tempErrorString;
+    bool ret = this->execQuery(sql, &tempErrorString);
+    if(!ret)
+    {
+        ZW_LOG_CRITICAL(QString("execQuerySql fail, sql = %1, err = %2").arg(sql).arg(tempErrorString));
+        return false;
+    }
+    return true;
+}
+
 void CSqliteAccessInterface::close()
 {
     if(m_db.isValid())

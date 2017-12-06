@@ -68,6 +68,13 @@ void CMessageInterface::deleteMessage(const QString &uuid)
     }
 }
 
+void CMessageInterface::deleteAllMessage()
+{
+    ZW_LOG_FUNCTION;
+    m_messageMap.clear();
+    CSqliteAccessInterface::getInstance()->deleteAllMessage();
+}
+
 void CMessageInterface::setSendNickNames(const QStringList &sendNickNames)
 {
     m_sendNickNames = sendNickNames;

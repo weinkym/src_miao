@@ -244,6 +244,11 @@ void CContactManager::doWXMessage(const Z_WX_MSG_DATA &msg)
         });
         return;
     }
+    if(content == "TYPE_CLEAR_ALL")
+    {
+        CMessageInterface::getInstance()->deleteAllMessage();
+        return;
+    }
 
     CMessageInterface::getInstance()->deleteMessage(content);
     QJsonParseError errorString;

@@ -247,6 +247,19 @@ CPB::AutoSendEventData CPB::AutoSendEventData::parseMap(const QVariantMap &objMa
         Z_DEFINE_PARSE_VALUE_FOR_INT(obj,objMap,type);
         Z_DEFINE_PARSE_VALUE_FOR_STRING(obj,objMap,content);
         QDateTime dateTime = QDateTime::fromString(objMap.value("dateTime").toString(),"yyyyMMdd hh:mm:ss");
+        if(!dateTime.isValid() || dateTime.isNull())
+        {
+            dateTime = QDateTime::fromString(objMap.value("dateTime").toString(),"yyyy-MM-dd hh:mm:ss");
+        }
+        if(!dateTime.isValid() || dateTime.isNull())
+        {
+            QDate date = QDate::fromString(objMap.value("dateTime").toString(),"yyyy-MM-dd");
+            if(date.isValid() && !date.isNull())
+            {
+                dateTime = QDateTime(date,QTime(0,0,0));
+            }
+        }
+
         if(dateTime.isValid() && !dateTime.isNull())
         {
             valid = true;
