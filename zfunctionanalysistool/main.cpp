@@ -27,7 +27,8 @@ QStringList test(const QString &str)
 void test()
 {
     ZAnalyzer analyzer;
-    analyzer.analye("/Users/miaozw/Library/Application Support/obs-studio/logs/2017-11-03 12-11-42.txt");
+//    analyzer.analye("/Users/miaozw/Library/Application Support/obs-studio/logs/2017-11-03 12-11-42.txt");
+    analyzer.analye("/Users/miaozw/Documents/log.log");
     //
 }
 

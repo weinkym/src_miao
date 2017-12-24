@@ -56,7 +56,7 @@ void ZAnalyzer::analye(const QString &fileName)
             QString key = funName+"_"+threadIdString;
             if(!m_dataMap.contains(key))
             {
-                Z_LOG_WARNING(QString("key=%1 is not contains").arg(key));
+//                Z_LOG_WARNING(QString("key=%1 is not contains").arg(key));
             }
             else
             {
@@ -83,7 +83,7 @@ QStringList ZAnalyzer::getLineMatchContent(const QString &str)
     {
         QString capturedText = rx.capturedTexts().at(0);
         capturedText = capturedText.mid(1,capturedText.length()-2);
-        Z_LOG_DEBUG(capturedText);
+//        Z_LOG_DEBUG(capturedText);
         strList.append(capturedText);
         pos += rx.matchedLength();
     }
@@ -99,7 +99,7 @@ void ZAnalyzer::printData()
         QString logInfo = QString("fun=%1,count=%2,time_consuming_all=%3,time_consuming_max=%4")
                 .arg(iter.value().name).arg(iter.value().count).arg(iter.value().time_consuming_all)
                   .arg(iter.value().time_consuming_max);
-        Z_LOG_WARNING(logInfo);
+//        Z_LOG_WARNING(logInfo);
         if(iter.value().count > 0)
         {
             Z_LOG_WARNING(logInfo);

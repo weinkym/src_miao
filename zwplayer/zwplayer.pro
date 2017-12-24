@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-11-13T11:04:20
+# Project created by QtCreator 2017-12-19T19:50:44
 #
 #-------------------------------------------------
 
@@ -8,11 +8,8 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = test_gui
+TARGET = zwplayer
 TEMPLATE = app
-
-include(../../zwgui.pri)
-include(../../../zwcore/zwcore.pri)
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
@@ -28,10 +25,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    testzwlabeldialog.cpp
+    zwvideothread.cpp
 
 HEADERS  += mainwindow.h \
-    testzwlabeldialog.h
+    zwvideothread.h
 
-FORMS    += mainwindow.ui \
-    testzwlabeldialog.ui
+FORMS    += mainwindow.ui
+
+include(ffmpeg.pri)
+include(../zwcore/zwcore.pri)
+include(../zwgui/zwgui.pri)

@@ -64,6 +64,7 @@ void CLoginManager::requestStatusNotify()
 
 void CLoginManager::requestSyncCheck()
 {
+    ZW_LOG_FUNCTION;
     if(m_isSyncChecking)
     {
         return;

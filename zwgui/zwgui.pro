@@ -31,12 +31,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += src/zwgui.cpp \
     src/zwgui_win.cpp \
     src/zwgui_mac.cpp \
-    src/zwgui_linux.cpp
+    src/zwgui_linux.cpp \
+    src/zwlabeltext.cpp
 
 INCLUDEPATH += $${PWD}/include
 HEADERS += include/zwgui.h\
         include/zwgui_global.h \
-    include/zwfilterlistwidget.h
+    include/zwfilterlistwidget.h \
+    include/zwlabeltext.h
 
 unix {
     target.path = /usr/lib
