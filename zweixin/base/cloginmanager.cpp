@@ -424,7 +424,8 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
 
         if(retcode == 0)
         {
-            if(selector == 2)
+//            if(selector == 2)
+            if(selector != 0)
             {
                 CContactManager::getInstance()->requestWXSync(m_baseRequestParam,m_syncKeyList);
             }

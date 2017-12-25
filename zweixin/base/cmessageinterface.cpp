@@ -110,7 +110,7 @@ CMessageInterface::CMessageInterface(QObject *parent)
     m_timer = new QTimer(this);
 //    m_timer->setInterval(m_intervalSeconds * 1000);
     m_sendNickNames.append("TT123456");
-    m_timer->setInterval(1 * 60 * 1000);
+    m_timer->setInterval(5 * 60 * 1000);
     connect(m_timer,SIGNAL(timeout()),this,SLOT(onTimerout()));
 }
 
@@ -159,9 +159,9 @@ void CMessageInterface::onTimerout()
     {
         iter.next();
         QDateTime dateTime = QDateTime::fromTime_t(iter.value().dateTime);
-        ZW_LOG_INFO(QString("dateTime:%1,iter.value().type=%2")
-                    .arg(dateTime.toString("yyyyMMdd hh:mm:ss"))
-                    .arg(iter.value().type));
+//        ZW_LOG_INFO(QString("dateTime:%1,iter.value().type=%2")
+//                    .arg(dateTime.toString("yyyyMMdd hh:mm:ss"))
+//                    .arg(iter.value().type));
         bool needSend = false;
         switch (iter.value().type)
         {
