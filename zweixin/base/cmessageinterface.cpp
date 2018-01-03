@@ -116,7 +116,7 @@ CMessageInterface::CMessageInterface(QObject *parent)
 
 void CMessageInterface::doRequestFinished(const CPB::RequestReplyData &response)
 {
-    if(response.statusCode > 200)
+    if(response.statusCode >= 400)
     {
         ZW_LOG_WARNING(QString("request is error").arg(QString(response.replyData)));
         if(response.type == TYPE_REQUEST_WX_SEND_MSG)

@@ -50,6 +50,12 @@ void CLoginManager::requestCookie()
     connectAction(ZPublicAction::createCookieAction(m_uuid,m_ticket,m_scan));
 }
 
+void CLoginManager::requestCookieRedirecturl(const QString &redirecturl)
+{
+    ZW_LOG_FUNCTION;
+    connectAction(ZPublicAction::createCookieRedirecturlAction(redirecturl));
+}
+
 void CLoginManager::requestInit()
 {
     ZW_LOG_FUNCTION;
@@ -74,6 +80,12 @@ void CLoginManager::requestSyncCheck()
     {
         this->connectAction(ZPublicAction::createSyncCheck(m_baseRequestParam,m_syncKeyList));
     });
+}
+
+void CLoginManager::doExit(const QString &message)
+{
+    ZW_LOG_WARNING(message);
+    exit(-1);
 }
 
 void CLoginManager::onRequestWaitLogin()
@@ -117,15 +129,25 @@ QString CLoginManager::parseUuid(const QByteArray &byteArray)
     return uuid;
 }
 
-bool CLoginManager::parseCookieData(const QByteArray &byteArray, Z_WX_COOKIE_PARAM &param)
+bool CLoginManager::parseCookieData(const QByteArray &byteArray, Z_WX_COOKIE_PARAM &param, QString &redirecturl)
 {
     QDomDocument doc;
     QString errorString;
+    QByteArray key = "&";
+    QByteArray key_replace = "&amp;";
     bool ok = doc.setContent(byteArray,&errorString);
     if(!ok)
     {
         ZW_LOG_CRITICAL(errorString);
-        return false;
+        ZW_LOG_CRITICAL("adjuest bytearray");
+        QByteArray adjuestByteArray = byteArray;
+        adjuestByteArray.replace(key.constData(),key_replace.constData());
+        ok = doc.setContent(adjuestByteArray,&errorString);
+        if(!ok)
+        {
+            ZW_LOG_CRITICAL(errorString);
+            return false;
+        }
     }
     QDomElement root = doc.documentElement();
     QDomNodeList domNodeList = root.childNodes();
@@ -159,6 +181,12 @@ bool CLoginManager::parseCookieData(const QByteArray &byteArray, Z_WX_COOKIE_PAR
         else if(element.tagName() == "pass_ticket")
         {
             param.pass_ticket = element.text();
+        }
+        else if(element.tagName() == "redirecturl")
+        {
+            redirecturl = element.text();
+            redirecturl.replace(key_replace,key);
+            ZW_LOG_WARNING(QString("pass_ticket=%1").arg(redirecturl));
         }
         else
         {
@@ -272,7 +300,7 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
         m_isSyncChecking = false;
     }
 
-    if(response.statusCode > 200)
+    if(response.statusCode >= 400)
     {
         ZW_LOG_DEBUG(QString("request is error").arg(QString(response.replyData)));
 
@@ -345,11 +373,26 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
         break;
     }
     case HttpRequestType::TYPE_REQUEST_COOKIE:
+    case HttpRequestType::TYPE_REQUEST_COOKIE_REDIRECTURL:
     {
-        bool ok = parseCookieData(response.replyData,m_cookieParam);
+        QString redirecturl;
+        bool ok = parseCookieData(response.replyData,m_cookieParam,redirecturl);
 //        emit sigLoginFinished(ok);
         if(ok)
         {
+            if(!redirecturl.isEmpty())
+            {
+
+                requestCookieRedirecturl(redirecturl);
+                break;
+            }
+            if(m_cookieParam.skey.isEmpty()
+                    || m_cookieParam.wxsid.isEmpty()
+                    || m_cookieParam.wxuin.isEmpty())
+            {
+                doExit("m_cookieParam param has empty");
+                break;
+            }
             QString str15("e");
             for(int i = 0; i < 15;++i)
             {
@@ -370,6 +413,8 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
             m_lastError = "parseCookieData is error";
             m_status = CPB::LOGIN_STATUS_ERROR;
             emit sigDateUpdate(CPB::DATA_UPDATE_TYPE_LOGIN_STATUS,m_status);
+            ZW_LOG_WARNING(QString("data parse is error"));
+            doExit("data parse is error");
         }
         break;
     }
@@ -438,7 +483,7 @@ void CLoginManager::doRequestFinished(const CPB::RequestReplyData &response)
         {
             //TODO 目前发现1101能发消息 收不到消息
             ZW_LOG_CRITICAL(QString("retcode=%1").arg(retcode));
-            exit(retcode);
+            doExit("status has error");
 //            requestSyncCheck();
         }
 

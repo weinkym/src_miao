@@ -13,6 +13,7 @@ public:
     ~CLoginManager();
     void start();
     void requestSyncCheck();
+    void doExit(const QString &message);
 
 protected:
     CLoginManager(QObject *parent = NULL);
@@ -22,11 +23,12 @@ private:
     void requestUuid();
     void requestQrCode();
     void requestCookie();
+    void requestCookieRedirecturl(const QString &redirecturl);
     void requestInit();
     void requestStatusNotify();
 
     static QString parseUuid(const QByteArray &byteArray);
-    static bool parseCookieData(const QByteArray &byteArray,Z_WX_COOKIE_PARAM &param);
+    static bool parseCookieData(const QByteArray &byteArray,Z_WX_COOKIE_PARAM &param,QString &redirecturl);
     bool parseRedirectUri(const QByteArray &byteArray);
     bool parseInitData(const QByteArray &byteArray);
     QString parseUrlParam(const QString &url,const QString &param);

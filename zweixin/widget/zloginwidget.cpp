@@ -171,7 +171,7 @@ bool ZLoginWidget::parseCookieData(const QByteArray &byteArray)
 void ZLoginWidget::onRequestFinished(const CPB::RequestReplyData &response)
 {
     ZW_LOG_FUNCTION;
-//    if(response.statusCode > 200)
+//    if(response.statusCode >= 400)
 //    {
 //        LOG_TEST(QString("request is error").arg(QString(response.replyData)));
 

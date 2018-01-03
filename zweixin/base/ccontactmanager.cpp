@@ -107,7 +107,7 @@ CContactManager::CContactManager(QObject *parent)
 
 void CContactManager::doRequestFinished(const CPB::RequestReplyData &response)
 {
-    if(response.statusCode > 200)
+    if(response.statusCode >= 400)
     {
         ZW_LOG_DEBUG(QString("request is error").arg(QString(response.replyData)));
         if(response.type == TYPE_REQUEST_WX_SYNC)

@@ -34,6 +34,13 @@ ZPublicAction *ZPublicAction::createCookieAction(const QString &uuid, const QStr
     return action;
 }
 
+ZPublicAction *ZPublicAction::createCookieRedirecturlAction(const QString &redirecturl)
+{
+    ZPublicAction *action = new ZPublicAction(TYPE_REQUEST_COOKIE_REDIRECTURL);
+    action->m_redirecturl = redirecturl;
+    return action;
+}
+
 ZPublicAction *ZPublicAction::createWxInitAction(const ZBaseRequestParam &baseRequestParam)
 {
     ZPublicAction *action = new ZPublicAction(TYPE_REQUEST_WX_INIT);
@@ -112,6 +119,7 @@ ZRequestAction::Operation ZPublicAction::getOperation()
     case TYPE_REQUEST_LOGIN_UUID:
     case TYPE_REQUEST_WAIT_LOGIN:
     case TYPE_REQUEST_COOKIE:
+    case TYPE_REQUEST_COOKIE_REDIRECTURL:
     case TYPE_REQUEST_AVATAR:
     case TYPE_REQUEST_CONTACT:
     case TYPE_REQUEST_SYNC_CHECK:
@@ -173,6 +181,12 @@ QNetworkRequest ZPublicAction::createRequest() const
                 .arg(m_ticket).arg(m_uuid).arg(m_scan);
 
         QNetworkRequest request(QUrl(head.toLatin1()));
+        return request;
+        break;
+    }
+    case TYPE_REQUEST_COOKIE_REDIRECTURL:
+    {
+        QNetworkRequest request(QUrl(m_redirecturl.toLatin1()));
         return request;
         break;
     }
