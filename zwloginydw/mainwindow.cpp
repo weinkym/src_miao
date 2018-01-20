@@ -9,11 +9,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    m_view = new QWebEngineView;
+    m_view = new ZWWebengineView;
     QHBoxLayout *hLayout = new QHBoxLayout;
     hLayout->addWidget(m_view);
     ui->tabWidget->currentWidget()->setLayout(hLayout);
-    m_view->load(QUrl("http://www.yidai.com/user/login/"));
+//    m_view->load(QUrl("http://www.yidai.com/user/login/"));
+    m_view->startLogin();
 }
 
 MainWindow::~MainWindow()
@@ -41,4 +42,5 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_pushButton_2_clicked()
 {
     m_view->page()->load(QUrl("https://www.yidai.com/borrowesharemy/index/"));
+//    m_view->startLogin();
 }

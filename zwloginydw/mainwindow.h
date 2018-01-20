@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QWebEngineView>
 #include <QWebEnginePage>
+#include "zwwebengineview.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,7 +25,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    QWebEngineView *m_view;
+    ZWWebengineView *m_view;
 };
 
 #endif // MAINWINDOW_H

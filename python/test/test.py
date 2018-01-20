@@ -12,4 +12,8 @@ def writeexcel03(path):
     wb.save(path)
     print("写入数据成功！")
 
-writeexcel03("/Users/miaozw/Documents/0001.xls")
+# writeexcel03("/Users/miaozw/Documents/0001.xls")
+consumed_bytes = 10000000000000000
+total_bytes = 10000000000000001
+rate = int(100 * (float(consumed_bytes) / float(total_bytes)))
+print('{0}'.format(rate))
