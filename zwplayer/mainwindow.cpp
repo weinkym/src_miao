@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->label->setScaledContents(true);
     m_videoThread = new ZWVideoThread();
     connect(m_videoThread,SIGNAL(sigImageChanged(QImage)),this,SLOT(onImageChanged(QImage)));
+    connect(m_videoThread,SIGNAL(sig_GetOneFrame(QImage)),this,SLOT(onImageChanged(QImage)));
     connect(m_videoThread,SIGNAL(sigErrorHappened(int,QString)),this,SLOT(onErrorHappened(int,QString)));
 }
 

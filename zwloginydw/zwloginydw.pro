@@ -1,14 +1,14 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-12-19T19:50:44
+# Project created by QtCreator 2018-01-14T16:17:44
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = zwplayer
+TARGET = zwloginydw
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -24,15 +24,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    zwvideothread.cpp
+        mainwindow.cpp
 
-HEADERS  += mainwindow.h \
-    zwvideothread.h
+HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
-
-include(ffmpeg.pri)
-include(sdl.pri)
-include(../zwcore/zwcore.pri)
-include(../zwgui/zwgui.pri)
