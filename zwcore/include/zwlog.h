@@ -79,4 +79,18 @@ private:
 
 #define ZW_LOG_TEST zw_log(getTestLogContent(),QString(__FILE__),QString::number(__LINE__),getTestLogLevel())
 
+#define ZW_BOOL_VALUE_TO_STRING(value) (value ? "TRUE":"FALSE")
+
+#define ZW_VALUE_LOG_TEST_BOOL(value) ZW_LOG_TEST(QString(#value"=%1").arg(ZW_BOOL_VALUE_TO_STRING(value)))
+#define ZW_VALUE_LOG_DEBUG_BOOL(value) ZW_LOG_DEBUG(QString(#value"=%1").arg(ZW_BOOL_VALUE_TO_STRING(value)))
+#define ZW_VALUE_LOG_INFO_BOOL(value) ZW_LOG_INFO(QString(#value"=%1").arg(ZW_BOOL_VALUE_TO_STRING(value)))
+#define ZW_VALUE_LOG_WARNING_BOOL(value) ZW_LOG_WARNING(QString(#value"=%1").arg(ZW_BOOL_VALUE_TO_STRING(value)))
+#define ZW_VALUE_LOG_ERROR_BOOL(value) ZW_LOG_ERROR(QString(#value"=%1").arg(ZW_BOOL_VALUE_TO_STRING(value)))
+
+#define ZW_VALUE_LOG_TEST(value) ZW_LOG_TEST(QString(#value"=%1").arg(value))
+#define ZW_VALUE_LOG_DEBUG(value) ZW_LOG_DEBUG(QString(#value"=%1").arg(value))
+#define ZW_VALUE_LOG_INFO(value) ZW_LOG_INFO(QString(#value"=%1").arg(value))
+#define ZW_VALUE_LOG_WARNING(value) ZW_LOG_WARNING(QString(#value"=%1").arg(value))
+#define ZW_VALUE_LOG_ERROR(value) ZW_LOG_ERROR(QString(#value"=%1").arg(value))
+
 #endif // ZWLOG_H
