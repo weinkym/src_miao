@@ -13,9 +13,11 @@ public:
 public slots:
     void doTest(const QString &text,int type);
     void test();
+    void pageCount(int count);
 
 signals:
     void sigTest(const QString &text,int type);
+    void sigPageCountChanged(int count);
 
 private:
 

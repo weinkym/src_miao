@@ -21,3 +21,8 @@ void ZWJSBridgeObject::test()
 {
     ZW_LOG_INFO("ssssss");
 }
+
+void ZWJSBridgeObject::pageCount(int count)
+{
+    emit sigPageCountChanged(count);
+}

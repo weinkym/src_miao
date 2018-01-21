@@ -32,6 +32,11 @@ var test = "";
 for(var i = 1; i < items.length; i++)
 {
 	var tds = items[i].getElementsByTagName("td")
+	var item0 = tds[0]
+	var title = item0.getElementsByTagName("a")[0]innerHTML;
+	var code = item0.getElementsByTagName("span")[0]innerHTML;
+	test = test+title+"@";
+	test = test+code+"@";
 	// for(var j = 1;j <tds.length;j++)
 	for(var j = 1;j <7;j++)
 	{
