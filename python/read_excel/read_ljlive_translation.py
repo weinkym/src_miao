@@ -67,6 +67,7 @@ def lj_check_cn_eg_data(obj,identifier):
         key_list.append("key_eg_short")
 
     if has_error:
+        # print(obj.key_eg)
         print("identifier=%s data has error character in row %d  cn=%s keys=%s"%(identifier,obj.key_row,obj.key_cn,"****".join(key_list)))
     return obj
 

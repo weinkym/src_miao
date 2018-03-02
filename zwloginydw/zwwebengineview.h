@@ -23,6 +23,7 @@ public:
     ZWWebengineView(QWidget *parent = Q_NULLPTR);
     ~ZWWebengineView();
     void startLogin();
+    void startLogin(const QString &userName,const QString &password,const QString &outDirPath);
 
 public slots:
     void setCount(int count);
@@ -44,6 +45,9 @@ private:
     int m_totalPageCount;
     int m_currentPageIndex;
     int m_crrentPageCount;
+    QString m_userName;
+    QString m_password;
+    QString m_outDirPath;
     Status m_status;
     QString m_webchannelJSString;
     QStringList m_jsList;

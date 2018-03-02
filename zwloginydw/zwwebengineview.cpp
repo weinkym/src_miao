@@ -18,14 +18,10 @@ ZWWebengineView::ZWWebengineView(QWidget *parent)
     channel->registerObject(ZW_JS_OBJECT_NAME, this);
     this->page()->setWebChannel(channel);
 
+    m_userName = "13616511205";
+    m_password = "miao1280";
+    m_outDirPath = QString("/Users/miaozw/Documents/TEMP");
     initWebengineJS();
-//    connect(m_bridgeObject, SIGNAL(sigKickedByOtherClient(QString)), this, SLOT(onKickedByOtherDevice(QString)));
-//    connect(m_bridgeObject, SIGNAL(sigSpeakingStatusChanged(int)), this, SLOT(onSpeakingStatusChanged(int)));
-//    connect(m_bridgeObject, SIGNAL(sigChangeStream(int)), this, SLOT(onChangeStream(int)));
-//    connect(m_bridgeObject, SIGNAL(sigChangeRoomStatus(int)), this, SLOT(onChangeRoomStatus(int)));
-//    this->page()->load(QUrl("file:///Users/miaozw/Documents/TEMP/test.htm"));
-//    this->load(QUrl("https://www.baidu.com/"));
-
 }
 
 ZWWebengineView::~ZWWebengineView()
@@ -40,6 +36,14 @@ void ZWWebengineView::startLogin()
     //    this->load(QUrl("https://www.baidu.com/"));
 }
 
+void ZWWebengineView::startLogin(const QString &userName, const QString &password, const QString &outDirPath)
+{
+    m_userName = userName;
+    m_password = password;
+    m_outDirPath = outDirPath;
+    startLogin();
+}
+
 void ZWWebengineView::setCount(int count)
 {
     ZW_LOG_INFO(QString("count=%1").arg(count));
@@ -51,10 +55,19 @@ void ZWWebengineView::setCount(int count)
 
 void ZWWebengineView::appendText(const QString &text, int count)
 {
-    ZW_LOG_INFO(QString("text=%1").arg(text));
-    ZW_LOG_INFO(QString("count=%1").arg(count));
-    QFile file("/Users/miaozw/Documents/TEMP/out.txt");
-    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
+    ZW_VALUE_LOG_INFO(text);
+    ZW_VALUE_LOG_INFO(count);
+    ZW_VALUE_LOG_INFO(m_outDirPath);
+    ZW_VALUE_LOG_INFO(m_totalPageCount);
+    ZW_VALUE_LOG_INFO(m_currentPageIndex);
+    QString filePath = m_outDirPath + QString("/%1.txt").arg(m_userName);
+    QFile file(filePath);
+    QIODevice::OpenMode flags = QIODevice::WriteOnly;
+    if(m_totalPageCount != m_currentPageIndex)
+    {
+        flags = QIODevice::WriteOnly | QIODevice::Append;
+    }
+    if(file.open(flags))
     {
         file.write(text.toLocal8Bit().data());
         file.close();
@@ -68,6 +81,8 @@ void ZWWebengineView::appendText(const QString &text, int count)
     else
     {
         ZW_LOG_INFO("finished");
+        this->close();
+        exit(0);
     }
 }
 
@@ -129,8 +144,8 @@ QString ZWWebengineView::getStatusJS()
     case STATUS_INDEX:
     {
         jsString.append("var demo = document.getElementById('login_button');\n");
-        jsString.append("document.getElementById('keywords').value=13616511205;\n");
-        jsString.append("document.getElementById('password').value='miao1280';\n");
+        jsString.append(QString("document.getElementById('keywords').value=%1;\n").arg(m_userName));
+        jsString.append(QString("document.getElementById('password').value='%1';\n").arg(m_password));
         jsString.append("demo.click();\n");
        break;
     }
