@@ -10,6 +10,11 @@ class LJCN_EG_DATA:
     key_count = 1
     key_row = 0
 
+class LJ_RELEASENOTE_DATA:
+    key_cn = ""
+    key_eg = ""
+    key_type = ""
+
 lj_g_remove_string_list = ["\n","\t"," "]
 def lj_check_string(string):
     str=string
@@ -80,7 +85,7 @@ def lj_read_summary_sheet(table):
         print("col is invalid")
         return
 
-    for row in range(0,num_row):
+    for row in range(1,num_row):
         obj = LJCN_EG_DATA()
         obj.key_cn = table.cell_value(row, 0)
         obj.key_eg = table.cell_value(row, 1)
@@ -110,7 +115,7 @@ def lj_read_source_sheet(table,summary_data):
         print("col is invalid")
         return
 
-    for row in range(0,num_row):
+    for row in range(1,num_row):
         obj = LJCN_EG_DATA()
         obj.key_cn = table.cell_value(row, 1)
         obj.key_src = table.cell_value(row, 2)
@@ -142,7 +147,7 @@ def lj_read_special_sheet(table):
         print("col is invalid col=",num_col)
         return result_data
 
-    for row in range(0, num_row):
+    for row in range(1, num_row):
         obj = LJCN_EG_DATA()
         obj.key_cn = table.cell_value(row, 0)
         obj.key_src = table.cell_value(row, 1)
@@ -189,18 +194,56 @@ def lj_test(summary_table,source_table,special_table):
         # sprint("%s %s %s %s %s" % (obj.key_cn,obj.key_src,tw,obj.key_eg,obj.key_eg_short))
     file_object.close()
 
+def lj_create_releasenote(table,filepath):
+    num_col = table.ncols
+    num_row = table.nrows
+    print(num_col)
+    print(num_row)
+    if num_col < 3:
+        return
+
+    data_list = []
+    for row in range(2,num_row):
+        type = table.cell_value(row, 0)
+        # print(type)
+        if type == "WIN" or type == "ALL" or type == "MAC":
+            obj = LJ_RELEASENOTE_DATA()
+            obj.key_cn = table.cell_value(row, 1)
+            obj.key_eg = table.cell_value(row, 2)
+            obj.key_type = type
+            data_list.append(obj)
+        if type == "END":
+            break
+
+
+
+    file_object = open(filepath, 'w')
+    for i in range(0, len(data_list)):
+        print(data_list[i].key_eg)
+        tw = Converter('zh-hant').convert(data_list[i].key_cn)
+        file_object.write("CN" + data_list[i].key_type + data_list[i].key_cn + "\n")
+        file_object.write("TW" + data_list[i].key_type + tw + "\n")
+        file_object.write("EG" + data_list[i].key_type + data_list[i].key_eg + "\n")
+
+
+
+
 
 filename = "/Users/miaozw/work/ljlive/ljobs/translations/all.xlsx"
 summary_table_name = "ALL"
 source_table_name = "结果"
 special_table_name = "特殊"
+releasenote_table_name = "releasenote"
 
 work_book = xlrd.open_workbook(filename)
 summary_table = work_book.sheet_by_name(summary_table_name)
 source_table = work_book.sheet_by_name(source_table_name)
 special_table = work_book.sheet_by_name(special_table_name)
+releasenote_table = work_book.sheet_by_name(releasenote_table_name)
 
 lj_test(summary_table,source_table,special_table)
+
+lj_create_releasenote(releasenote_table,"/Users/miaozw/work/ljlive/ljobs/translations/releasenote.txt")
 # tempstr="asdfadf"
 # tempstr = lj_check_string(tempstr)
 # print(tempstr[0])
