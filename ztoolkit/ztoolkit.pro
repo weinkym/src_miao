@@ -27,7 +27,14 @@ INCLUDEPATH += $${OBJECTS_DIR}/uic
 INCLUDEPATH += ./include
 INCLUDEPATH += ../mplib/include
 ###############################################################################
-LIBS += -L../mplib/lib -lmplib -luser32
+#LIBS += -L../mplib/lib -lmplib -luser32
+CGLOBAL_PRF=../mplib/cglobal.prf
+!exists($${CGLOBAL_PRF}) {
+    error("$${CGLOBAL_PRF} is not found")
+}
+include($${CGLOBAL_PRF})
+include(../mplib/mplib.pri)
+
 ###############################################################################
 HEADERS += \
     include/mainwindow.h \
