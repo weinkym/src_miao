@@ -6,6 +6,8 @@
 #include <QKeyEvent>
 #include <QSettings>
 #include <QMessageBox>
+#include <QDebug>
+#include <QDateTime>
 
 ZCatlogWidget::ZCatlogWidget(QWidget *parent) :
     QWidget(parent),
@@ -139,6 +141,11 @@ QString ZCatlogWidget::toHtmlString(const QString &source, const QColor &backgro
     return QString("<strong style=\"background:%1\"><font color=\"%2\">%3</font></strong>").arg(backgroundColor.name()).arg(color.name()).arg(source);
 }
 
+struct LogData{
+    int line = 0;
+    int count = 0;
+};
+
 void ZCatlogWidget::doUpdateFunction()
 {
     ui->textEdit->clear();
@@ -149,7 +156,7 @@ void ZCatlogWidget::doUpdateFunction()
         return;
     }
     QTextStream textStream(&file);
-    int line = 1;
+    int line = 0;
     Qt:: CaseSensitivity cs = ui->checkBoxCaseSensitivity->isChecked() ? Qt::CaseSensitive : Qt::CaseInsensitive;
     bool isRegExp = true;
 
@@ -159,13 +166,17 @@ void ZCatlogWidget::doUpdateFunction()
     ui->textEdit->append(QString("key=%1").arg(key));
 
 //    QRegExp rx(key);
-    QRegExp rx("\\[\\[.*\\]\\]");
+    QRegExp rx("\\[.*\\]");
 
-    QString startKey = "[[Enter";
-    QString endKey = "[[Leave";
-    QMap<QString,int> funMap;
+    QString startKey = "[Enter]";
+    QString endKey = "[Leave]";
+
+
+    QMap<QString,LogData> funMap;
     rx.setMinimal(true);
     int row = 1;
+//    static int s_test_count_enter = 0;
+//    static int s_test_count_leave = 0;
     while(!textStream.atEnd())
     {
         line++;
@@ -174,31 +185,72 @@ void ZCatlogWidget::doUpdateFunction()
                 .replace(QString(">"),QString("&gt;"))
                 .replace(QString("&nbsp;"),QString(" "));
         QStringList tempString = regExpStringList(rx,lineString);
+//        qDebug()<<"tempString"<<tempString;
+
         if(tempString.isEmpty())
         {
             continue;
         }
-        QString content = tempString.first();
-        int addCount = 0;
-        if(content.startsWith(startKey))
+        if(tempString.count() < 2)
         {
-            content.remove(startKey);
-            addCount = 1;
+            continue;
         }
-        else if(content.startsWith(endKey))
+        QString content = tempString.at(1);
+        LogData obj = funMap.value(content);
+//        int addCount = 0;
+
+        if(tempString.contains(startKey))
+        {
+//            content.remove(startKey);
+            obj.count++;
+            obj.line = line;
+//            if(tempString.contains("[function:void __thiscall ft2_source::prepareUpdate(void)]"))
+//            {
+//                s_test_count_enter++;
+//            }
+        }
+        else if(tempString.contains(endKey))
         {
             content.remove(endKey);
-            addCount = -1;
+            obj.count--;
+//            if(tempString.contains("[function:void __thiscall ft2_source::prepareUpdate(void)]"))
+//            {
+//                s_test_count_leave++;
+//            }
         }
-        funMap.insert(content,funMap.value(content) + addCount);
+        int leave = 0;
+        int enter = 0;
+        for(auto obj:tempString)
+        {
+            if(obj.contains(startKey))
+            {
+                enter++;
+            }
+            if(obj.contains(endKey))
+            {
+                leave++;
+            }
+        }
+        if(leave + enter > 1)
+        {
+            qDebug()<<"line=="<<line;
+        }
+//        if(obj.count >1 && tempString.contains("[function:void __thiscall ft2_source::prepareUpdate(void)]"))
+//        {
+//            qDebug()<<"line=="<<line;
+//        }
+//        obj.count += addCount;
+        funMap.insert(content,obj);
     }
-    QMapIterator<QString,int> iter(funMap);
+//    qDebug()<<"line"<<s_test_count_enter;
+//    qDebug()<<"line"<<s_test_count_leave;
+    QMapIterator<QString,LogData> iter(funMap);
     while(iter.hasNext())
     {
         iter.next();
-        if(iter.value() != 0)
+        if(iter.value().count != 0)
         {
-        ui->textEdit->append(QString("fun=%1,count=%2").arg(iter.key()).arg(iter.value()));
+            ui->textEdit->append(QString("fun=%1,count=%2,line=%3").arg(iter.key()).arg(iter.value().count).arg(iter.value().line));
         }
     }
     ui->textEdit->append("end");
@@ -214,6 +266,34 @@ QStringList ZCatlogWidget::regExpStringList(const QRegExp &rx, const QString &so
         pos += rx.matchedLength();
     }
     return capList;
+}
+
+void ZCatlogWidget::updateFilePathWithLog()
+{
+#ifdef Q_OS_MAC
+    QString dirName = "/Users/miaozw/Library/Application Support/yxtliveshow/ljobs/logs";
+#endif
+
+    QDir dir(dirName);
+    QDateTime dateTime;
+    QString filePath;
+    foreach(QFileInfo file, dir.entryInfoList())
+    {
+        if(file.fileName() == "." || file.fileName() == ".")
+            continue;
+        if(file.isDir())
+            continue;
+
+        QDateTime curDateTime = QDateTime::fromString(file.baseName(),"yyyyMMddhhmmsszzz");
+        if(curDateTime.isValid() && !curDateTime.isNull() && curDateTime > dateTime)
+        {
+            filePath = file.absoluteFilePath();
+        }
+    }
+    if(!filePath.isEmpty())
+    {
+        ui->lineEditPath->setText(filePath);
+    }
 }
 
 void ZCatlogWidget::on_pushButtonUpdate_clicked()
@@ -237,4 +317,9 @@ void ZCatlogWidget::on_pushButtonLoad_clicked()
 void ZCatlogWidget::on_pushButtonClose_clicked()
 {
     this->close();
+}
+
+void ZCatlogWidget::on_pushButton_clicked()
+{
+    updateFilePathWithLog();
 }
