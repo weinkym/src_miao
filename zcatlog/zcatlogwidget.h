@@ -24,6 +24,7 @@ private:
     QString  toHtmlString(const QString &source,const QColor &backgroundColor,const QColor &color);
     void doUpdateFunction();
     QStringList regExpStringList(const QRegExp &rx, const QString  &source);
+    void updateFilePathWithLog();
 
 private slots:
     void on_pushButtonUpdate_clicked();
@@ -31,6 +32,8 @@ private slots:
     void on_pushButtonLoad_clicked();
 
     void on_pushButtonClose_clicked();
+
+    void on_pushButton_clicked();
 
 private:
     Ui::ZCatlogWidget *ui;

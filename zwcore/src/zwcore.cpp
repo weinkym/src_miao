@@ -199,3 +199,78 @@ QString ZWCore::getBoolString(bool boolValue)
 {
     return boolValue ? "TRUE":"FALSE";
 }
+
+//UTF-8是一种多字节编码的字符集，表示一个Unicode字符时，它可以是1个至多个字节，在表示上有规律：
+//1字节：0xxxxxxx
+//2字节：110xxxxx 10xxxxxx
+//3字节：1110xxxx 10xxxxxx 10xxxxxx
+//4字节：11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+//但很少会遇到4字节的
+bool ZWCore::isUTF8(const char *srcBuffer, long size)
+{
+    bool ret = true;
+    unsigned char* start = (unsigned char*)srcBuffer;
+    unsigned char* end = (unsigned char*)srcBuffer + size;
+    while(start < end)
+    {
+        if(*start < (0x80))
+        {
+            // (10000000): 值小于0x80的为ASCII字符
+            start++;
+        }
+        else if(*start < (0xC0))
+        {
+            // (11000000): 值介于0x80与0xC0之间的为无效UTF-8字符
+            ret = false;
+            break;
+        }
+        else if(*start < (0xE0))
+        {
+            // (11100000): 此范围内为2字节UTF-8字符
+            if (start >= end - 1)
+            {
+                break;
+            }
+            if ((start[1] & (0xC0)) != 0x80)
+            {
+                ret = false;
+                break;
+            }
+            start += 2;
+        }
+        else if (*start < (0xF0))
+        {
+            // (11110000): 此范围内为3字节UTF-8字符
+            if (start >= end - 2)
+            {
+                break;
+            }
+            if ((start[1] & (0xC0)) != 0x80 || (start[2] & (0xC0)) != 0x80)
+            {
+                ret = false;
+                break;
+            }
+            start += 3;
+        }
+        else if (*start < (0xF8))
+        {
+            // (11111000): 此范围内为4字节UTF-8字符
+            if (start >= end - 3)
+            {
+                break;
+            }
+            if ((start[1] & (0xC0)) != 0x80 || (start[2] & (0xC0)) != 0x80 || (start[3] & (0xC0)) != 0x80)
+            {
+                ret = false;
+                break;
+            }
+            start += 4;
+        }
+        else
+        {
+            ret = false;
+            break;
+        }
+    }
+    return ret;
+}

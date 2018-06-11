@@ -1,19 +1,19 @@
+from xlutils.copy import copy
+import xlrd
 import xlwt
 
+#xlutils:修改excel
+file_path = '/Users/miaozw/Documents/TEMP/test.xls'
+book1 = xlrd.open_workbook(file_path)
+book2 = copy(book1)#拷贝一份原来的excel
 
-def writeexcel03(path):
-    wb = xlwt.Workbook()
-    sheet = wb.add_sheet("xlwt3数据测试表")
-    value = [["名称", "hadoop编程实战", "hbase编程实战", "lucene编程实战"], ["价格", "52.3", "45", "36"],
-             ["出版社", "机械工业出版社", "人民邮电出版社", "华夏人民出版社"], ["中文版式", "中", "英", "英"]]
-    for i in range(0, 4):
-        for j in range(0, len(value[i])):
-            sheet.write(i, j, value[i][j])
-    wb.save(path)
-    print("写入数据成功！")
+print(type(book2))
+# print(dir(book2))
+sheet = book2.get_sheet(0)#获取第几个sheet页，book2现在的是xlutils里的方法，不是xlrd的
 
-# writeexcel03("/Users/miaozw/Documents/0001.xls")
-consumed_bytes = 10000000000000000
-total_bytes = 10000000000000001
-rate = int(100 * (float(consumed_bytes) / float(total_bytes)))
-print('{0}'.format(rate))
+temp = sheet.last_used_row
+temp2 = sheet.first_used_row
+for row in range(3,sheet.last_used_row):
+    sheet.write(row,3,'',)
+
+book2.save(file_path)

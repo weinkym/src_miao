@@ -13,6 +13,7 @@ public:
     static QStringList convertToPinyin(const QChar &c,bool initial = false);
     static QStringList convertToPinyin(ushort unicode,bool initial = false);
     static QString getBoolString(bool boolValue);
+    static bool isUTF8(const char *srcBuffer,long size);
 
 #if defined(Q_OS_MAC) || defined(Q_OS_WIN)
     static void openFinder(const QString &filePath);
