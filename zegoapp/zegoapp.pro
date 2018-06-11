@@ -28,10 +28,14 @@ INCLUDEPATH += ./ljlive
 SOURCES += main.cpp\
         mainwindow.cpp \
     ljlive/ljlivepublishercallback.cpp \
-    ljlive/ljliveplayercallback.cpp
+    ljlive/ljliveplayercallback.cpp \
+    ljlive/clogsetting.cpp \
+    ljlive/ljroomcallback.cpp
 
 HEADERS  += mainwindow.h \
     ljlive/ljlivepublishercallback.h \
-    ljlive/ljliveplayercallback.h
+    ljlive/ljliveplayercallback.h \
+    ljlive/clogsetting.h \
+    ljlive/ljroomcallback.h
 
 FORMS    += mainwindow.ui
