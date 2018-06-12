@@ -25,17 +25,32 @@ DEFINES += QT_DEPRECATED_WARNINGS
 include(cglobal.prf)
 include(./zego/zego.pri)
 INCLUDEPATH += ./ljlive
+INCLUDEPATH += ./Model
+INCLUDEPATH += ./Signal
+#INCLUDEPATH += ./Module
+
+
 SOURCES += main.cpp\
         mainwindow.cpp \
     ljlive/ljlivepublishercallback.cpp \
     ljlive/ljliveplayercallback.cpp \
     ljlive/clogsetting.cpp \
-    ljlive/ljroomcallback.cpp
+    ljlive/ljroomcallback.cpp \
+    Model/ZegoRoomModel.cpp \
+    Model/ZegoRoomMsgModel.cpp \
+    Model/ZegoStreamModel.cpp \
+    Model/ZegoUserModel.cpp \
+    Signal/ZegoSDKSignal.cpp
 
 HEADERS  += mainwindow.h \
     ljlive/ljlivepublishercallback.h \
     ljlive/ljliveplayercallback.h \
     ljlive/clogsetting.h \
-    ljlive/ljroomcallback.h
+    ljlive/ljroomcallback.h \
+    Model/ZegoRoomModel.h \
+    Model/ZegoRoomMsgModel.h \
+    Model/ZegoStreamModel.h \
+    Model/ZegoUserModel.h \
+    Signal/ZegoSDKSignal.h
 
 FORMS    += mainwindow.ui
