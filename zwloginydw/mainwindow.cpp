@@ -18,13 +18,16 @@ MainWindow::MainWindow(QWidget *parent) :
 //    m_view->load(QUrl("http://www.yidai.com/user/login/"));
 //    m_view->startLogin();
 
-    m_textView = new QWebEngineView;
-    ui->tabWidget->insertTab(0,m_textView,QIcon(""),"TEST");
+    m_bridgeObject = new ZWJSBridgeObject;
+    ui->tabWidget->insertTab(0,m_bridgeObject->getView(),QIcon(""),"TEST");
 
-    QWebChannel *channel = new QWebChannel(this);
-//    m_bridgeObject = new ZWJSBridgeObject(this);
-    channel->registerObject("ZTESTWebEngineView", this);
-    m_textView->page()->setWebChannel(channel);
+//    m_textView = new QWebEngineView;
+//    ui->tabWidget->insertTab(0,m_textView,QIcon(""),"TEST");
+
+//    QWebChannel *channel = new QWebChannel(this);
+////    m_bridgeObject = new ZWJSBridgeObject(this);
+//    channel->registerObject("ZTESTWebEngineView", this);
+//    m_textView->page()->setWebChannel(channel);
 
 }
 
@@ -60,18 +63,21 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_pbLoadUrl_clicked()
 {
-    m_textView->load(QUrl(ui->lineEditUrl->text()));
+    m_bridgeObject->load(QUrl(ui->lineEditUrl->text()));
 }
 
 void MainWindow::on_pbRunJS_clicked()
 {
-    QString jsString;
+//    QString jsString;
 
-    jsString.append(m_view->m_webchannelJSString);
-    jsString.append("\n");
-    jsString.append(ui->textEditJS->toPlainText());
-    jsString.append("\n");
-    m_textView->page()->runJavaScript(jsString);
+//    jsString.append(m_view->m_webchannelJSString);
+//    jsString.append("\n");
+//    jsString.append(ui->textEditJS->toPlainText());
+//    jsString.append("\n");
+    m_bridgeObject->runJavaScript(ui->textEditJS->toPlainText());
+
+//    m_bridgeObject->onAmountCallback("1,003.51","本月最近待收：2018-07-02&nbsp;&nbsp;&nbsp;金额：￥",
+//                                  "1,003.51","本月最近待收：2018-07-02&nbsp;&nbsp;&nbsp;金额：￥");
 }
 
 void MainWindow::testToJS()

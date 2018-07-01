@@ -5,6 +5,7 @@
 #include <QWebEngineView>
 #include <QWebEnginePage>
 #include "zwwebengineview.h"
+#include "zwjsbridgeobject.h"
 
 namespace Ui {
 class MainWindow;
@@ -35,7 +36,8 @@ public slots:
 private:
     Ui::MainWindow *ui;
     ZWWebengineView *m_view;
-    QWebEngineView *m_textView;
+    ZWJSBridgeObject *m_bridgeObject;
+//    QWebEngineView *m_textView;
 };
 
 #endif // MAINWINDOW_H
