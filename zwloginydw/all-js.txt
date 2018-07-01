@@ -4,6 +4,8 @@ document.getElementById('keywords').value='13616511205';
 document.getElementById('password').value='miao1280';
 demo.click();
 
+//=================获取余额
+
 //=================打开宜享界面
 <a href="https://www.yidai.com/borrowesharemy/index/">我的宜享</a>
 <a href="https://www.yidai.com/borroweshareapply/index/">申请宜享</a>
@@ -158,7 +160,14 @@ doError("date not found");
 }
 readData();
 
-//执行申请
+//=================执行申请
+var obj_timeLimitType = document.getElementById('timeLimitType');
+var obj_timeLimit = document.getElementById('timeLimit');
+//选择按月，期限为1个月
+obj_timeLimitType.getElementsByTagName("option")[1].selected=true;
+obj_timeLimit.getElementsByTagName("option")[0].selected=true;
+alert(obj_timeLimitType.value);
+//开始申请
 borroweshareapply();
 
 //=================获取可以宜享的标列表
