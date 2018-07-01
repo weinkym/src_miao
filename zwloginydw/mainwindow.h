@@ -18,14 +18,24 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-private slots:
+public slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
 
+    void on_pbLoadUrl_clicked();
+
+    void on_pbRunJS_clicked();
+
+    void testToJS();
+    void testToJS2(const QString &test,int number);
+    int testToJS3(const QString &test,int number);
+    QString testToJS4(const QString &test,int number);
+
 private:
     Ui::MainWindow *ui;
     ZWWebengineView *m_view;
+    QWebEngineView *m_textView;
 };
 
 #endif // MAINWINDOW_H

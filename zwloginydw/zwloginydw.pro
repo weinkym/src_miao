@@ -28,12 +28,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     zwwebengineview.cpp \
     zwwebenginepage.cpp \
-    zwjsbridgeobject.cpp
+    zwjsbridgeobject.cpp \
+    zwydwpublic.cpp
 
 HEADERS  += mainwindow.h \
     zwwebengineview.h \
     zwwebenginepage.h \
-    zwjsbridgeobject.h
+    zwjsbridgeobject.h \
+    zwydwpublic.h
 
 FORMS    += mainwindow.ui
 

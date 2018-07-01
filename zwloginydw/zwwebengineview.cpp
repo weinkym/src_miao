@@ -26,7 +26,11 @@ ZWWebengineView::ZWWebengineView(QWidget *parent)
 
 ZWWebengineView::~ZWWebengineView()
 {
-
+    if(m_bridgeObject)
+    {
+        m_bridgeObject->deleteLater();
+        m_bridgeObject = NULL;
+    }
 }
 
 void ZWWebengineView::startLogin()

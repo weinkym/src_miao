@@ -1,0 +1,220 @@
+//=================登陆
+var demo = document.getElementById('login_button');
+document.getElementById('keywords').value='13616511205';
+document.getElementById('password').value='miao1280';
+demo.click();
+
+//=================打开宜享界面
+<a href="https://www.yidai.com/borrowesharemy/index/">我的宜享</a>
+<a href="https://www.yidai.com/borroweshareapply/index/">申请宜享</a>
+<a href="https://www.yidai.com/esharerepay/index/">回转明细</a>
+
+//=================打开回转中宜享
+<a href="javascript:void(0);" onclick="borrowesharemy.searchborrowesharemy(2,-1,0);">回转中</a>
+
+
+//=================提取宜享记录
+var tab3 = document.getElementsByClassName("tab-3")[0];
+var rowObjList = tab3.getElementsByTagName("tr");
+var jsnump = document.getElementById("jsnump");
+var pageCount = jsnump.getElementsByTagName("li").length;
+page_jump("this",pageCount);
+
+var test='';
+for(var i =  1; i <rowObjList.length;i++)
+{
+    var tds = rowObjList[i].getElementsByTagName("td");
+if(tds.length == 11)
+{
+var index=0;
+    var title = tds[index].getElementsByTagName("a")[0].title;
+var code = tds[index].getElementsByTagName("span")[0].innerHTML;
+    index++;
+index++;
+var data = tds[index++].innerHTML;
+var money = tds[index++].innerHTML;
+var deadline = tds[index++].innerHTML;
+var rate = tds[index++].innerHTML;
+var profitAndLoss = tds[index++].innerHTML;
+alert("profitAndLoss="+profitAndLoss);
+}
+
+    break;
+}
+
+
+alert(pageCount);
+
+
+//=================跳转申请宜享
+<a href="https://www.yidai.com/borroweshareapply/index/">申请宜享</a>
+//=================检查宜享是否ok
+function check()
+{
+var obj_eshare_table = document.getElementsByClassName("uc-tables eshare-tables")[0];
+var obj_table = obj_eshare_table.getElementsByTagName("table")[0];
+var obj_tbody = obj_table.getElementsByTagName("tbody")[0];
+var array_tr = obj_tbody.getElementsByTagName("tr");
+alert(array_tr.length);
+var array_data = array_tr[1].getElementsByTagName("td");
+if(array_data.length != 6)
+{
+return;
+}
+var money = array_data[2].innerHTML;
+var date = array_data[5].innerHTML;
+alert(money+date);
+}
+check();
+
+
+//=================重新选择宜享-弹窗
+var cn_reSelection_btn = document.getElementsByClassName("reSelection_btn")[0];
+//alert(cn_reSelection_btn.tagName);
+//重新选择弹窗
+cn_reSelection_btn.click();
+//需要重新执行js才能正常获取，否则获取为空，最好间隔点时间，以便数据能加载
+//on
+//=================重新选择宜享-确定
+
+function doError(value)
+{
+alert(value);
+}
+
+function isValid(obj)
+{
+return (typeof(obj) == "undefined" || (!obj && obj != 0))
+}
+
+function readData()
+{
+var obj_eshare_btn = document.getElementById('eshare_btn');
+
+if (isValid(obj_eshare_btn))
+{
+doError("eshare_btn not found");
+    return;
+}
+
+var obj_eshare_selection_box = document.getElementsByClassName("eshare-selection-box")[0];
+//alert(typeof obj_eshare_selection_box );
+var obj_uc_tables = obj_eshare_selection_box.getElementsByClassName("uc-tables")[0];
+var obj_table = obj_uc_tables.getElementsByTagName("table")[0];
+//alert(obj_uc_tables.length);
+
+
+var array_tbody = obj_table.getElementsByTagName("tbody");
+if(array_tbody.length <= 0)
+{
+doError("tbody not found");
+return;
+}
+
+var obj_tbody = array_tbody[0];
+var array_tr = obj_tbody.getElementsByTagName("tr");
+if(array_tr.length < 2)
+{
+doError("tr length "+array_tr.length+"< 2");
+return;
+}
+var found = false;
+var date;
+var money;
+for(var i = 1; i < array_tr.length;++i)
+{
+var array_td = array_tr[i].getElementsByTagName("td");
+//alert(array_td.length);
+if(array_td.length !=7)
+{
+continue;
+}
+date = array_td[6].innerHTML;
+money= array_td[3].innerHTML;
+if(date === '07-07')
+{
+found = true;
+var array_input = array_td[0].getElementsByTagName("input");
+if(array_input.length != 1)
+{
+doError("array_input length"+array_tr.length+"!= 1");
+return;
+}
+var obj_input = array_input[0];
+alert(obj_input.name);
+obj_input.checked = true;
+break;
+}
+}
+if(found == true)
+{
+//onCallBack
+obj_eshare_btn.click();
+}
+else
+{
+doError("date not found");
+}
+}
+readData();
+
+//执行申请
+borroweshareapply();
+
+//=================获取可以宜享的标列表
+function readData()
+{
+var obj_eshare_selection_box = document.getElementsByClassName("eshare-selection-box")[0];
+//alert(typeof obj_eshare_selection_box );
+var obj_uc_tables = obj_eshare_selection_box.getElementsByClassName("uc-tables")[0];
+var obj_table = obj_uc_tables.getElementsByTagName("table")[0];
+//alert(obj_tbody.length);
+
+var obj_tbody = obj_table.getElementsByTagName("tbody")[0];
+//alert(obj_tbody.length);
+
+//alert(typeof obj_tbody );
+var array_tr = obj_tbody.getElementsByTagName("tr");
+//var array_tr = obj_tbody.getElementsByClassName("even");
+//alert(array_tr[0].className);
+alert(array_tr.length);
+//var obj_one = array_tr[0];
+//var array_th = obj_one.getElementsByTagName("tr");
+//alert(array_th.length);
+}
+
+
+//=================取消宜享
+var obj_opt = document.getElementsByClassName("opt")[0];
+//可能是提前结标或者撤销
+var obj_a = obj_opt.getElementsByTagName("a")[0];
+//alert(obj_a.length)
+alert(obj_a.href);
+//弹窗撤销窗口
+obj_a.onclick();
+var obj_tradePassword = document.getElementById("tradePassword");
+//支付密码
+obj_tradePassword.value='zfydw1280';
+var obj_cancelborrow = document.getElementById('cancelborrow');
+if (typeof(obj_cancelborrow) == "undefined")
+{
+    obj_cancelborrow = document.getElementById('finishborrow');
+}
+//确定取消
+obj_cancelborrow.click();
+
+
+
+//
+function appendData(js_object)
+{
+     for(var i = 0; i < 1;i++)
+{
+var res = js_object.testToJS2('麻将',i);
+alert(typeof res);
+}
+}
+var obj = new QWebChannel(qt.webChannelTransport, function(channel) {
+        var js_object = channel.objects.ZTESTWebEngineView;
+        appendData(js_object);
+});

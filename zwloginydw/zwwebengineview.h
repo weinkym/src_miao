@@ -40,7 +40,7 @@ private slots:
     void onLoadFinished(bool finished);
     void test();
 
-private:
+public:
     ZWJSBridgeObject *m_bridgeObject;
     int m_totalPageCount;
     int m_currentPageIndex;
