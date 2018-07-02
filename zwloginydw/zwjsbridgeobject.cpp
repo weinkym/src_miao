@@ -20,6 +20,8 @@ ZWJSBridgeObject::ZWJSBridgeObject(QObject *parent)
 
     initBaseJS();
     m_isLoading = false;
+    m_userName = "13616511205";
+    m_password = "miao1280";
 }
 
 ZWJSBridgeObject::~ZWJSBridgeObject()
@@ -44,6 +46,7 @@ void ZWJSBridgeObject::runJavaScript(const QString &js)
         jsString.append("var js_callback_object = channel.objects.ZWJSBridgeObject;\n");
         //                jsString.append("js_callback_object.onError(\"adsfadsf\",0);\n");
         jsString.append(QString("var g_type=%1;\n").arg(m_status));
+        jsString.append(QString("var g_needReload=0;\n"));
         jsString.append("\n");
         jsString.append(m_publicJSString);
         jsString.append("\n");
@@ -66,10 +69,16 @@ void ZWJSBridgeObject::load(const QUrl &url)
     }
 }
 
+void ZWJSBridgeObject::start()
+{
+    m_status = STATUS_INDEX_LOADING;
+    m_isLoading = true;
+    this->load(QUrl("http://www.yidai.com/user/login"));
+}
+
 void ZWJSBridgeObject::runJS()
 {
     ZW_LOG_FUNCTION;
-
     ZW_VALUE_LOG_INFO(m_status);
     int msecs = qrand() % 5000 + 1000;
     QTimer::singleShot(msecs,[this]{
@@ -78,7 +87,8 @@ void ZWJSBridgeObject::runJS()
 //        ZW_VALUE_LOG_INFO(jsString);
         if(m_view)
         {
-            m_view->page()->runJavaScript(jsString);
+            this->runJavaScript(jsString);
+//            m_view->page()->runJavaScript(jsString);
         }
     });
 }
@@ -88,17 +98,18 @@ QString ZWJSBridgeObject::getStatusJS()
     QString jsString;
     QString filePath;
     switch (m_status) {
-    case STATUS_INDEX:
+    case STATUS_INDEX_FINISHED:
     {
-        jsString.append("var demo = document.getElementById('login_button');\n");
-        jsString.append(QString("document.getElementById('keywords').value=%1;\n").arg(m_userName));
-        jsString.append(QString("document.getElementById('password').value='%1';\n").arg(m_password));
-        jsString.append("demo.click();\n");
+        jsString = getJSFileData(":/res/js/login.js").arg(m_userName).arg(m_password);
+//        jsString.append("var demo = document.getElementById('login_button');\n");
+//        jsString.append(QString("document.getElementById('keywords').value=%1;\n").arg(m_userName));
+//        jsString.append(QString("document.getElementById('password').value='%1';\n").arg(m_password));
+//        jsString.append("demo.click();\n");
        break;
     }
-    case STATUS_LOGINING:
+    case STATUS_LOGIN_FINISHED:
     {
-        filePath = QString(":/res/STATUS_LOGINING.js");
+        jsString = getJSFileData(":/res/js/amount.js");
         break;
     }
     case STATUS_MAINPAGE:
@@ -142,6 +153,26 @@ QString ZWJSBridgeObject::getStatusJS()
         jsString.append(QString("zw_read_page(%1);\n").arg(m_currentPageIndex));
     }
     return jsString;
+}
+
+QString ZWJSBridgeObject::getStatusKey()
+{
+    QString key;
+    switch (m_status) {
+    case STATUS_INDEX_FINISHED:
+    {
+        key = "STATUS_INDEX_FINISHED";
+       break;
+    }
+    case STATUS_LOGIN_FINISHED:
+    {
+        key = "STATUS_LOGIN_FINISHED";
+        break;
+    }
+    default:
+        break;
+    }
+    return key;
 }
 
 void ZWJSBridgeObject::initBaseJS()
@@ -219,7 +250,7 @@ void ZWJSBridgeObject::onLoadFinished(bool finished)
     {
         return;
     }
-    ZW_LOG_DEBUG("TTTTTT");
+    ZW_LOG_INFO(QString("onLoadFinished status = %1").arg(m_status));
     if(m_view)
     {
         static int s_index = 0;
@@ -233,25 +264,19 @@ void ZWJSBridgeObject::onLoadFinished(bool finished)
             }
         });
     }
-    ZW_VALUE_LOG_INFO(m_status);
 
     switch (m_status)
     {
-    case  STATUS_UNDEFINE:
+    case  STATUS_INDEX_LOADING:
     {
-        m_status = STATUS_INDEX;
+        m_status = STATUS_INDEX_FINISHED;
         runJS();
         break;
     }
-    case STATUS_INDEX:
+
+    case STATUS_INDEX_FINISHED:
     {
-        m_status = STATUS_LOGINING;
-        runJS();
-        break;
-    }
-    case STATUS_LOGINING:
-    {
-        m_status = STATUS_MAINPAGE;
+        m_status = STATUS_LOGIN_FINISHED;
         runJS();
         break;
     }
@@ -277,10 +302,21 @@ void ZWJSBridgeObject::onViewDestroyed(QObject *obj)
     m_view = NULL;
 }
 
-void ZWJSBridgeObject::onError(const QString &error, int type)
+void ZWJSBridgeObject::onError(const QString &error, int type, int needReload)
 {
     ZW_VALUE_LOG_INFO(error);
     ZW_VALUE_LOG_INFO(type);
+    ZW_VALUE_LOG_INFO(needReload);
+    if(needReload && m_currentIgnoreErrorTimes < m_maxIgnoreErrorTimes)
+    {
+        m_currentIgnoreErrorTimes++;
+        runJS();
+    }
+    else
+    {
+        m_currentIgnoreErrorTimes = 0;
+        //
+    }
 }
 
 void ZWJSBridgeObject::onWarning(const QString &error, int type)
@@ -298,6 +334,7 @@ void ZWJSBridgeObject::onDebug(const QString &error, int type)
 void ZWJSBridgeObject::onAmountCallback(const QString &receivable_amount, const QString &receivable_amount_date,
                                         const QString &refund_amount, const QString &refund_amount_date)
 {
+    m_currentIgnoreErrorTimes = 0;
     ZW_VALUE_LOG_INFO(receivable_amount);
     ZW_VALUE_LOG_INFO(receivable_amount_date);
     ZW_VALUE_LOG_INFO(refund_amount);
@@ -314,3 +351,15 @@ void ZWJSBridgeObject::onAmountCallback(const QString &receivable_amount, const 
     ZW_LOG_INFO(receivableDate.toString("SSSS===yyyy-MM-dd"));
     ZW_LOG_INFO(refundDate.toString("SSSS===yyyy-MM-dd"));
 }
+
+//void ZWJSBridgeObject::onLastIgnoreErrorKey(int type, const QString &msg)
+//{
+//    ZW_VALUE_LOG_INFO(type);
+//    ZW_VALUE_LOG_INFO(msg);
+//    m_lastIgnoreErrorType = key;
+//}
+
+//void ZWJSBridgeObject::onErrorStatus()
+//{
+
+//}

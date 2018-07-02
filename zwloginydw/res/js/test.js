@@ -8,7 +8,20 @@ alert(obj_timeLimitType.value);
 borroweshareapply();
 
 
+\n
+function doFun(){
+	var obj = new QWebChannel(qt.webChannelTransport, function(channel) {
+		var js_callback_object = channel.objects.ZWJSBridgeObject; {
 
+			js_callback_object.onError("fffff",123123);
+
+		});
+		}
+		doFun();
+
+
+
+js_callback_object.onError("fffff",123123);
 
 
 

@@ -33,6 +33,9 @@ public slots:
     int testToJS3(const QString &test,int number);
     QString testToJS4(const QString &test,int number);
 
+private slots:
+    void on_pushButtonAuto_clicked();
+
 private:
     Ui::MainWindow *ui;
     ZWWebengineView *m_view;

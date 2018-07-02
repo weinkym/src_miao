@@ -1,17 +1,17 @@
-function isValid(obj)
-{
-	return !(typeof(obj) == "undefined" || (!obj && obj != 0))
-}
+// function isValid(obj)
+// {
+// 	return !(typeof(obj) == "undefined" || (!obj && obj != 0))
+// }
 
-function onWarning(value)
-{
-	alert(value);
-}
+// function onWarning(value)
+// {
+// 	alert(value);
+// }
 
-function onError(value)
-{
-	alert(value);
-}
+// function onError(value)
+// {
+// 	alert(value);
+// }
 
 
 function getAmount()
@@ -41,7 +41,7 @@ function getAmount()
 		return;
 	}
 	var amount = obj_span_amount.innerHTML;
-	alert("amount="+amount);
+	// alert("amount="+amount);
 	return amount;
 	// AccountBalance
 
@@ -87,7 +87,7 @@ function getAccountBalance()
 		return;
 	}
 	var amount = obj_div_span_a.innerHTML;
-	alert("obj_div_span_a="+amount);
+	// alert("obj_div_span_a="+amount);
 	return amount;
 
 }
@@ -150,6 +150,7 @@ function readData()
 	if(array_div_li.length != 5)
 	{
 		onWarning("array_div_li.length != 5 len="+array_div_li.length);
+		onNeedReload();
 		return false;
 	}
 
@@ -183,7 +184,7 @@ function readData()
     }
     var recent_refund_amount = obj_span_recent_refund_amount.innerHTML;
 
-    alert(recent_receivable_amount_date+recent_receivable_amount+recent_refund_amount_date+recent_refund_amount);
+    // alert(recent_receivable_amount_date+recent_receivable_amount+recent_refund_amount_date+recent_refund_amount);
     js_callback_object.onAmountCallback(recent_receivable_amount,recent_receivable_amount_date,recent_refund_amount,recent_refund_amount_date);
 
 	return true;

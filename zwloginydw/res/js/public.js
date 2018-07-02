@@ -17,6 +17,10 @@ function onWarning(value)
 
 function onError(value)
 {
-	js_callback_object.onError(value,g_type);
+	js_callback_object.onError(value,g_type,g_needReload);
 }
 
+function onNeedReload()
+{
+	g_needReload = 1;
+}

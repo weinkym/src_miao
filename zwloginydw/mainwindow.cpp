@@ -108,3 +108,8 @@ QString MainWindow::testToJS4(const QString &test, int number)
 }
 
 
+
+void MainWindow::on_pushButtonAuto_clicked()
+{
+    m_bridgeObject->start();
+}

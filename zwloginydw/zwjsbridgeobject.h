@@ -11,7 +11,10 @@ public:
     enum Status
     {
         STATUS_UNDEFINE,
-        STATUS_INDEX,
+        STATUS_INDEX_LOADING,
+        STATUS_INDEX_FINISHED,
+        STATUS_LOGIN_FINISHED,
+
         STATUS_LOGINING,
         STATUS_MAINPAGE,
         STATUS_PAGE_LIST,
@@ -26,10 +29,12 @@ public:
     QWebEngineView *getView();
     void runJavaScript(const QString &js);
     void load(const QUrl &url);
+    void start();
 
 private:
     void runJS();
     QString getStatusJS();
+    QString getStatusKey();
     void initBaseJS();
     QString getJSFileData(const QString &filePath);
 
@@ -50,16 +55,19 @@ public slots:
 
     void onViewDestroyed(QObject *obj);
 
-    void onError(const QString &error,int type);
+    void onError(const QString &error,int type,int needReload);
     void onWarning(const QString &error,int type);
     void onDebug(const QString &error,int type);
 
     void onAmountCallback(const QString &receivable_amount,const QString &receivable_amount_date,
                           const QString &refund_amount,const QString &refund_amount_date);
 
+//    void onLastIgnoreErrorKey(int type,const QString &msg);
+
 signals:
     void sigTest(const QString &text,int type);
     void sigPageCountChanged(int count);
+    void sigAmountChanged();
 
 private:
     QWebEngineView *m_view;
@@ -68,6 +76,8 @@ private:
     int m_totalPageCount;
     int m_currentPageIndex;
     int m_crrentPageCount;
+    int m_currentIgnoreErrorTimes = 0;
+    int m_maxIgnoreErrorTimes = 3;
     bool m_isLoading;
     QString m_userName;
     QString m_password;
@@ -75,7 +85,6 @@ private:
     QString m_webchannelJSString;
     QString m_publicJSString;
     QStringList m_jsList;
-
 };
 
 #endif // ZWJSBRIDGEOBJECT_H

@@ -1,7 +1,7 @@
 var demo = document.getElementById('login_button');
-document.getElementById('keywords').value=13616511205
-document.getElementById('password').value="miao1280"
-// demo.click();
+document.getElementById('keywords').value=13616511205;
+document.getElementById('password').value="miao1280";
+demo.click();
 
 //========//
 window.location.href="https://www.yidai.com/borrowesharemy/index/"; 

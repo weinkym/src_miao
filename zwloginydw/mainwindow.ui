@@ -95,6 +95,13 @@ p, li { white-space: pre-wrap; }
            </spacer>
           </item>
           <item>
+           <widget class="QPushButton" name="pushButtonAuto">
+            <property name="text">
+             <string>自动运行</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="pbRunJS">
             <property name="text">
              <string>RunJS</string>
