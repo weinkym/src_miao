@@ -43,7 +43,6 @@ function getAmount()
 	var amount = obj_span_amount.innerHTML;
 	// alert("amount="+amount);
 	return amount;
-	// AccountBalance
 
 }
 
@@ -134,8 +133,8 @@ function readData()
 		onWarning("getAmount not isValid");
 		return false;
 	}
-	var accountBalance = getAccountBalance();
-	if(!isValid(accountBalance))
+	var account_balance = getAccountBalance();
+	if(!isValid(account_balance))
 	{
 		onWarning("getAccountBalance not isValid");
 		return false;
@@ -184,8 +183,17 @@ function readData()
     }
     var recent_refund_amount = obj_span_recent_refund_amount.innerHTML;
 
-    // alert(recent_receivable_amount_date+recent_receivable_amount+recent_refund_amount_date+recent_refund_amount);
-    js_callback_object.onAmountCallback(recent_receivable_amount,recent_receivable_amount_date,recent_refund_amount,recent_refund_amount_date);
+	g_return_data_obj.amount = amount;
+	g_return_data_obj.account_balance = account_balance;
+	g_return_data_obj.recent_receivable_amount = recent_receivable_amount;
+	g_return_data_obj.recent_receivable_amount_date = recent_receivable_amount_date;
+	g_return_data_obj.recent_refund_amount = recent_refund_amount;
+	g_return_data_obj.recent_refund_amount_date = recent_refund_amount_date;
+	onJSResultCallabk();
+
+// alert(recent_receivable_amount_date+recent_receivable_amount+recent_refund_amount_date+recent_refund_amount);
+    // js_callback_object.onAmountCallback(recent_receivable_amount,recent_receivable_amount_date,
+    	// recent_refund_amount,recent_refund_amount_date);
 
 	return true;
 	//todo callback

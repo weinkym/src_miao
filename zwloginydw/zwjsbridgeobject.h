@@ -2,25 +2,24 @@
 #define ZWJSBRIDGEOBJECT_H
 #include <QObject>
 #include <QWebEngineView>
+#include "zwydwpublic.h"
 
 class ZWJSBridgeObject : public QObject
 {
     Q_OBJECT
 
 public:
+    enum DateUpdateType
+    {
+        DATE_UPDATE_TYPE_MONEY,
+    };
+
     enum Status
     {
         STATUS_UNDEFINE,
         STATUS_INDEX_LOADING,
         STATUS_INDEX_FINISHED,
         STATUS_LOGIN_FINISHED,
-
-        STATUS_LOGINING,
-        STATUS_MAINPAGE,
-        STATUS_PAGE_LIST,
-        STATUS_LOAD_PAGE,
-        STATUS_READ_PAGE,
-        STATUS_LOAD_APPLYING,
     };
 
 
@@ -42,12 +41,12 @@ private:
     QStringList getMatchList(const QString &src,const QRegExp &re);
     double conertStringToDouble(const QString &src,bool &ok);
 
+    void doResultLoginFinished(const QVariantMap &dataMap);
+
 public slots:
     void onRepaymentPageCount(int count);
     void onAppendRepaymentRecord(const QString &title,const QString &code,const QString &status,const QString &rate,const QString &dRate,const QString &money,
-    const QString &repaymentMoney,const QString &interimRepaymentMoney,const QString &deadline,const QString &repaymentDate);
-//    void onLoadApplyingFinished();
-//    void onApplyingFinished();
+                                 const QString &repaymentMoney,const QString &interimRepaymentMoney,const QString &deadline,const QString &repaymentDate);
 
     void doTest(const QString &text,int type);
 
@@ -62,14 +61,16 @@ public slots:
     void onAmountCallback(const QString &receivable_amount,const QString &receivable_amount_date,
                           const QString &refund_amount,const QString &refund_amount_date);
 
-//    void onLastIgnoreErrorKey(int type,const QString &msg);
+    void onJSResultCallabk(const QString &jsonData,int type);
 
 signals:
     void sigTest(const QString &text,int type);
     void sigPageCountChanged(int count);
     void sigAmountChanged();
+    void sigErrorHappend(const QString &errorString);
+    void sigDataChanged(int type);
 
-private:
+public:
     QWebEngineView *m_view;
     Status m_status;
 
@@ -79,6 +80,7 @@ private:
     int m_currentIgnoreErrorTimes = 0;
     int m_maxIgnoreErrorTimes = 3;
     bool m_isLoading;
+    ZWYDW::MoneyData m_moneyData;
     QString m_userName;
     QString m_password;
     QString m_outDirPath;

@@ -5,6 +5,11 @@
 #include <QWebChannel>
 #include <QTimer>
 #include <QRegExp>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonValue>
+#include <QJsonObject>
+#include "zwydwpublic.h"
 
 ZWJSBridgeObject::ZWJSBridgeObject(QObject *parent)
     :QObject(parent)
@@ -47,6 +52,9 @@ void ZWJSBridgeObject::runJavaScript(const QString &js)
         //                jsString.append("js_callback_object.onError(\"adsfadsf\",0);\n");
         jsString.append(QString("var g_type=%1;\n").arg(m_status));
         jsString.append(QString("var g_needReload=0;\n"));
+        jsString.append(QString("var g_return_data_obj={};\n"));
+        jsString.append(QString("var g_result_obj={};\n"));
+        jsString.append(QString("g_result_obj.error=0;\n"));
         jsString.append("\n");
         jsString.append(m_publicJSString);
         jsString.append("\n");
@@ -101,57 +109,18 @@ QString ZWJSBridgeObject::getStatusJS()
     case STATUS_INDEX_FINISHED:
     {
         jsString = getJSFileData(":/res/js/login.js").arg(m_userName).arg(m_password);
-//        jsString.append("var demo = document.getElementById('login_button');\n");
-//        jsString.append(QString("document.getElementById('keywords').value=%1;\n").arg(m_userName));
-//        jsString.append(QString("document.getElementById('password').value='%1';\n").arg(m_password));
-//        jsString.append("demo.click();\n");
        break;
     }
     case STATUS_LOGIN_FINISHED:
     {
-        jsString = getJSFileData(":/res/js/amount.js");
+        jsString = getJSFileData(":/res/js/login_finished.js");
         break;
     }
-    case STATUS_MAINPAGE:
-    {
-        filePath = QString(":/res/STATUS_MAINPAGE.js");
-        break;
-    }
-    case STATUS_PAGE_LIST:
-    {
-        jsString.append(m_webchannelJSString);
-        filePath = QString(":/res/STATUS_PAGE_LIST.js");
-        break;
-    }
-    case STATUS_LOAD_PAGE:
-    {
-        jsString.append(QString("page_jump(\"this\",\"%1\")\n").arg(m_currentPageIndex));
-        break;
-    }
-    case STATUS_READ_PAGE:
-    {
-        jsString.append(m_webchannelJSString);
-        filePath = QString(":/res/STATUS_READ_PAGE.js");
-        break;
-    }
+
     default:
         break;
     }
-    if(!filePath.isEmpty())
-    {
-        QFile file(filePath);
-        if(file.open(QIODevice::ReadOnly))
-        {
-            jsString.append("\n");
-            jsString.append(QString(file.readAll()));
-            jsString.append("\n");
-            file.close();
-        }
-    }
-    if(m_status == STATUS_READ_PAGE)
-    {
-        jsString.append(QString("zw_read_page(%1);\n").arg(m_currentPageIndex));
-    }
+
     return jsString;
 }
 
@@ -226,6 +195,32 @@ double ZWJSBridgeObject::conertStringToDouble(const QString &src, bool &ok)
     return temp.toDouble(&ok);
 }
 
+void ZWJSBridgeObject::doResultLoginFinished(const QVariantMap &dataMap)
+{
+    ZW_LOG_FUNCTION;
+    bool ok = true;
+    ZWYDW::MoneyData obj = ZWYDWPublic::parseMoneyData(dataMap,ok);
+    ZW_VALUE_LOG_INFO(ok);
+    if(ok)
+    {
+        ZW_VALUE_LOG_INFO(obj.amount);
+        ZW_VALUE_LOG_INFO(obj.account_balance);
+        ZW_VALUE_LOG_INFO(obj.recent_receivable_amount);
+        ZW_VALUE_LOG_INFO(obj.recent_refund_amount);
+        ZW_VALUE_LOG_INFO(obj.recent_receivable_amount_date.toString("yyyyMMdd"));
+        ZW_VALUE_LOG_INFO(obj.recent_refund_amount_date.toString("yyyyMMdd"));
+    }
+    if(!ok)
+    {
+        ZW_VALUE_LOG_INFO(obj.errorString);
+        emit sigErrorHappend(QString("parse loginfinished data error %1").arg(obj.errorString));
+        return;
+    }
+    m_moneyData = obj;
+    emit sigDataChanged(DATE_UPDATE_TYPE_MONEY);
+    //
+}
+
 void ZWJSBridgeObject::onRepaymentPageCount(int count)
 {
     m_totalPageCount = count;
@@ -280,18 +275,7 @@ void ZWJSBridgeObject::onLoadFinished(bool finished)
         runJS();
         break;
     }
-    case STATUS_MAINPAGE:
-    {
-        m_status = STATUS_PAGE_LIST;
-        runJS();
-        break;
-    }
-    case STATUS_LOAD_PAGE:
-    {
-        m_status = STATUS_READ_PAGE;
-        runJS();
-        break;
-    }
+
     default:
         break;
     }
@@ -350,6 +334,67 @@ void ZWJSBridgeObject::onAmountCallback(const QString &receivable_amount, const 
 
     ZW_LOG_INFO(receivableDate.toString("SSSS===yyyy-MM-dd"));
     ZW_LOG_INFO(refundDate.toString("SSSS===yyyy-MM-dd"));
+}
+
+void ZWJSBridgeObject::onJSResultCallabk(const QString &jsonData, int type)
+{
+    ZW_VALUE_LOG_INFO(jsonData);
+
+    QJsonParseError error;
+    QJsonDocument doc = QJsonDocument::fromJson(jsonData.toLocal8Bit(), &error);
+    if(error.error != QJsonParseError::NoError)
+    {
+        ZW_VALUE_LOG_INFO(error.errorString());
+        return;
+    }
+    QVariantMap objMap = doc.toVariant().toMap();
+    if(objMap.isEmpty())
+    {
+        ZW_LOG_WARNING("json data is not obj");
+        return;
+    }
+    qDebug()<<objMap;
+
+
+    QVariantMap dataMap = objMap.value("data").toMap();
+    ZW_VALUE_LOG_INFO(QStringList(dataMap.keys()).join(";"));
+    if(dataMap.isEmpty())
+    {
+        ZW_LOG_WARNING("dataMap.isEmpty()");
+        return;
+    }
+    bool hasError = (objMap.value("error",1).toInt() != 0);
+    bool needReload = (objMap.value("needReload",1).toInt() != 0);
+    QString errorKey = objMap.value("errorKey").toString();
+    ZW_VALUE_LOG_INFO_BOOL(hasError);
+    ZW_VALUE_LOG_INFO_BOOL(needReload);
+    ZW_VALUE_LOG_INFO(errorKey);
+
+    if(hasError)
+    {
+        ZW_VALUE_LOG_INFO(errorKey);
+        if(needReload && m_currentIgnoreErrorTimes < m_maxIgnoreErrorTimes)
+        {
+            m_currentIgnoreErrorTimes++;
+            runJS();
+        }
+        else
+        {
+            m_currentIgnoreErrorTimes = 0;
+            ZW_VALUE_LOG_INFO(errorKey);
+            emit sigErrorHappend(errorKey);
+            return;
+        }
+    }
+
+    switch (type)
+    {
+    case STATUS_LOGIN_FINISHED:
+        doResultLoginFinished(dataMap);
+        break;
+    default:
+        break;
+    }
 }
 
 //void ZWJSBridgeObject::onLastIgnoreErrorKey(int type, const QString &msg)

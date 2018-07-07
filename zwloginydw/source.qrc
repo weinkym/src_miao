@@ -7,6 +7,6 @@
         <file>res/STATUS_READ_PAGE.js</file>
         <file>res/js/public.js</file>
         <file>res/js/login.js</file>
-        <file>res/js/amount.js</file>
+        <file>res/js/login_finished.js</file>
     </qresource>
 </RCC>
