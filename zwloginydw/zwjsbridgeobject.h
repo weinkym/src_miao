@@ -20,6 +20,12 @@ public:
         STATUS_INDEX_LOADING,
         STATUS_INDEX_FINISHED,
         STATUS_LOGIN_FINISHED,
+
+        STATUS_APPLYING_PAGE_LOADING,
+        STATUS_APPLYING_PAGE_FINISHED,
+
+        STATUS_APPLY_PAGE_LOADING,
+        STATUS_APPLY_PAGE_FINISHED,
     };
 
 
@@ -41,7 +47,13 @@ private:
     QStringList getMatchList(const QString &src,const QRegExp &re);
     double conertStringToDouble(const QString &src,bool &ok);
 
+
+    void loadApplyingPage();
+    void loadApplyPage();
+    void runApplyYX();
+
     void doResultLoginFinished(const QVariantMap &dataMap);
+    void doResultApplyPageFinished(const QVariantMap &dataMap);
 
 public slots:
     void onRepaymentPageCount(int count);

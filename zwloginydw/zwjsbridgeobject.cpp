@@ -116,6 +116,16 @@ QString ZWJSBridgeObject::getStatusJS()
         jsString = getJSFileData(":/res/js/login_finished.js");
         break;
     }
+    case STATUS_APPLYING_PAGE_FINISHED:
+    {
+        jsString = getJSFileData("::/res/js/applying_page_finished.js");
+        break;
+    }
+    case STATUS_APPLY_PAGE_FINISHED:
+    {
+        jsString = getJSFileData(":/res/js/apply_page_finished.js");
+        break;
+    }
 
     default:
         break;
@@ -195,6 +205,18 @@ double ZWJSBridgeObject::conertStringToDouble(const QString &src, bool &ok)
     return temp.toDouble(&ok);
 }
 
+void ZWJSBridgeObject::loadApplyingPage()
+{
+    m_status = STATUS_APPLYING_PAGE_LOADING;
+    m_view->load(QUrl("https://www.yidai.com/borrowesharemy/index/"));
+}
+
+void ZWJSBridgeObject::loadApplyPage()
+{
+    m_status = STATUS_APPLY_PAGE_LOADING;
+    m_view->load(QUrl("https://www.yidai.com/borroweshareapply/index/"));
+}
+
 void ZWJSBridgeObject::doResultLoginFinished(const QVariantMap &dataMap)
 {
     ZW_LOG_FUNCTION;
@@ -221,6 +243,23 @@ void ZWJSBridgeObject::doResultLoginFinished(const QVariantMap &dataMap)
     //
 }
 
+void ZWJSBridgeObject::doResultApplyPageFinished(const QVariantMap &dataMap)
+{
+    QString key = "apply_count";
+    if(dataMap.contains(key))
+    {
+        bool ok = true;
+        int apply_count = dataMap.value(key).toInt(&ok);
+        if(ok)
+        {
+            if(apply_count == 0)
+            {
+                //
+            }
+        }
+    }
+}
+
 void ZWJSBridgeObject::onRepaymentPageCount(int count)
 {
     m_totalPageCount = count;
@@ -241,6 +280,9 @@ void ZWJSBridgeObject::doTest(const QString &text, int type)
 
 void ZWJSBridgeObject::onLoadFinished(bool finished)
 {
+    ZW_LOG_FUNCTION;
+    ZW_VALUE_LOG_INFO_BOOL(finished);
+    ZW_VALUE_LOG_INFO_BOOL(m_isLoading);
     if(!m_isLoading)
     {
         return;
@@ -272,6 +314,18 @@ void ZWJSBridgeObject::onLoadFinished(bool finished)
     case STATUS_INDEX_FINISHED:
     {
         m_status = STATUS_LOGIN_FINISHED;
+        runJS();
+        break;
+    }
+    case STATUS_APPLYING_PAGE_LOADING:
+    {
+        m_status = STATUS_APPLYING_PAGE_FINISHED;
+        runJS();
+        break;
+    }
+    case STATUS_APPLY_PAGE_LOADING:
+    {
+        m_status = STATUS_APPLY_PAGE_FINISHED;
         runJS();
         break;
     }
@@ -391,6 +445,9 @@ void ZWJSBridgeObject::onJSResultCallabk(const QString &jsonData, int type)
     {
     case STATUS_LOGIN_FINISHED:
         doResultLoginFinished(dataMap);
+        break;
+    case STATUS_APPLYING_PAGE_FINISHED:
+        doResultApplyPageFinished(dataMap);
         break;
     default:
         break;

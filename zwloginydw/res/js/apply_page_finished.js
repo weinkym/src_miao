@@ -3,13 +3,13 @@ function readData()
 {
 	g_return_data_obj.apply_count=0;
 
-	var obj_table = obj_div_item.getElementsByClassName("tab-3")[0];
-	if(!isValid(obj_table_amount))
+	var obj_table = document.getElementsByClassName("tab-3")[0];
+	if(!isValid(obj_table))
 	{
-		onError("obj_table_amount not isValid");
+		onError("obj_table not isValid");
 		return fasle;
 	}
-	var obj_tbody = obj_div_amount.getElementsByTagName("tobody")[0];
+	var obj_tbody = obj_table.getElementsByTagName("tobody")[0];
 	if(!isValid(obj_tbody))
 	{
 		onError("obj_tbody not isValid");
