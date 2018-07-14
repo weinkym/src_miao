@@ -59,8 +59,20 @@ function isValid(obj)
 	return !(typeof(obj) == "undefined" || (!obj && obj != 0))
 }
 
+
+function fun_name (num){
+	var tmp = arguments.callee.toString();
+	var re = /function\s*(\w*)/ig;
+	var matches = re.exec(tmp); //正则原因只能获取一个，获取多个需循环获取 函数形式 function xxx() 
+	alert(matches[1]);
+	
+}
+fun_name();
+
+
 function test()
 {
+	alert(this.getName())
 	var date = toDateWidthMonthDay("-","07-08");
 
 	if(!isValid(date))

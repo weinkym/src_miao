@@ -25,8 +25,13 @@ ZWJSBridgeObject::ZWJSBridgeObject(QObject *parent)
 
     initBaseJS();
     m_isLoading = false;
-    m_userName = "13616511205";
-    m_password = "miao1280";
+//    m_userName = "13616511205";
+//    m_password = "miao1280";
+//    m_payPassword = "zfydw1280";
+
+    m_userName = "15267080236";
+    m_password = "ydw120zp";
+    m_payPassword = "zf829816";
 }
 
 ZWJSBridgeObject::~ZWJSBridgeObject()
@@ -92,7 +97,7 @@ void ZWJSBridgeObject::runJS()
     QTimer::singleShot(msecs,[this]{
         ZW_VALUE_LOG_INFO(m_status);
         QString jsString = getStatusJS();
-//        ZW_VALUE_LOG_INFO(jsString);
+        ZW_VALUE_LOG_INFO(jsString);
         if(m_view)
         {
             this->runJavaScript(jsString);
@@ -118,12 +123,17 @@ QString ZWJSBridgeObject::getStatusJS()
     }
     case STATUS_APPLYING_PAGE_FINISHED:
     {
-        jsString = getJSFileData("::/res/js/applying_page_finished.js");
+        jsString = getJSFileData(":/res/js/applying_page_finished.js");
         break;
     }
     case STATUS_APPLY_PAGE_FINISHED:
     {
         jsString = getJSFileData(":/res/js/apply_page_finished.js");
+        break;
+    }
+    case STATUS_STOP_APPLYING:
+    {
+        jsString = getJSFileData(":/res/js/stop_applying.js").arg(m_payPassword);
         break;
     }
 
@@ -240,10 +250,11 @@ void ZWJSBridgeObject::doResultLoginFinished(const QVariantMap &dataMap)
     }
     m_moneyData = obj;
     emit sigDataChanged(DATE_UPDATE_TYPE_MONEY);
-    //
+
+    loadApplyingPage();
 }
 
-void ZWJSBridgeObject::doResultApplyPageFinished(const QVariantMap &dataMap)
+void ZWJSBridgeObject::doResultApplyingPageFinished(const QVariantMap &dataMap)
 {
     QString key = "apply_count";
     if(dataMap.contains(key))
@@ -254,7 +265,14 @@ void ZWJSBridgeObject::doResultApplyPageFinished(const QVariantMap &dataMap)
         {
             if(apply_count == 0)
             {
-                //
+                loadApplyPage();
+            }
+            else
+            {
+                QTimer::singleShot(5000,[this]{
+                    m_status = STATUS_STOP_APPLYING;
+                    runJS();
+                });
             }
         }
     }
@@ -415,7 +433,7 @@ void ZWJSBridgeObject::onJSResultCallabk(const QString &jsonData, int type)
     if(dataMap.isEmpty())
     {
         ZW_LOG_WARNING("dataMap.isEmpty()");
-        return;
+//        return;
     }
     bool hasError = (objMap.value("error",1).toInt() != 0);
     bool needReload = (objMap.value("needReload",1).toInt() != 0);
@@ -447,8 +465,21 @@ void ZWJSBridgeObject::onJSResultCallabk(const QString &jsonData, int type)
         doResultLoginFinished(dataMap);
         break;
     case STATUS_APPLYING_PAGE_FINISHED:
-        doResultApplyPageFinished(dataMap);
+        doResultApplyingPageFinished(dataMap);
         break;
+    case STATUS_STOP_APPLYING:
+    {
+        QTimer::singleShot(5000,[this]{
+            loadApplyingPage();
+        });
+        break;
+    }
+    case STATUS_APPLY_PAGE_FINISHED:
+    {
+        ZW_LOG_INFO(QString("finished apply"));
+        //
+        break;
+    }
     default:
         break;
     }

@@ -198,7 +198,7 @@ var obj_opt = document.getElementsByClassName("opt")[0];
 //可能是提前结标或者撤销
 var obj_a = obj_opt.getElementsByTagName("a")[0];
 //alert(obj_a.length)
-alert(obj_a.href);
+//alert(obj_a.href);
 //弹窗撤销窗口
 obj_a.onclick();
 var obj_tradePassword = document.getElementById("tradePassword");

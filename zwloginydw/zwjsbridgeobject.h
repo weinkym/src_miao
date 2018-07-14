@@ -24,6 +24,8 @@ public:
         STATUS_APPLYING_PAGE_LOADING,
         STATUS_APPLYING_PAGE_FINISHED,
 
+        STATUS_STOP_APPLYING,
+
         STATUS_APPLY_PAGE_LOADING,
         STATUS_APPLY_PAGE_FINISHED,
     };
@@ -53,7 +55,7 @@ private:
     void runApplyYX();
 
     void doResultLoginFinished(const QVariantMap &dataMap);
-    void doResultApplyPageFinished(const QVariantMap &dataMap);
+    void doResultApplyingPageFinished(const QVariantMap &dataMap);
 
 public slots:
     void onRepaymentPageCount(int count);
@@ -95,6 +97,7 @@ public:
     ZWYDW::MoneyData m_moneyData;
     QString m_userName;
     QString m_password;
+    QString m_payPassword;
     QString m_outDirPath;
     QString m_webchannelJSString;
     QString m_publicJSString;
