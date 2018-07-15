@@ -21,6 +21,11 @@ MainWindow::MainWindow(QWidget *parent) :
     m_bridgeObject = new ZWJSBridgeObject;
     ui->tabWidget->insertTab(0,m_bridgeObject->getView(),QIcon(""),"TEST");
 
+    m_runTimer = new QTimer;
+    m_runTimer->setInterval(30000);
+    m_runTimer->setSingleShot(true);
+    connect(m_runTimer,SIGNAL(timeout()),this,SLOT(onTimeout()));
+
 //    m_textView = new QWebEngineView;
 //    ui->tabWidget->insertTab(0,m_textView,QIcon(""),"TEST");
 
@@ -28,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
 ////    m_bridgeObject = new ZWJSBridgeObject(this);
 //    channel->registerObject("ZTESTWebEngineView", this);
 //    m_textView->page()->setWebChannel(channel);
+    m_runTimer->start();
 
 }
 
@@ -50,6 +56,7 @@ void MainWindow::on_pushButton_clicked()
 //    qDebug()<<"data";
 //    qDebug()<<data;
 //    m_view->page()->runJavaScript(QString(data));
+    QDateTime dateTime = QDateTime::currentDateTime();
 
 }
 
@@ -112,4 +119,19 @@ QString MainWindow::testToJS4(const QString &test, int number)
 void MainWindow::on_pushButtonAuto_clicked()
 {
     m_bridgeObject->start();
+}
+
+void MainWindow::onTimeout()
+{
+    QDateTime dateTime = QDateTime::currentDateTime();
+    if(dateTime > QDateTime(QDate(2018,7,15),QTime(1,5,5)))
+    {
+        ZW_LOG_INFO("run auto start");
+        m_bridgeObject->start();
+    }
+    else
+    {
+        ZW_LOG_INFO("wait next");
+        m_runTimer->start();
+    }
 }

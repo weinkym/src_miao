@@ -477,7 +477,22 @@ void ZWJSBridgeObject::onJSResultCallabk(const QString &jsonData, int type)
     case STATUS_APPLY_PAGE_FINISHED:
     {
         ZW_LOG_INFO(QString("finished apply"));
-        //
+        bool hasMoney = dataMap.value("has_money",false).toBool();
+        ZW_VALUE_LOG_INFO_BOOL(hasMoney);
+        int min = 5 + qrand() % 5;
+        if(hasMoney)
+        {
+            min = 1;
+        }
+        ZW_VALUE_LOG_INFO(min);
+        m_currentTime++;
+        if(m_currentTime < 20)
+        {
+            QTimer::singleShot(min * 60 * 1000,[this]{
+                loadApplyingPage();
+            });
+            break;
+        }
         break;
     }
     default:

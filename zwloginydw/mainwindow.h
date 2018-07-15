@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QWebEngineView>
 #include <QWebEnginePage>
+#include <QTimer>
 #include "zwwebengineview.h"
 #include "zwjsbridgeobject.h"
 
@@ -35,11 +36,13 @@ public slots:
 
 private slots:
     void on_pushButtonAuto_clicked();
+    void onTimeout();
 
 private:
     Ui::MainWindow *ui;
     ZWWebengineView *m_view;
     ZWJSBridgeObject *m_bridgeObject;
+    QTimer *m_runTimer;
 //    QWebEngineView *m_textView;
 };
 

@@ -29,9 +29,11 @@ function stopApplying()
 	obj_tradePassword.value=zw_param_01;
 
 	var obj_cancelborrow = document.getElementById('cancelborrow');
+	g_return_data_obj.has_money=0;
 	if (!(obj_cancelborrow.value))
 	{
-    		obj_cancelborrow = document.getElementById('finishborrow');
+		g_return_data_obj.has_money=1;
+  		obj_cancelborrow = document.getElementById('finishborrow');
 	}
 	if(!isValid(obj_cancelborrow))
 	{

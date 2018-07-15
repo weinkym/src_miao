@@ -122,7 +122,7 @@ function readData()
 		onError("obj_borrow_apr not isValid");
 		return false;
 	}
-	obj_borrow_apr.value = 15;
+    obj_borrow_apr.value = 15;
 	onDebug("set obj_borrow_apr.value="+obj_borrow_apr.value);
 
 	//开始申请

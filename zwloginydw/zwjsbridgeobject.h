@@ -93,6 +93,7 @@ public:
     int m_crrentPageCount;
     int m_currentIgnoreErrorTimes = 0;
     int m_maxIgnoreErrorTimes = 3;
+    int m_currentTime = 0;
     bool m_isLoading;
     ZWYDW::MoneyData m_moneyData;
     QString m_userName;
