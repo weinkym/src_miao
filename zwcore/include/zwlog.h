@@ -54,7 +54,7 @@ void ZWCORESHARED_EXPORT setLogTypeSeparator(const QString &separatorBegin,const
 void ZWCORESHARED_EXPORT setDebugStatus(bool on);
 }
 
-void zw_log(const QString &content,const QString &funciton,const QString &file,const QString &line,ZW_LOG_LEVEL level);
+void ZWCORESHARED_EXPORT zw_log(const QString &content,const QString &funciton,const QString &file,const QString &line,ZW_LOG_LEVEL level);
 
 class ZWCORESHARED_EXPORT ZWLogFuncHelper
 {

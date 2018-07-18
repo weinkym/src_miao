@@ -14,8 +14,8 @@ struct ZWLogSettings
         ,debug_on(true)
         ,test_log_content("TTTTV")
         ,file_path("")
-        ,log_type_separator_begin("【")
-        ,log_type_separator_end("】")
+        ,log_type_separator_begin("[")
+        ,log_type_separator_end("]")
         ,types(LOG_TYPE_FILE | LOG_TYPE_DATE_TIME | LOG_TYPE_LINE | LOG_TYPE_FUNCTION | LOG_TYPE_LEVEL_STRING)
     {
     }
