@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_runTimer->setInterval(30000);
     m_runTimer->setSingleShot(true);
     connect(m_runTimer,SIGNAL(timeout()),this,SLOT(onTimeout()));
+//    m_runTimer->start();
 
 //    m_textView = new QWebEngineView;
 //    ui->tabWidget->insertTab(0,m_textView,QIcon(""),"TEST");
@@ -33,7 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
 ////    m_bridgeObject = new ZWJSBridgeObject(this);
 //    channel->registerObject("ZTESTWebEngineView", this);
 //    m_textView->page()->setWebChannel(channel);
-    m_runTimer->start();
 
 }
 
@@ -124,7 +124,7 @@ void MainWindow::on_pushButtonAuto_clicked()
 void MainWindow::onTimeout()
 {
     QDateTime dateTime = QDateTime::currentDateTime();
-    if(dateTime > QDateTime(QDate(2018,7,15),QTime(1,5,5)))
+    if(dateTime > QDateTime(QDate(2018,7,17),QTime(1,2,5)))
     {
         ZW_LOG_INFO("run auto start");
         m_bridgeObject->start();

@@ -1,6 +1,6 @@
 
 
-function readData()
+function zwfun()
 {
 	g_return_data_obj.apply_count=0;
 
@@ -28,19 +28,9 @@ function readData()
 	return true;
 }
 
-function run()
-{
-	onDebug("apply_page_finished");
-	var res = readData();
-	onDebug("apply_page_finished2");
-	if(res != true)
-	{
-    	onError("doFun");
-    	return;
-	}
-	onDebug("apply_page_finished3");
-}
-run();
+onDebug("applying_page_finished1");
+zwfun();
+onDebug("applying_page_finished2");
 
 
 

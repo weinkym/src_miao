@@ -11,5 +11,6 @@
         <file>res/js/apply_page_finished.js</file>
         <file>res/js/applying_page_finished.js</file>
         <file>res/js/stop_applying.js</file>
+        <file>res/js/select_apply.js</file>
     </qresource>
 </RCC>

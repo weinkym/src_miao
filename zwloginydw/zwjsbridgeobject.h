@@ -2,6 +2,7 @@
 #define ZWJSBRIDGEOBJECT_H
 #include <QObject>
 #include <QWebEngineView>
+#include <QTimer>
 #include "zwydwpublic.h"
 
 class ZWJSBridgeObject : public QObject
@@ -28,6 +29,9 @@ public:
 
         STATUS_APPLY_PAGE_LOADING,
         STATUS_APPLY_PAGE_FINISHED,
+
+        STATUS_SELECT_APPLY,
+
     };
 
 
@@ -42,6 +46,7 @@ private:
     void runJS();
     QString getStatusJS();
     QString getStatusKey();
+    QString getDateString();
     void initBaseJS();
     QString getJSFileData(const QString &filePath);
 
@@ -56,6 +61,8 @@ private:
 
     void doResultLoginFinished(const QVariantMap &dataMap);
     void doResultApplyingPageFinished(const QVariantMap &dataMap);
+
+    void doRestart();
 
 public slots:
     void onRepaymentPageCount(int count);
@@ -77,6 +84,8 @@ public slots:
 
     void onJSResultCallabk(const QString &jsonData,int type);
 
+    void onLoadUrlTimeout();
+
 signals:
     void sigTest(const QString &text,int type);
     void sigPageCountChanged(int count);
@@ -95,6 +104,9 @@ public:
     int m_maxIgnoreErrorTimes = 3;
     int m_currentTime = 0;
     bool m_isLoading;
+    bool m_hasApplyMoney;
+    bool m_loginFinished;
+    QTimer m_loadUrlTimer;
     ZWYDW::MoneyData m_moneyData;
     QString m_userName;
     QString m_password;

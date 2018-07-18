@@ -7,7 +7,7 @@ function stopApplying()
 	if(!isValid(obj_opt))
 	{
 		onError("obj_opt not isValid");
-		return fasle;
+		return false;
 	}
 
 	//可能是提前结标或者撤销
@@ -15,7 +15,7 @@ function stopApplying()
 	if(!isValid(obj_a))
 	{
 		onError("obj_a not isValid");
-		return fasle;
+		return false;
 	}
 	//弹窗撤销窗口
 	obj_a.onclick();
@@ -23,7 +23,7 @@ function stopApplying()
 	if(!isValid(obj_tradePassword))
 	{
 		onError("obj_tradePassword not isValid");
-		return fasle;
+		return false;
 	}
 	//支付密码
 	obj_tradePassword.value=zw_param_01;
@@ -38,7 +38,7 @@ function stopApplying()
 	if(!isValid(obj_cancelborrow))
 	{
 		onError("obj_cancelborrow not isValid");
-		return fasle;
+		return false;
 	}
 	//确定取消
 	//alert(obj_cancelborrow.value);

@@ -19,8 +19,13 @@ function setMonthParam(obj_timeLimit,month)
 }
 
 
-function readData()
+function zwfun()
 {
+	var zw_param_date_str = "%1";
+	var zw_param_borrow_apr = "%2";
+
+	g_return_data_obj.need_select = false;
+
 	var obj_div_table = document.getElementsByClassName("uc-tables eshare-tables")[0];
 	if(!isValid(obj_div_table))
 	{
@@ -63,17 +68,45 @@ function readData()
 		onError("array_td not isValid");
 		return false;
 	}
-	if(array_td.length != 6)
+	var adIndex = 0;
+	if(array_td.length == 7)
 	{
-		onError("array_tr.length != 6");
+		adIndex = 1;
+	}
+	else if(array_td.length != 6)
+	{
+		onError("array_tr.length != 6  " + array_td.length);
 		return false;
 	}
-	var mount = array_td[2].innerHTML;
+
+	var currentDateString = array_td[5+adIndex].innerHTML;
+	onDebug("currentDateString=" + currentDateString +"  zw_param_date_str= "+zw_param_date_str);
+	if(!(zw_param_date_str === currentDateString))
+	{
+		var message = ("currentDateString != currentDateString ("+zw_param_date_str+"  "+currentDateString+")");
+		onDebug(message);
+
+		var cn_reSelection_btn = document.getElementsByClassName("reSelection_btn")[0];
+		if(!isValid(cn_reSelection_btn))
+		{
+			onError("cn_reSelection_btn not isValid");
+			return false;
+		}
+		//重新选择弹窗
+		cn_reSelection_btn.click();
+
+		g_return_data_obj.need_select = true;
+		onJSResultCallabk();
+		return true;
+	}
+
+	var mount = array_td[2+adIndex].innerHTML;
 	mount = mount.replace(/,/, "")
 	mount = parseInt(parseFloat(mount) / 100) * 100;
-	if(mount > 10000)
+	var maxMount=30000;
+	if(mount > maxMount)
 	{
-		mount = 10000;
+		mount = maxMount;
 	}
 	onDebug("mount="+mount)
 
@@ -98,6 +131,7 @@ function readData()
 	{
 		//类型：0是天 1是月
 		obj_timeLimitType.getElementsByTagName("option")[1].selected=true;
+		//设置月数
 		setMonthParam(obj_timeLimit,3);
 	}
 	else
@@ -122,7 +156,7 @@ function readData()
 		onError("obj_borrow_apr not isValid");
 		return false;
 	}
-    obj_borrow_apr.value = 15;
+    obj_borrow_apr.value = zw_param_borrow_apr;
 	onDebug("set obj_borrow_apr.value="+obj_borrow_apr.value);
 
 	//开始申请
@@ -131,16 +165,6 @@ function readData()
 	return true;
 }
 
-function run()
-{
-	onDebug("apply_page_finished1");
-
-	var res = readData();
-	onDebug("apply_page_finished2");
-	if(res != true)
-	{
-    	onError("doFun");
-    	return;
-	}
-}
-run();
+onDebug("apply_page_finished1");
+zwfun();
+onDebug("apply_page_finished2");
