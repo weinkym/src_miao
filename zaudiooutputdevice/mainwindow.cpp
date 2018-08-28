@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,7 +26,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_pbTest_clicked()
 {
     QAudioDeviceInfo device = ui->comboBox->currentData().value<QAudioDeviceInfo>();
-    m_test.start("/Users/miaozw/Movies/a.pcm",device);
+    m_test.start(ui->lineEditPath->text(),device);
 //    m_device = QAudioDeviceInfo::defaultOutputDevice();
 //    if(m_audioOutput)
 //    {
@@ -57,4 +58,16 @@ void MainWindow::on_pbTest_clicked()
 //    m_PCMIODevice->start();
 //    m_audioOutput->start(m_PCMIODevice);
 //    m_volumeSlider->setValue(int(m_audioOutput->volume()*100.0f));
+}
+
+void MainWindow::on_pbLoad_clicked()
+{
+    ui->lineEditPath->setReadOnly(true);
+    QString fileName = QFileDialog::getOpenFileName(this,
+          tr("Open PCM"), "./", tr("PCM Files (*.pcm)"));
+    if(fileName.isEmpty())
+    {
+        return;
+    }
+    ui->lineEditPath->setText(fileName);
 }
