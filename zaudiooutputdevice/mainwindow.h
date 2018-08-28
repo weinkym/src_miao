@@ -23,6 +23,8 @@ private slots:
 
     void on_pbLoad_clicked();
 
+    void onValueChanged(int value);
+
 private:
     Ui::MainWindow *ui;
 

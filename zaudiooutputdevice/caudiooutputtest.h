@@ -11,6 +11,7 @@ class CAudioOutputTest : public QObject
 public:
     CAudioOutputTest(QObject *parent = Q_NULLPTR);
     ~CAudioOutputTest();
+    void setVolume(qreal volume);
     void start(const QString &filePath,const QAudioDeviceInfo &audioDeviceInfo);
 
 private:

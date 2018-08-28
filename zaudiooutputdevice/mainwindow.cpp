@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
         if (deviceInfo != defaultDeviceInfo)
             ui->comboBox->addItem(deviceInfo.deviceName(), qVariantFromValue(deviceInfo));
     }
+    connect(ui->horizontalSlider,SIGNAL(valueChanged(int)),this,SLOT(onValueChanged(int)));
 }
 
 MainWindow::~MainWindow()
@@ -27,6 +28,7 @@ void MainWindow::on_pbTest_clicked()
 {
     QAudioDeviceInfo device = ui->comboBox->currentData().value<QAudioDeviceInfo>();
     m_test.start(ui->lineEditPath->text(),device);
+    m_test.setVolume(ui->horizontalSlider->value() / 100.0);
 //    m_device = QAudioDeviceInfo::defaultOutputDevice();
 //    if(m_audioOutput)
 //    {
@@ -70,4 +72,9 @@ void MainWindow::on_pbLoad_clicked()
         return;
     }
     ui->lineEditPath->setText(fileName);
+}
+
+void MainWindow::onValueChanged(int value)
+{
+    m_test.setVolume(ui->horizontalSlider->value() / 100.0);
 }

@@ -19,6 +19,14 @@ CAudioOutputTest::~CAudioOutputTest()
     }
 }
 
+void CAudioOutputTest::setVolume(qreal volume)
+{
+    if(m_audioOutput)
+    {
+        m_audioOutput->setVolume(volume);
+    }
+}
+
 void CAudioOutputTest::start(const QString &filePath, const QAudioDeviceInfo &audioDeviceInfo)
 {
     stop();
