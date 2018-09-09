@@ -1,6 +1,6 @@
 import xlrd
 import sys
-
+import os
 import  xml.dom.minidom
 from xml.dom.minidom import Document
 
@@ -116,7 +116,7 @@ def create_codument(list_node_context,dict_ts_source,key_name):
 
             if ts_value == None:
                 note_translation.setAttribute('type', 'unfinished')
-                sys.stderr.write("not found source=%s\n" % (message_obj['source']))
+                sys.stderr.write("not found source=%s,file=%s\n" % (message_obj['source'],message_obj['location'][0]['filename']))
             else:
                 note_translation_text = doc.createTextNode(ts_value)
                 note_translation.appendChild(note_translation_text)
@@ -222,9 +222,15 @@ def read_ts_source(filename):
     return res
 
 def update():
-    path="/Users/miaozw/work/mzwdoc/dclive/dcobs/translations"
-    dict_ts_source = read_ts_source(path+'/all.xlsx')
-    update_ts(path+"/dcobs_zh_CN.ts",path+"/out.ts",dict_ts_source,'cn')
+    project_path='/Users/miaozw/work/mzwdoc/dclive/dcobs'
+    trans_path=project_path+"/translations"
+    ts_path=trans_path+'/dcobs_zh_CN.ts'
+    os.system('rm -rf '+ts_path)
+    os.system("lupdate "+project_path+"/dcobs.pro")
+    dict_ts_source = read_ts_source(trans_path+'/all.xlsx')
+    update_ts(ts_path,ts_path,dict_ts_source,'cn')
+    os.system("lrelease " + ts_path)
+
     # in_files = r"/Users/miaozw/work/mzwdoc/dclive/dcobs/translations/dcobs_zh_CN.ts"
     # out_file = r"/Users/miaozw/work/mzwdoc/dclive/dcobs/translations/dcobs_zh_CN.ts"
 # print(itemlist.length)
