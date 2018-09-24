@@ -57,6 +57,7 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     m_screen->setSceneRect(QRect(0,0,geometry.width(),geometry.height()));
     m_sx = 1.0 * geometry.width() / pixmap.width();
     m_sy = 1.0 * geometry.height() / pixmap.height();
+
     m_backgroundItem->setScale(m_sx);
     m_selectRectItem = new CScreenSelectRectItem(m_desktopPixmap);
     m_selectRectItem->setScale(m_sx);
@@ -183,8 +184,9 @@ QPixmap CScreenShotView::createDesktopPixmap()
     QPixmap pixmap = getScreenPixmap(m_desktopScreen);
 #else
     QDesktopWidget *pDesktoWidget = QApplication::desktop();
-    QPixmap pixmap = m_desktopScreen->grabWindow(pDesktoWidget->winId(),geometry.x()
-                                        ,geometry.y(),geometry.width(),geometry.height());
+    QPixmap pixmap = m_desktopScreen->grabWindow(pDesktoWidget->winId(),pDesktoWidget->geometry().x()
+                                        ,pDesktoWidget->geometry().y(),pDesktoWidget->geometry().width(),pDesktoWidget->geometry().height());
+
 #endif
     return pixmap;
 }
