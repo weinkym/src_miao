@@ -16,7 +16,7 @@
 #include "cscreenshotutil.h"
 
 CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
-                                 QScreen *screen,
+                                 QScreen *screen, bool onlySelect,
                                  QWidget *parent)
     :QGraphicsView(parent)
     ,m_windowRectList(rectList)
@@ -34,6 +34,7 @@ CScreenShotView::CScreenShotView(const QList<QRect> &rectList,
     ,m_isPressed(false)
     ,m_isLocked(false)
     ,m_isValid(false)
+    ,m_onlySelect(onlySelect)
 {
     C_SCREENSHOT_LOG_FUNCTION;
     this->setMouseTracking(true);
@@ -142,11 +143,27 @@ bool CScreenShotView::isValid() const
 void CScreenShotView::setPreviewItemHidden(bool isHidden)
 {
     C_SCREENSHOT_LOG_FUNCTION;
-    m_previewItem->setVisible(!isHidden);
+    m_previewItem->setVisible(!isHidden && !m_onlySelect);
     if(m_selectRectItem->isVisible() && isHidden)
     {
         m_selectRectItem->setVisible(false);
     }
+}
+
+QRect CScreenShotView::getScreenGeometry()
+{
+    QRect rect;
+    if(m_desktopScreen)
+    {
+        rect = m_desktopScreen->geometry();
+    }
+    return rect;
+}
+
+QRectF CScreenShotView::getSelectRect() const
+{
+    return m_selectRect;
+//    return m_selectRectItem->getSelectRect();
 }
 
 QPixmap CScreenShotView::createPixmap(const QRect &rect)
@@ -415,6 +432,10 @@ void CScreenShotView::mouseReleaseEvent(QMouseEvent *event)
             m_selectRectItem->setVisible(true);
             m_selectRectItem->setMovePointHidden(false);
             m_toolbarItem->setVisible(true);
+            if(m_onlySelect)
+            {
+                doFinished();
+            }
         }
         else if(m_shotStatus == CSCREEN_SHOT_STATE_SELECTED)
         {
@@ -789,7 +810,7 @@ void CScreenShotView::updatePreviewItem(const QPoint &pos)
     if(!m_previewItem->isVisible())
     {
         emit sigPreviewItemShow();
-        m_previewItem->setVisible(true);
+        m_previewItem->setVisible(true && !m_onlySelect);
     }
 }
 

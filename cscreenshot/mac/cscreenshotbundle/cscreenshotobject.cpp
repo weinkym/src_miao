@@ -11,7 +11,7 @@ CScreenShotObject::CScreenShotObject(QObject *parent)
     :QObject(parent)
     ,m_localServer(NULL)
 {
-    connect(CScreenShotManager::getInstance(),SIGNAL(sigScreenShotPixmapChanged(QPixmap)),
+    connect(CScreenShotManager::getInstance(),SIGNAL(sigScreenShotPixmapChanged(QPixmap,QRect,QRect)),
             this,SLOT(onScreenShotPixmapChanged(QPixmap)));
 }
 

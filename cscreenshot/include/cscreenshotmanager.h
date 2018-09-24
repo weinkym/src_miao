@@ -15,7 +15,7 @@ class CSCREENSHOTSHARED_EXPORT CScreenShotManager : public QObject
 public:
     static CScreenShotManager *getInstance();
     ~CScreenShotManager();
-    void startScreenShot();
+    void startScreenShot(bool onlySelect);
     void clearAll();
 
 protected:
@@ -26,11 +26,12 @@ private slots:
     void onPreviewItemShow();
 
 signals:
-    void sigScreenShotPixmapChanged(const QPixmap &pixmap);
+    void sigScreenShotPixmapChanged(const QPixmap &pixmap,const QRect &screenRect,const QRect &selectRect);
 
 private:
     static CScreenShotManager *m_instance;
     bool m_isRunning;
+    bool m_onlySelect;
     QList<CScreenShotView *> m_viewList;
 };
 

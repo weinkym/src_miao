@@ -13,6 +13,7 @@ CScreenShotManager * CScreenShotManager::m_instance = NULL;
 CScreenShotManager::CScreenShotManager(QObject *parent)
     :QObject(parent)
     ,m_isRunning(false)
+    ,m_onlySelect(false)
 {
 }
 
@@ -30,7 +31,7 @@ CScreenShotManager::~CScreenShotManager()
     clearAll();
 }
 
-void CScreenShotManager::startScreenShot()
+void CScreenShotManager::startScreenShot(bool onlySelect)
 {
     C_SCREENSHOT_LOG_FUNCTION;
     if(m_isRunning)
@@ -40,6 +41,7 @@ void CScreenShotManager::startScreenShot()
     C_SCREENSHOT_LOG_TEST;
     clearAll();
     C_SCREENSHOT_LOG_TEST;
+    m_onlySelect = onlySelect;
     QList<QScreen *> screens = QApplication::screens();
     int index = 0;
     QList<QRect> rectList = getWindownRectList();
@@ -49,7 +51,7 @@ void CScreenShotManager::startScreenShot()
     {
         index++;
         C_SCREENSHOT_LOG_TEST;
-        CScreenShotView *view = new CScreenShotView(rectList,d);
+        CScreenShotView *view = new CScreenShotView(rectList,d,onlySelect);
         m_viewList.append(view);
         connect(view,SIGNAL(sigStatusChanged(CScreenShotStatus)),
                 this,SLOT(onStatusChanged(CScreenShotStatus)));
@@ -86,7 +88,11 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
         C_SCREENSHOT_LOG_INFO(QString("view is NULL"));
         return;
     }
+
     QPixmap pixmap;
+    QRect screenRect = view->getScreenGeometry();
+    QRect selectRect = view->getSelectRect().toRect();
+
     bool isValid = false;
     C_SCREENSHOT_LOG_TEST;
     if(status == CSCREEN_SHOT_STATE_FINISHED)
@@ -134,7 +140,7 @@ void CScreenShotManager::onStatusChanged(CScreenShotStatus status)
             if(!pixmap.isNull() && isValid)
             {
                 C_SCREENSHOT_LOG_TEST;
-                emit sigScreenShotPixmapChanged(pixmap);
+                emit sigScreenShotPixmapChanged(pixmap,screenRect,selectRect);
             }
             else
             {

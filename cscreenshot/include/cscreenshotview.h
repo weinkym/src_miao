@@ -18,13 +18,15 @@ class CSCREENSHOTSHARED_EXPORT CScreenShotView : public QGraphicsView
     Q_OBJECT
 
 public:
-    CScreenShotView(const QList<QRect> &rectList,QScreen *screen,QWidget *parent = 0);
+    CScreenShotView(const QList<QRect> &rectList,QScreen *screen,bool onlySelect,QWidget *parent = 0);
     ~CScreenShotView();
     void startSCreenShot();
     void setLocked(bool locked);
     QPixmap getPixmap();
     bool isValid() const;
     void setPreviewItemHidden(bool isHidden);
+    QRect getScreenGeometry();
+    QRectF getSelectRect() const;
 
 protected:
     bool event(QEvent *event);
@@ -84,6 +86,7 @@ private:
     bool m_isPressed;
     bool m_isLocked;
     bool m_isValid;
+    bool m_onlySelect;
     QPoint m_startPoint;
     QPoint m_endPoint;
     QPixmap m_backgroundPixmap;

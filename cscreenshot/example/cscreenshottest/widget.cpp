@@ -7,7 +7,7 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    connect(CScreenShotManager::getInstance(),SIGNAL(sigScreenShotPixmapChanged(QPixmap)),
+    connect(CScreenShotManager::getInstance(),SIGNAL(sigScreenShotPixmapChanged(QPixmap,QRect,QRect)),
             this,SLOT(onScreenShotPixmapChanged(QPixmap)));
     //    ui->labelPixmap->setScaledContents(true);
     //    this->setAttribute(Qt::WA_QuitOnClose,false);
@@ -80,5 +80,5 @@ void Widget::on_pushButton_clicked()
 
 void Widget::on_btnShot_clicked()
 {
-    CScreenShotManager::getInstance()->startScreenShot();
+    CScreenShotManager::getInstance()->startScreenShot(true);
 }
