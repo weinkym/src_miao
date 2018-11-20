@@ -6,8 +6,8 @@
 
 ZShadowEngine::ZShadowEngine()
 {
-//    m_color = QColor(227,227,227,15);
-    m_color = QColor(150,160,255);
+    m_color = QColor(227,227,227,128);
+//    m_color = QColor(150,160,255);
     m_radius = 20;
     m_shawWidth = 20;
 }
@@ -107,7 +107,7 @@ QBrush ZShadowEngine::getBrush(const QPoint &center, int radius)
     radialGradient.setColorAt(0, m_color);
     radialGradient.setColorAt(1 - shawPos, m_color);
 //    radialGradient.setColorAt(1,QColor(m_color.red(),m_color.green(),m_color.blue(),0));
-    radialGradient.setColorAt(0.8,QColor(255,255,255,255));
+//    radialGradient.setColorAt(0.8,QColor(255,255,255,255));
     radialGradient.setColorAt(1,QColor(255,255,255,0));
     return QBrush(radialGradient);
 }
@@ -119,7 +119,7 @@ void ZShadowEngine::setLineGradientPainter(QPainter *painter, const QPointF &sta
     linearGradient.setColorAt(0,m_color);
     linearGradient.setColorAt(1- shawPos,m_color);
 //    linearGradient.setColorAt(1,QColor(m_color.red(),m_color.green(),m_color.blue(),0));
-    linearGradient.setColorAt(0.8,QColor(255,255,255,255));
+//    linearGradient.setColorAt(0.8,QColor(255,255,255,255));
     linearGradient.setColorAt(1,QColor(255,255,255,0));
     painter->setBrush(QBrush(linearGradient));
 }
