@@ -21,7 +21,7 @@ void ZShadowWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 //
-    QColor color = QColor(227,227,227,128);
+    QColor color = QColor(227,227,227,32);
 //    QPen pen(color);
     QPen pen("#ff0000");
 //    painter.setPen(pen);
