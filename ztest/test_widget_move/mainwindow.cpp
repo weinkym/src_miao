@@ -21,7 +21,7 @@ bool MainWindow::event(QEvent *event)
     qDebug()<<event->type()<<this->geometry().bottomRight();
     if(event->type() == QEvent::NonClientAreaMouseMove)
     {
-        dlg->move(QCursor::pos() + QPoint(100,100));
+        dlg->move(QCursor::pos() + QPoint(-100,100));
     }
     return QMainWindow::event(event);
 }

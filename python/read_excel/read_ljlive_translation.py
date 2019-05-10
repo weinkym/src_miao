@@ -1,4 +1,5 @@
 import xlrd
+import sys
 
 from langconv import *
 
@@ -93,6 +94,8 @@ def lj_read_summary_sheet(table):
         obj.key_row = row
         obj = lj_check_cn_eg_data(obj,"lj_read_summary_sheet")
 
+        # print("TTTTTV"+obj.key_eg_short)
+        #
         if obj.key_cn == "":
             continue
         if obj.key_eg == "" and obj.key_eg_short == "":
@@ -172,9 +175,9 @@ def lj_test(summary_table,source_table,special_table):
     summary_data = lj_read_summary_sheet(summary_table)
     source_data = lj_read_source_sheet(source_table,summary_data)
     special_data = lj_read_special_sheet(special_table)
-    print(len(summary_data))
-    print(len(source_data))
-    print(len(special_data))
+    # print(len(summary_data))
+    # print(len(source_data))
+    # print(len(special_data))
 
     file_object = open('/Users/miaozw/work/ljlive/ljobs/translations/language.txt', 'w')
 
@@ -187,6 +190,9 @@ def lj_test(summary_table,source_table,special_table):
         eg = obj.key_eg
         if obj.key_eg_short != "":
             eg = obj.key_eg_short
+
+        if obj.key_eg == "Assistant scan code":
+            print("TTTTTV" + obj.key_eg_short)
 
         mylist = [obj.key_src,obj.key_cn,tw,eg]
 
@@ -219,7 +225,7 @@ def lj_create_releasenote(table,filepath):
 
     file_object = open(filepath, 'w')
     for i in range(0, len(data_list)):
-        print(data_list[i].key_eg)
+        # print(data_list[i].key_eg)
         tw = Converter('zh-hant').convert(data_list[i].key_cn)
         file_object.write("CN" + data_list[i].key_type + data_list[i].key_cn + "\n")
         file_object.write("TW" + data_list[i].key_type + tw + "\n")
@@ -227,6 +233,11 @@ def lj_create_releasenote(table,filepath):
 
 
 
+
+# sys.stderr.write('EEEEEEEEEEEEEEEE')
+
+# print('00000000000000000')
+# exit()
 
 
 filename = "/Users/miaozw/work/ljlive/ljobs/translations/all.xlsx"

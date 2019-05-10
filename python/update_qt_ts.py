@@ -224,9 +224,9 @@ def read_ts_source(filename):
 def update():
     project_path='/Users/miaozw/work/mzwdoc/dclive/dcobs'
     trans_path=project_path+"/translations"
-    ts_path=trans_path+'/dcobs_zh_CN.ts'
+    ts_path=trans_path+'/ClassPro_zh_CN.ts'
     os.system('rm -rf '+ts_path)
-    os.system("lupdate "+project_path+"/dcobs.pro")
+    os.system("lupdate "+project_path+"/ClassPro.pro")
     dict_ts_source = read_ts_source(trans_path+'/all.xlsx')
     update_ts(ts_path,ts_path,dict_ts_source,'cn')
     os.system("lrelease " + ts_path)
