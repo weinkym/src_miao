@@ -80,5 +80,5 @@ void Widget::on_pushButton_clicked()
 
 void Widget::on_btnShot_clicked()
 {
-    CScreenShotManager::getInstance()->startScreenShot(true);
+    CScreenShotManager::getInstance()->startScreenShot(false);
 }
