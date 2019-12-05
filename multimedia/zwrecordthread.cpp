@@ -25,8 +25,8 @@ ZWRecordThread::ZWRecordThread(QObject *parent)
     , m_swsCtx(nullptr)
     , m_state(RecordState::NotStarted)
 {
-    m_width = 2880;
-    m_height = 1800;
+    m_width = 1280;
+    m_height = 720;
     m_fps = 30;
     m_filePath = "/Users/miaozw/Documents/TEMP/test-out.flv";
 }
@@ -40,14 +40,14 @@ void ZWRecordThread::Start()
 {
     if (m_state == RecordState::NotStarted)
     {
-        qDebug() << "start record";
+        ZW_LOG_INFO("start record");
         m_state = RecordState::Started;
         std::thread recordThread(&ZWRecordThread::ScreenRecordThreadProc, this);
         recordThread.detach();
     }
     else if (m_state == RecordState::Paused)
     {
-        qDebug() << "continue record";
+        ZW_LOG_INFO("continue record");
         m_state = RecordState::Started;
         m_cvNotPause.notify_one();
     }
@@ -55,7 +55,7 @@ void ZWRecordThread::Start()
 
 void ZWRecordThread::Pause()
 {
-    qDebug() << "pause record";
+    ZW_LOG_INFO("pause record");
     m_state = RecordState::Paused;
 }
 
@@ -125,7 +125,7 @@ void ZWRecordThread::ScreenRecordThreadProc()
         ret = avcodec_send_frame(m_vEncodeCtx, m_vOutFrame);
         if (ret != 0)
         {
-            qDebug() << "video avcodec_send_frame failed, ret: " << ret;
+            ZW_LOG_WARNING("video avcodec_send_frame failed "+ZW_LOG_P(ret));
             av_packet_unref(&pkt);
             continue;
         }
@@ -135,10 +135,10 @@ void ZWRecordThread::ScreenRecordThreadProc()
             av_packet_unref(&pkt);
             if (ret == AVERROR(EAGAIN))
             {
-                qDebug() << "EAGAIN avcodec_receive_packet";
+                ZW_LOG_WARNING("EAGAIN avcodec_receive_packet"+ZW_LOG_P(ret));
                 continue;
             }
-            qDebug() << "video avcodec_receive_packet failed, ret: " << ret;
+            ZW_LOG_WARNING("video avcodec_receive_packet failed "+ZW_LOG_P(ret));
             return;
         }
         pkt.stream_index = m_vOutIndex;
@@ -146,15 +146,18 @@ void ZWRecordThread::ScreenRecordThreadProc()
 
         ret = av_interleaved_write_frame(m_oFmtCtx, &pkt);
         if (ret == 0)
-            qDebug() << "Write video packet id: " << ++g_encodeFrameCnt_zw;
+        {
+//            ZW_LOG_INFO("Write video packet id: "+ZW_LOG_P(g_encodeFrameCnt_zw));
+            g_encodeFrameCnt_zw++;
+        }
         else
-            qDebug() << "video av_interleaved_write_frame failed, ret:" << ret;
+            ZW_LOG_WARNING("video av_interleaved_write_frame failed "+ZW_LOG_P(ret));
         av_free_packet(&pkt);
     }
     FlushEncoder();
     av_write_trailer(m_oFmtCtx);
     Release();
-    qDebug() << "parent thread exit";
+    ZW_LOG_INFO("parent thread exit");
 }
 
 void ZWRecordThread::ScreenAcquireThreadProc()
@@ -176,30 +179,40 @@ void ZWRecordThread::ScreenAcquireThreadProc()
         if (m_state == RecordState::Paused)
         {
             unique_lock<mutex> lk(m_mtxPause);
-            m_cvNotPause.wait(lk, [this] { return m_state != RecordState::Paused; });
+            //在第二种情况下（即设置了 Predicate），
+            //只有当 pred 条件为false 时调用 wait() 才会阻塞当前线程
+            //，并且在收到其他线程的通知后只有当 pred 为 true 时才会被解除阻塞。其内部代码
+            //while (!pred()) wait(lck);
+            m_cvNotPause.wait(lk, [this] {
+                bool temp = m_state != RecordState::Paused;
+                ZW_LOG_INFO(ZW_LOG_P2(m_state,temp));
+                return temp;
+//                return false;
+            });
+            ZW_LOG_INFO("ScreenAcquireThreadProc"+ZW_LOG_P(m_state));
         }
         if (av_read_frame(m_vFmtCtx, &pkt) < 0)
         {
-            qDebug() << "video av_read_frame < 0";
+            ZW_LOG_WARNING("video av_read_frame < 0");
             continue;
         }
         if (pkt.stream_index != m_vIndex)
         {
-            qDebug() << "not a video packet from video input";
+            ZW_LOG_WARNING("not a video packet from video input");
             av_packet_unref(&pkt);
-
+            continue;
         }
         ret = avcodec_send_packet(m_vDecodeCtx, &pkt);
         if (ret != 0)
         {
-            qDebug() << "avcodec_send_packet failed, ret:" << ret;
+            ZW_LOG_WARNING("avcodec_send_packet failed"+ZW_LOG_P(ret));
             av_packet_unref(&pkt);
             continue;
         }
         ret = avcodec_receive_frame(m_vDecodeCtx, oldFrame);
         if (ret != 0)
         {
-            qDebug() << "avcodec_receive_frame failed, ret:" << ret;
+            ZW_LOG_WARNING("avcodec_receive_frame failed"+ZW_LOG_P(ret));
             av_packet_unref(&pkt);
             continue;
         }
@@ -276,8 +289,19 @@ int ZWRecordThread::openVideo()
         }
         ret = avcodec_open2(m_vDecodeCtx, decoder, &m_dict);
         RETBREAK(ret,"avcodec_open2t failed");
+//#define SWS_FAST_BILINEAR     1
+//#define SWS_BILINEAR          2
+//#define SWS_BICUBIC           4
+//#define SWS_X                 8
+//#define SWS_POINT          0x10
+//#define SWS_AREA           0x20
+//#define SWS_BICUBLIN       0x40
+//#define SWS_GAUSS          0x80
+//#define SWS_SINC          0x100
+//#define SWS_LANCZOS       0x200
+//#define SWS_SPLINE        0x400
         m_swsCtx = sws_getContext(m_vDecodeCtx->width, m_vDecodeCtx->height, m_vDecodeCtx->pix_fmt,
-            m_width, m_height, AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
+            m_width, m_height, AV_PIX_FMT_YUV420P, SWS_BICUBIC, nullptr, nullptr, nullptr);
         ret = 0;
     }while(0);
 
@@ -427,25 +451,18 @@ void ZWRecordThread::Release()
 
 int ZWRecordThread::InitBuffer()
 {
-    ZW_LOG_INFO(QString("line=%1").arg(__LINE__));
-    ZW_LOG_INFO(QString("m_width=%1").arg(m_width));
-    ZW_LOG_INFO(QString("m_height=%1").arg(m_height));
+    ZW_LOG_TEST;
     if(!m_vEncodeCtx)
     {
         return -1;
     }
-    ZW_LOG_INFO(QString("m_vEncodeCtx->pix_fmt=%1").arg(m_vEncodeCtx->pix_fmt));
     m_vOutFrameSize = av_image_get_buffer_size(m_vEncodeCtx->pix_fmt, m_width, m_height, 1);
-    ZW_LOG_INFO(QString("line=%1").arg(__LINE__));
     m_vOutFrameBuf = (uint8_t *)av_malloc(m_vOutFrameSize);
-    ZW_LOG_INFO(QString("line=%1").arg(__LINE__));
+    ZW_LOG_INFO(ZW_LOG_P4(m_width,m_height,m_vEncodeCtx->pix_fmt,m_vOutFrameSize));
     m_vOutFrame = av_frame_alloc();
-    ZW_LOG_INFO(QString("line=%1").arg(__LINE__));
     //先让AVFrame指针指向buf，后面再写入数据到buf
-    ZW_LOG_INFO(QString("line=%1").arg(__LINE__));
     av_image_fill_arrays(m_vOutFrame->data, m_vOutFrame->linesize, m_vOutFrameBuf, m_vEncodeCtx->pix_fmt, m_width, m_height, 1);
     //申请30帧缓存
-    ZW_LOG_INFO(QString("line=%1").arg(__LINE__));
     if (!(m_vFifoBuf = av_fifo_alloc_array(30, m_vOutFrameSize)))
     {
         ZW_LOG_WARNING("av_fifo_alloc_array failed");

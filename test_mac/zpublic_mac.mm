@@ -8,6 +8,7 @@
 #import <CoreMedia/CoreMedia.h>
 #import <CoreVideo/CoreVideo.h>
 #import <CoreMediaIO/CMIOHardware.h>
+#import <CoreServices/CoreServices.h>
 
 QList<QPair<QVariant, QVariant> > ZPublic::getCameras()
 {
@@ -41,6 +42,15 @@ QList<QPair<QVariant, QVariant> > ZPublic::getCameras()
 
     return objList;
 }
+
+void ZPublic::getVersion(SInt32 &major, SInt32 &minor, SInt32 &bugfix)
+{
+//    SInt32 major, minor, bugfix;
+    Gestalt(gestaltSystemVersionMajor, &major);
+    Gestalt(gestaltSystemVersionMinor, &minor);
+    Gestalt(gestaltSystemVersionBugFix, &bugfix);
+}
+
 
 static inline QString cfStringToQString(CFStringRef str)
 {
@@ -118,39 +128,42 @@ static QByteArray get_device_info(AudioDeviceID audioDevice, QAudio::Mode mode)
 
 void ZPublic::test()
 {
-    QList<QByteArray> devices;
-    UInt32  propSize = 0;
-    AudioObjectPropertyAddress audioDevicesPropertyAddress = { kAudioHardwarePropertyDevices,
-                                                               kAudioObjectPropertyScopeGlobal,
-                                                               kAudioObjectPropertyElementMaster };
-
-    if (AudioObjectGetPropertyDataSize(kAudioObjectSystemObject,
-                                       &audioDevicesPropertyAddress,
-                                       0, NULL, &propSize) == noErr) {
-
-        const int dc = propSize / sizeof(AudioDeviceID);
-        qDebug()<<"dc="<<dc;
-
-        if (dc > 0)
+    QList<QPair<QVariant, QVariant> > objList;
+    for (AVCaptureDevice *dev in [AVCaptureDevice
+         devices]) {
+        if ([dev hasMediaType: AVMediaTypeVideo] ||
+                [dev hasMediaType: AVMediaTypeMuxed])
         {
-            AudioDeviceID*  audioDevices = new AudioDeviceID[dc];
+//            AVCaptureDALDevice;
+//            objList.append(QPair<QVariant, QVariant>(dev.localizedName.UTF8String,dev.uniqueID.UTF8String));
+//            qDebug()<<dev.localizedName.UTF8String<<" ======  "<<dev.uniqueID.UTF8String;
+//            qDebug()<<dev.uniqueID.UTF8String;
+//            qDebug()<<dev.modelID.UTF8String;
+//            obs_property_list_add_string(dev_list,
+//                                         dev.localizedName.UTF8String,
+//                                         dev.uniqueID.UTF8String);
+        }
+//        if ([dev hasMediaType: AVMediaTypeAudio])
+        {
+            NSString *name = [NSString stringWithUTF8String:object_getClassName(dev)];
+            ZW_LOG_INFO(ZW_LOG_P(name.UTF8String));
 
-            if (AudioObjectGetPropertyData(kAudioObjectSystemObject, &audioDevicesPropertyAddress, 0, NULL, &propSize, audioDevices) == noErr)
-            {
-                QAudio::Mode mode = QAudio::AudioOutput;
-//                QByteArray defaultDevice = (mode == QAudio::AudioOutput) ? defaultOutputDevice() : defaultInputDevice();
-                for (int i = 0; i < dc; ++i) {
-                    QByteArray info = get_device_info(audioDevices[i], mode);
-//                    if (!info.isNull()) {
-//                        if (info == defaultDevice)
-//                            devices.prepend(info);
-//                        else
-//                            devices << info;
-//                    }
-                }
-            }
-
-            delete[] audioDevices;
+//            AVCaptureDeviceType *type = dev.deviceType.UTF8String;
+//            dev.deviceType.UTF8String;
+            QString content = ZW_LOG_P6(dev.localizedName.UTF8String,dev.uniqueID.UTF8String,dev.modelID.UTF8String,
+                      dev.manufacturer.UTF8String,dev.transportType,dev.manufacturer.UTF8String);
+            ZW_LOG_INFO(content);
+//            objList.append(QPair<QVariant, QVariant>(dev.localizedName.UTF8String,dev.uniqueID.UTF8String));
+//            qDebug()<<"===========>>"<<dev.localizedName.UTF8String<<" ======  "<<dev.uniqueID.UTF8String
+//                   <<dev.modelID.UTF8String<<dev.manufacturer.UTF8String
+//                   <<dev.transportType<<dev.manufacturer.UTF8String;
+//            qDebug()<<dev.uniqueID.UTF8String;
+//            qDebug()<<dev.modelID.UTF8String;
+//            obs_property_list_add_string(dev_list,
+//                                         dev.localizedName.UTF8String,
+//                                         dev.uniqueID.UTF8String);
         }
     }
+
+    return;
 }

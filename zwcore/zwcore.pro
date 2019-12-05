@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       -= gui
+QT       += core gui
 
 TARGET = zwcore
 TEMPLATE = lib
@@ -32,7 +32,8 @@ INCLUDEPATH += $${PWD}/include
 HEADERS += include/zwcore_global.h \
     include/zwcore.h \
     include/zwpublic.h \
-    include/zwlog.h
+    include/zwlog.h \
+    include/zwlogvalueengine.h
 
 unix {
     target.path = /usr/lib

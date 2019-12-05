@@ -38,10 +38,12 @@ void MainWindow::on_pushButton_clicked()
 //     foreach (const QAudioDeviceInfo &info, infos) {
 //         qDebug()<<info.deviceName();
 //     }
-    ZPublic::test();
+//    qDebug()<<QSysInfo::prettyProductName()<<QSysInfo::macVersion();
+    ZPublic::testAll();
+//    ZPublic::getCameras();
 }
 
 void MainWindow::onTest()
 {
-    ZPublic::getCameras();
+//    ZPublic::getCameras();
 }

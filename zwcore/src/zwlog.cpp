@@ -78,11 +78,11 @@ void zw_log(const QString &content, const QString &funciton, const QString &file
     {
         addLogTypeString(QDateTime::currentDateTime().toString("yyyyMMdd hh:mm:ss"),str);
     }
-    addLogTypeString(QString("content:") + content,str);
+    addLogTypeString(QString("C:") + content,str);
 
     if(g_log_settings.types & LOG_TYPE_FILE)
     {
-        addLogTypeString(QString("file:") + file,str);
+        addLogTypeString(QString("F:") + file,str);
     }
     if(g_log_settings.types & LOG_TYPE_LINE)
     {
@@ -94,7 +94,7 @@ void zw_log(const QString &content, const QString &funciton, const QString &file
     }
     if(g_log_settings.types & LOG_TYPE_FUNCTION)
     {
-        addLogTypeString(QString("funciton:") + funciton,str);
+        addLogTypeString(QString("fun:") + funciton,str);
     }
     if(g_log_settings.file.isOpen())
     {

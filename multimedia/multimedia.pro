@@ -25,11 +25,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 include(ffmpeg.pri)
 include(../zwcore/zwcore.pri)
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    ScreenRecordImpl.cpp
+INCLUDEPATH += ./TEST
 
-HEADERS  += mainwindow.h \
-    ScreenRecordImpl.h
+FORMS += \
+    mainwindow.ui
 
-FORMS    += mainwindow.ui
+HEADERS += \
+    mainwindow.h \
+    zwffpublic.h \
+    zwrecordthread.h \
+    TEST/ScreenRecordImpl.h
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp \
+    zwffpublic.cpp \
+    zwrecordthread.cpp \
+    TEST/ScreenRecordImpl.cpp
+

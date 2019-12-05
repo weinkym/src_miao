@@ -1,9 +1,19 @@
 #include "mainwindow.h"
 #include <QApplication>
+#include "zwlog.h"
 
 int main(int argc, char *argv[])
 {
+//    LOG_TYPE_FILE = 0x00000001,
+//    LOG_TYPE_DATE = LOG_TYPE_FILE<<1,
+//    LOG_TYPE_DATE_TIME = LOG_TYPE_DATE<<1,
+//    LOG_TYPE_DATE_TIMES = LOG_TYPE_DATE_TIME<<1,
+//    LOG_TYPE_THREAD = LOG_TYPE_DATE_TIMES<<1,
+//    LOG_TYPE_LINE = LOG_TYPE_THREAD<<1,
+//    LOG_TYPE_FUNCTION = LOG_TYPE_LINE<<1,
+//    LOG_TYPE_LEVEL_STRING = LOG_TYPE_FUNCTION<<1,
     QApplication a(argc, argv);
+    ZW_LOG::setLogTypes(ZW_LOG_TYPES(LOG_TYPE_DATE | LOG_TYPE_LINE | LOG_TYPE_FUNCTION));
     MainWindow w;
     w.show();
 

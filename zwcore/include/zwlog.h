@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QTime>
 #include <QFlags>
+#include "zwlogvalueengine.h"
 
 enum ZW_LOG_LEVEL
 {
@@ -66,8 +67,16 @@ private:
     QTime m_time;
 };
 
+#define ZW_LOG_P(value) (QString(#value"=%1").arg(createLogContent(value)))
+#define ZW_LOG_P2(value1,value2) (ZW_LOG_P(value1)+","+ZW_LOG_P(value2))
+#define ZW_LOG_P3(value1,value2,value3) (ZW_LOG_P2(value1,value2)+","+ZW_LOG_P(value3))
+#define ZW_LOG_P4(value1,value2,value3,value4) (ZW_LOG_P2(value1,value2)+","+ZW_LOG_P2(value3,value4))
+#define ZW_LOG_P5(value1,value2,value3,value4,value5) (ZW_LOG_P3(value1,value2,value3)+","+ZW_LOG_P2(value4,value5))
+#define ZW_LOG_P6(value1,value2,value3,value4,value5,value6) (ZW_LOG_P3(value1,value2,value3)+","+ZW_LOG_P3(value4,value5,value6))
 
-#define ZW_LOG(X,Y) zw_log(X,QString(Q_FUNC_INFO),QString(__FILE__),QString::number(__LINE__),Y)
+#define ZW_LOG(X,LEVEL) zw_log(X,QString(Q_FUNC_INFO),QString(__FILE__),QString::number(__LINE__),LEVEL)
+
+#define ZW_LOG_FUNCTION ZWLogFuncHelper logFuncHelper(Q_FUNC_INFO)
 
 #define ZW_LOG_DEBUG(X) ZW_LOG(X,LOG_LEVEL_DEBUG)
 #define ZW_LOG_CRITICAL(X) ZW_LOG(X,LOG_LEVEL_CRITICAL)
@@ -75,22 +84,7 @@ private:
 #define ZW_LOG_INFO(X) ZW_LOG(X,LOG_LEVEL_INFO)
 #define ZW_LOG_WARNING(X) ZW_LOG(X,LOG_LEVEL_WARNING)
 
-#define ZW_LOG_FUNCTION ZWLogFuncHelper logFuncHelper(Q_FUNC_INFO)
+#define ZW_LOG_TEST ZW_LOG(ZW_LOG_P2(__LINE__,__FILE__),LOG_LEVEL_DEBUG)
 
-#define ZW_LOG_TEST zw_log(getTestLogContent(),QString(__FILE__),QString::number(__LINE__),getTestLogLevel())
-
-#define ZW_BOOL_VALUE_TO_STRING(value) (value ? "TRUE":"FALSE")
-
-#define ZW_VALUE_LOG_TEST_BOOL(value) ZW_LOG_TEST(QString(#value"=%1").arg(ZW_BOOL_VALUE_TO_STRING(value)))
-#define ZW_VALUE_LOG_DEBUG_BOOL(value) ZW_LOG_DEBUG(QString(#value"=%1").arg(ZW_BOOL_VALUE_TO_STRING(value)))
-#define ZW_VALUE_LOG_INFO_BOOL(value) ZW_LOG_INFO(QString(#value"=%1").arg(ZW_BOOL_VALUE_TO_STRING(value)))
-#define ZW_VALUE_LOG_WARNING_BOOL(value) ZW_LOG_WARNING(QString(#value"=%1").arg(ZW_BOOL_VALUE_TO_STRING(value)))
-#define ZW_VALUE_LOG_ERROR_BOOL(value) ZW_LOG_ERROR(QString(#value"=%1").arg(ZW_BOOL_VALUE_TO_STRING(value)))
-
-#define ZW_VALUE_LOG_TEST(value) ZW_LOG_TEST(QString(#value"=%1").arg(value))
-#define ZW_VALUE_LOG_DEBUG(value) ZW_LOG_DEBUG(QString(#value"=%1").arg(value))
-#define ZW_VALUE_LOG_INFO(value) ZW_LOG_INFO(QString(#value"=%1").arg(value))
-#define ZW_VALUE_LOG_WARNING(value) ZW_LOG_WARNING(QString(#value"=%1").arg(value))
-#define ZW_VALUE_LOG_ERROR(value) ZW_LOG_ERROR(QString(#value"=%1").arg(value))
 
 #endif // ZWLOG_H
