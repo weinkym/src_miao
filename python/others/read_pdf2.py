@@ -1,5 +1,7 @@
 import PyPDF2
 
+
+
 fileName='/Users/miaozw/Documents/TEMP/201705687108/TEST.pdf'
 pdfFile = open(fileName,'rb')
 
