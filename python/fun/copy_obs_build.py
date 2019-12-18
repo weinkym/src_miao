@@ -118,35 +118,9 @@ def copy_build_lib(build_dp,to_root_dp,lib_subffix_list,need_adjuest=False):
         if check_lib_list(need_adjuest_lib_fp_list,exists_lib_name_list):
             print("error is happend")
             return False
-
-
-        # replace_path_list=["/Users/miaozw/Downloads/ffmpeg-3.4.7/build/lib","/usr/local/opt/freetype/lib","/usr/local/opt/x264/lib"]
-        # for p_path,p_name in plugins_list:
-        #     des_fp=os.path.join(to_plugins_dp,p_name)
-        #     if not os.path.exists(des_fp):
-        #         print("{} is not exists".format(des_fp))
-        #         return False
-
-        #     invalid_data_list=get_invalid_paths(des_fp)
-        #     if len(invalid_data_list) == 0:
-        #         print("change finished lib={}  no changed".format(p_name))
-        #         continue
-        #     for line in invalid_data_list:
-        #         # (file_path,file_name,shot_name,suffix)
-        #         info = zwutil.getPathFileNameInfo(line)
-        #         file_name=info[1]
-        #         if file_name not in exists_lib_name_list:
-        #             print("{} is no found".format(file_name))
-        #             return False
-        #         print("changed lib={},line={},file={}".format(p_name,line,file_name))
-        #         os.system("install_name_tool -change \"{}\" \"{}\" \"{}\"".format(line,file_name,des_fp))
-        #     if not check_lib(des_fp):
-        #         print("change error lib={}".format(p_name))
-        #         return False
-        #     print("change finished lib={}".format(p_name))
     return True
 
 g_lib_subffix_list=[".so",".dylib",".a"]
 build_dp="/Users/miaozw/Documents/TEMP/build-obs"
-to_root_dp="/Users/miaozw/Documents/TEMP/test_obs"
+to_root_dp="/Users/miaozw/work/ljlive/vendor/obs/mac"
 copy_build_lib(build_dp,to_root_dp,g_lib_subffix_list,True)
