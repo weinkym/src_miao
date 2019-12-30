@@ -89,7 +89,6 @@ def copyDirList(src_dp, dst_dp, dir_name_list):
 
 
 def adjuestFileDepends(lib_fp, lib_name, LIB_NAME_LIST):
-    print("adjuestFileDepends lib_fp={},lib_name={}".format(lib_fp,lib_name))
     if not os.path.exists(lib_fp):
         return False
     os.system("install_name_tool -id \"{}\" \"{}\"".format(lib_name, lib_fp))
@@ -124,7 +123,10 @@ def adjuestFileDepends(lib_fp, lib_name, LIB_NAME_LIST):
         adjust_cmd_list.append(change_cmd)
         # print('line={},change_cmd={}'.format(line,change_cmd))
 
-    print('adjust_cmd_list={}'.format(adjust_cmd_list))
+    if len(adjust_cmd_list) == 0:
+        print("no changed lib_fp={},lib_name={}".format(lib_fp,lib_name))
+    else:
+        print("adjuestFileDepends lib_fp={},lib_name={}".format(lib_fp,lib_name))
     for cmd in adjust_cmd_list:
         print('cmd={}'.format(cmd))
         os.system(cmd)
@@ -205,6 +207,9 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make, need_cef_app):
             # print('suffix={}'.format(suffix))
             obj_list = zwutil.getFileNamePaths(dp, suffix)
             for fp, name in obj_list:
+                if '/debug/' in fp:
+                    print("{} is debug,ignore".format(fp))
+                    continue
                 # shutil.copy(fp,frameworks_to_dp,follow_symlinks=False)
                 # print('libname={},fp={}'.format(name,fp))
                 LIB_NAME_LIST.append(name)
