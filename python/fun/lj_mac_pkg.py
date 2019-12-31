@@ -87,9 +87,20 @@ def copyDirList(src_dp, dst_dp, dir_name_list):
             return False
     return True
 
+def copyFile(src_fp,dst_fp):
+    if not os.path.exists(src_fp):
+        print('src_fp is not exists {}'.format(src_fp))
+        return False
 
-def adjuestFileDepends(lib_fp, lib_name, LIB_NAME_LIST):
+    if os.path.exists(dst_fp):
+        print('dst_fp is exists ,remove {}'.format(dst_fp))
+        os.system('rm -f \'{}\''.format(dst_fp))
+    shutil.copy(src_fp,dst_fp,follow_symlinks=False)
+    return os.path.exists(dst_fp)
+
+def adjuestFileDepends(lib_fp, lib_name, LIB_NAME_DICT):
     if not os.path.exists(lib_fp):
+        print('lib_fp is not exists {}'.format(lib_fp))
         return False
     os.system("install_name_tool -id \"{}\" \"{}\"".format(lib_name, lib_fp))
     res = zwutil.run_cmd("otool -L \"{}\"".format(lib_fp))
@@ -111,11 +122,12 @@ def adjuestFileDepends(lib_fp, lib_name, LIB_NAME_LIST):
             continue
         if info.lib_path == lib_name:
             continue
-        if not info.lib_name in LIB_NAME_LIST:
-            print("lib_name({}) is not in LIB_NAME_LIST lib_fp={},line={}".format(
-                info.lib_name, lib_fp, line))
+
+        
+        if not info.lib_name in LIB_NAME_DICT.keys():
+            print("lib_name({}) is not in LIB_NAME_DICT lib_fp={},line={}".format(info.lib_name, lib_fp, line))
             return False
-        new_fp = '@executable_path/../Frameworks/{}'.format(info.lib_name)
+        new_fp = LIB_NAME_DICT[info.lib_name]
         if new_fp == info.lib_path:
             continue
         change_cmd = 'install_name_tool -change \"{}\" \"{}\" \"{}\"'.format(
@@ -147,6 +159,22 @@ C_USER_LOCAT_PATH = getCMDLineContent('cd;pwd;')
 C_QTBIN_PATH = "{}/Qt5.7.1/5.7/clang_64/bin".format(C_USER_LOCAT_PATH)
 C_QT_MACDEPLOYQT_FILE_PATH = '{}/macdeployqt'.format(C_QTBIN_PATH)
 
+def lj_check_path(path):
+    if not os.path.exists(path):
+        print('path is not exists {}'.format(path))
+        return False
+    return True
+
+def lj_create_temp_path(dp):
+    if os.path.exists(dp):
+        shutil.rmtree(dp)
+    if os.path.exists(dp):
+        print('{} can not removed'.format(dp))
+        return False
+    if not createPath(dp):
+        print('{} is not exists'.format(dp))
+        return False
+    return True
 
 def runPkg(project_dp, need_codesign, need_qmake, need_make, need_cef_app):
     if not os.path.exists(project_dp):
@@ -155,6 +183,14 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make, need_cef_app):
 
     OBS_ROOT_DP = '{}/vendor/obs/mac'.format(project_dp)
     OBS_LIB_DP = '{}/vendor/obs/mac/lib/release'.format(project_dp)
+    CEF_NAME='Chromium Embedded Framework'
+    CEF_FRAMWORK_DP='{}/vendor/cef/mac/Release/{}.framework'.format(project_dp,CEF_NAME)
+    C_PAK_BUILD_BIN_FP=getCMDLineContent('which packagesbuild')
+    C_PKG_PROJECT_DIR_NAME='pkg'
+    C_PKG_PRJOECT_DP='{}/install/mac/{}'.format(project_dp,C_PKG_PROJECT_DIR_NAME)
+    app_buil_out_dp = '/Users/miaozw/work/ljlive/release/mac/32bit'
+    app_xuanlive_from_dp = '{}/{}.app'.format(app_buil_out_dp, C_BUNDLE_EG_NAME)
+    app_avatar_from_dp = '{}/{}.app'.format(app_buil_out_dp, C_BUNDLE_AVATAR_NAME)
 
     THIRD_DIR_NAME_LIST = ['log4Qt', 'qjson']
     THIRD_DIR_DP_LIST = []
@@ -163,71 +199,87 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make, need_cef_app):
         THIRD_DIR_DP_LIST.append('{}/vendor/{}'.format(project_dp, name))
 
     # T_TEMP_PATH='{}/TEMP_PKG_{}'.format(C_LJ_PROJECT_PATH,C_DATE_TIME_START.strftime('%Y%m%d%I%M%S'))
-    T_TEMP_PATH = '{}/TEMP_PKG_{}'.format(C_LJ_PROJECT_PATH,
-                                          C_DATE_TIME_START.strftime('%Y%m%d'))
-    # if os.path.exists(T_TEMP_PATH):
-    #     shutil.rmtree(T_TEMP_PATH)
-    # if os.path.exists(T_TEMP_PATH):
-    #     print('{} can not removed'.format(T_TEMP_PATH))
+    T_TEMP_PATH = '{}/TEMP_PKG_{}'.format(C_LJ_PROJECT_PATH,C_DATE_TIME_START.strftime('%Y%m%d'))
+    # if not lj_create_temp_path(T_TEMP_PATH):
     #     return False
-    # if not createPath(T_TEMP_PATH):
-    #     print('{} is not exists'.format(T_TEMP_PATH))
+    # app_xuanlive_to_dp = '{}/{}.app'.format(T_TEMP_PATH, C_BUNDLE_CN_NAME)
+    # if not copyDir(app_xuanlive_from_dp,app_xuanlive_to_dp):
+    #     return False
+    # app_xuanlive_fp='{}/Contents/MacOS/{}'.format(app_xuanlive_to_dp,C_BUNDLE_EG_NAME)
+    # if not lj_check_path(app_xuanlive_fp):
+    #     return False
+    
+    # app_avatar_to_dp = '{}/{}.app'.format(T_TEMP_PATH, C_BUNDLE_AVATAR_NAME)
+    # app_avatar_fp='{}/Contents/MacOS/{}'.format(app_avatar_to_dp,C_BUNDLE_AVATAR_NAME)
+    # app_avatar_to_fp='{}/Contents/MacOS/{}'.format(app_xuanlive_to_dp,C_BUNDLE_AVATAR_NAME)
+    # if not copyDir(app_avatar_from_dp,app_avatar_to_dp):
     #     return False
 
-    app_buil_out_dp = '/Users/miaozw/work/ljlive/release/mac/32bit'
-    app_xuanlive_from_dp = '{}/{}.app'.format(
-        app_buil_out_dp, C_BUNDLE_EG_NAME)
-    app_xuanlive_to_dp = '{}/{}.app'.format(T_TEMP_PATH, C_BUNDLE_CN_NAME)
-    app_xuanlive_fp='{}/Contents/MacOS/{}'.format(app_xuanlive_to_dp,C_BUNDLE_EG_NAME)
-    # if not copyDir(app_xuanlive_from_dp,app_xuanlive_to_dp):
-    #     print('{} is not exists'.format(app_xuanlive_to_dp))
+    # zwutil.run_cmd('macdeployqt \'{}\''.format(app_avatar_to_dp))
+    # if not copyFile(app_avatar_fp,app_avatar_to_fp):
     #     return False
 
     # zwutil.run_cmd('macdeployqt \'{}\''.format(app_xuanlive_to_dp))
-    frameworks_to_dp = '{}/Contents/Frameworks'.format(app_xuanlive_to_dp)
-    # if not os.path.exists(frameworks_to_dp):
-    #     print('{} is not exists'.format(app_xuanlive_to_dp))
+    # frameworks_to_dp = '{}/Contents/Frameworks'.format(app_xuanlive_to_dp)
+    # if not lj_check_path(frameworks_to_dp):
+    #     return False
+    
+    # CEF_FRAMWORK_TO_DP='{}/{}.framework'.format(frameworks_to_dp,CEF_NAME)
+    # if not copyDir(CEF_FRAMWORK_DP,CEF_FRAMWORK_TO_DP):
     #     return False
 
-    dir_name_list = ['data', 'ljdata']
-    # to_path='{}/Contents/{}'.format(app_xuanlive_to_dp,copy_dir_name)
-    # from_path='{}/Contents/{}'.format(app_xuanlive_to_dp,copy_dir_name)
+    # os.system('cd \'{}\';xattr -c -r *'.format(frameworks_to_dp))
+    # os.system('chmod +x \'{}\''.format(CEF_FRAMWORK_TO_DP))
+
+    # obs_plugins_name='obs-plugins'
+    # dir_name_list = ['data', 'ljdata',obs_plugins_name]
     # if not copyDirList(OBS_ROOT_DP,'{}/Contents'.format(app_xuanlive_to_dp),dir_name_list):
-    #     print('{} is error'.format('copyDirList'))
     #     return False
-    dir_name = 'obs-plugins'
-    obs_plugins_to_dp = '{}/Contents/{}'.format(app_xuanlive_to_dp, dir_name)
-    # if not copyDir('{}/{}'.format(OBS_ROOT_DP,dir_name),obs_plugins_to_dp):
-    #     print('{} is error'.format('copyDir'))
+    # obs_plugins_to_dp = '{}/Contents/{}'.format(app_xuanlive_to_dp, obs_plugins_name)
+    # if not lj_check_path(obs_plugins_to_dp):
     #     return False
-    LIB_NAME_LIST = []
-    for dp in THIRD_DIR_DP_LIST:
-        # print('dp={}'.format(dp))
-        for suffix in C_LIB_SUFFIX_LIST:
-            # print('suffix={}'.format(suffix))
-            obj_list = zwutil.getFileNamePaths(dp, suffix)
-            for fp, name in obj_list:
-                if '/debug/' in fp:
-                    print("{} is debug,ignore".format(fp))
-                    continue
-                # shutil.copy(fp,frameworks_to_dp,follow_symlinks=False)
-                # print('libname={},fp={}'.format(name,fp))
-                LIB_NAME_LIST.append(name)
+    # obs_plugins_list = zwutil.getFileNamePaths(obs_plugins_to_dp,"")
+    # LIB_NAME_DICT = {}
+    # LIB_NAME_DICT[CEF_NAME]='@executable_path/../Frameworks/{}.framework/{}'.format(CEF_NAME,CEF_NAME)
+    # for dp in THIRD_DIR_DP_LIST:
+    #     for suffix in C_LIB_SUFFIX_LIST:
+    #         obj_list = zwutil.getFileNamePaths(dp, suffix)
+    #         for fp, name in obj_list:
+    #             if '/debug/' in fp:
+    #                 print("{} is debug,ignore".format(fp))
+    #                 continue
+    #             shutil.copy(fp,frameworks_to_dp,follow_symlinks=False)
+    #             LIB_NAME_DICT[name]='@executable_path/../Frameworks/{}'.format(name)
 
-    for name in LIB_NAME_LIST:
-        lib_fp = '{}/{}'.format(frameworks_to_dp, name)
-        if not adjuestFileDepends(lib_fp,name,LIB_NAME_LIST):
-            return False
+    # for name in LIB_NAME_DICT.keys(): 
+    #     if name == CEF_NAME:
+    #         continue
+    #     lib_fp = '{}/{}'.format(frameworks_to_dp, name)
+    #     if not adjuestFileDepends(lib_fp,name,LIB_NAME_DICT):
+    #         return False
 
-    if not adjuestFileDepends(app_xuanlive_fp,C_BUNDLE_EG_NAME,LIB_NAME_LIST):
-        return False
+    # for lib_fp,name in obs_plugins_list:
+    #     if not adjuestFileDepends(lib_fp,name,LIB_NAME_DICT):
+    #         return False
+
+    # if not adjuestFileDepends(app_xuanlive_fp,C_BUNDLE_EG_NAME,LIB_NAME_DICT):
+    #     return False
+    # if not adjuestFileDepends(app_avatar_to_fp,C_BUNDLE_AVATAR_NAME,LIB_NAME_DICT):
+    #     return False
+
+    
+    # C_PKG_PRJOECT_TO_DP='{}/{}'.format(T_TEMP_PATH,C_PKG_PROJECT_DIR_NAME)
+    # if not copyDir(C_PKG_PRJOECT_DP,C_PKG_PRJOECT_TO_DP):
+    #     return False
+
+    C_PKG_PROJECT_FN = '{}/{}.pkgproj'.format(C_PKG_PRJOECT_TO_DP,C_BUNDLE_EG_NAME)
+    os.system('{} --verbose --identity \'{}\' \'{}\''.format(C_PAK_BUILD_BIN_FP,C_PKG_INSTALL_ID,C_PKG_PROJECT_FN))
     return True
 
 
 def test():
-    test_v = '/System/Library/Frameworks/Cocoa.framework/Versions/A/Cocoa (compatibility version 1.0.0, current version 22.0.0)'
-    res = parse_otool_line(test_v)
-    print('res={}'.format(res))
+    C_PAK_BIN_FILE_PATH=getCMDLineContent('which packagesbuild')
+    print('res={}'.format(C_PAK_BIN_FILE_PATH))
     # THIRD_DIR_NAME_LIST=['log4Qt','qjson']
     # THIRD_DIR_DP_LIST=[]
     # for name in THIRD_DIR_NAME_LIST:

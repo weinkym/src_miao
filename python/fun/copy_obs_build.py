@@ -120,7 +120,7 @@ def copy_build_lib(build_dp,to_root_dp,lib_subffix_list,need_adjuest=False):
             return False
     return True
 
-g_lib_subffix_list=[".so",".dylib",".a"]
+g_lib_subffix_list=[".so",".dylib",".a","obs-browser-page"]
 build_dp="/Users/miaozw/Documents/TEMP/build-obs"
 to_root_dp="/Users/miaozw/work/ljlive/vendor/obs/mac"
 copy_build_lib(build_dp,to_root_dp,g_lib_subffix_list,True)

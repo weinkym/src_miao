@@ -25,7 +25,17 @@ def getPathFileNameInfo(path):
     (file_path,file_name) = os.path.split(path)
     (shot_name,suffix) = os.path.splitext(file_name)
     return file_path,file_name,shot_name,suffix
-    
+
+def getDirPaths(path,suffix):
+    objList=[]
+    for parent,dirnames,filenames in os.walk(path,  topdown=False):
+        for name in dirnames:
+            if name.endswith(suffix):
+                dp=os.path.join(parent,name)
+                objList.append(dp)
+                # print(dp)
+    return objList
+
 def run_cmd(cmd):
     sub = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     sub.wait()
