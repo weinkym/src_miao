@@ -100,7 +100,7 @@ def getVersionInfo(version_fp):
                 v_patch = getKeyNumber(line,'C_VERSION_PATCH')
             if 'C_VERSION_BUILD' in line:
                 v_build = getKeyNumber(line,'C_VERSION_BUILD')
-    return (v_major,v_minor,v_patch,v_build)
+    return '{}.{}.{}.{}'.format(v_major,v_minor,v_patch,v_build)
 
 def createPath(dp):
     if not os.path.exists(dp):
@@ -110,7 +110,10 @@ def createPath(dp):
 def removeDir(dp):
     if os.path.exists(dp):
         shutil.rmtree(dp)
-    return os.path.exists(dp)
+    if os.path.exists(dp):
+        print('remove error path={}'.format(dp))
+        return False
+    return True
 
 
 def copyDir(src_dp, dst_dp):
@@ -262,113 +265,158 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make,need_update,out_dp,t
         print('{} is not exists'.format(project_dp))
         return False
 
+    print('log line={}'.format(sys._getframe().f_lineno))
+    T_TEMP_PATH = temp_cacha_dp
+    # T_TEMP_PATH = '{}/TEMP_PKG_{}'.format(C_LJ_PROJECT_PATH,C_DATE_TIME_START.strftime('%Y%m%d'))
+    if not lj_create_temp_path(T_TEMP_PATH):
+        return False
+
+    print('log line={}'.format(sys._getframe().f_lineno))
+    check_path_list=[]
     # if need_update:
     #     updateCode(project_dp)
     OBS_ROOT_DP = '{}/vendor/obs/mac'.format(project_dp)
     OBS_LIB_DP = '{}/vendor/obs/mac/lib/release'.format(project_dp)
     CEF_NAME='Chromium Embedded Framework'
     CEF_FRAMWORK_DP='{}/vendor/cef/mac/Release/{}.framework'.format(project_dp,CEF_NAME)
-    C_PAK_BUILD_BIN_FP=getCMDLineContent('which packagesbuild')
     C_PKG_PROJECT_DIR_NAME='pkg'
     C_PKG_PRJOECT_DP='{}/install/mac/{}'.format(project_dp,C_PKG_PROJECT_DIR_NAME)
-
-    
-    app_buil_out_dp = '{}/release/mac/32bit'.format(project_dp)
-    app_xuanlive_from_dp = '{}/{}.app'.format(app_buil_out_dp, C_BUNDLE_EG_NAME)
-    app_avatar_from_dp = '{}/{}.app'.format(app_buil_out_dp, C_BUNDLE_AVATAR_NAME)
-    if need_make:
-        if not removeDir(app_xuanlive_from_dp) or not removeDir(app_avatar_from_dp):
-            return False
-        xuanlive_pro_fp='{}/ljobs/ljobs.pro'.format(project_dp)
-        avatar_pro_fp='{}/ljobs/agora/{}.pro'.format(project_dp,C_BUNDLE_AVATAR_NAME)
-        if not makeCode(xuanlive_pro_fp,need_qmake) or not makeCode(avatar_pro_fp,need_qmake):
-            return False
+    C_VERSION_FP='{}/ljobs/base/cversion_mac.cpp'.format(project_dp)
 
     THIRD_DIR_NAME_LIST = ['log4Qt', 'qjson']
     THIRD_DIR_DP_LIST = []
     THIRD_DIR_DP_LIST.append(OBS_LIB_DP)
     for name in THIRD_DIR_NAME_LIST:
-        THIRD_DIR_DP_LIST.append('{}/vendor/{}'.format(project_dp, name))
+        dp='{}/vendor/{}'.format(project_dp, name)
+        THIRD_DIR_DP_LIST.append(dp)
+        check_path_list.append(dp)
 
-    # T_TEMP_PATH='{}/TEMP_PKG_{}'.format(C_LJ_PROJECT_PATH,C_DATE_TIME_START.strftime('%Y%m%d%I%M%S'))
-    T_TEMP_PATH = '{}/TEMP_PKG_{}'.format(C_LJ_PROJECT_PATH,C_DATE_TIME_START.strftime('%Y%m%d'))
-    # if not lj_create_temp_path(T_TEMP_PATH):
-    #     return False
-    # app_xuanlive_to_dp = '{}/{}.app'.format(T_TEMP_PATH, C_BUNDLE_CN_NAME)
-    # if not copyDir(app_xuanlive_from_dp,app_xuanlive_to_dp):
-    #     return False
-    # app_xuanlive_fp='{}/Contents/MacOS/{}'.format(app_xuanlive_to_dp,C_BUNDLE_EG_NAME)
-    # if not lj_check_path(app_xuanlive_fp):
-    #     return False
-    
-    # app_avatar_to_dp = '{}/{}.app'.format(T_TEMP_PATH, C_BUNDLE_AVATAR_NAME)
-    # app_avatar_fp='{}/Contents/MacOS/{}'.format(app_avatar_to_dp,C_BUNDLE_AVATAR_NAME)
-    # app_avatar_to_fp='{}/Contents/MacOS/{}'.format(app_xuanlive_to_dp,C_BUNDLE_AVATAR_NAME)
-    # if not copyDir(app_avatar_from_dp,app_avatar_to_dp):
-    #     return False
+    check_path_list.append(OBS_ROOT_DP)
+    check_path_list.append(OBS_LIB_DP)
+    check_path_list.append(CEF_FRAMWORK_DP)
+    check_path_list.append(C_PKG_PRJOECT_DP)
+    check_path_list.append(C_VERSION_FP)
+    C_BIN_NAME_LIST=['packagesbuild','macdeployqt','qmake','make']
+    C_VERSION_INFO=getVersionInfo(C_VERSION_FP)
+    print('C_VERSION_INFO={}'.format(C_VERSION_INFO))
 
-    # zwutil.run_cmd('macdeployqt \'{}\''.format(app_avatar_to_dp))
-    # if not copyFile(app_avatar_fp,app_avatar_to_fp):
-    #     return False
+    for name in C_BIN_NAME_LIST:
+        fp=getCMDLineContent('which {}'.format(name))
+        check_path_list.append(fp)
+    for dp in check_path_list:
+        if not lj_check_path(dp):
+            return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    app_buil_out_dp = '{}/release/mac/32bit'.format(project_dp)
+    app_xuanlive_from_dp = '{}/{}.app'.format(app_buil_out_dp, C_BUNDLE_EG_NAME)
+    app_avatar_from_dp = '{}/{}.app'.format(app_buil_out_dp, C_BUNDLE_AVATAR_NAME)
+    if need_make and False:
+        # if not removeDir(app_xuanlive_from_dp) or not removeDir(app_avatar_from_dp):
+        #     return False
+        xuanlive_pro_fp='{}/ljobs/ljobs.pro'.format(project_dp)
+        avatar_pro_fp='{}/ljobs/agora/{}.pro'.format(project_dp,C_BUNDLE_AVATAR_NAME)
+        # makeCode(avatar_pro_fp,need_qmake)
+        if not makeCode(xuanlive_pro_fp,need_qmake) or not makeCode(avatar_pro_fp,need_qmake):
+            return False
+            
+    print('log line={}'.format(sys._getframe().f_lineno))
+    check_path_list=[app_xuanlive_from_dp,app_avatar_from_dp]
+    for dp in check_path_list:
+        if not lj_check_path(dp):
+            return False
+    print('log line={}'.format(sys._getframe().f_lineno))
 
-    # zwutil.run_cmd('macdeployqt \'{}\''.format(app_xuanlive_to_dp))
-    # frameworks_to_dp = '{}/Contents/Frameworks'.format(app_xuanlive_to_dp)
-    # if not lj_check_path(frameworks_to_dp):
-    #     return False
-    
-    # CEF_FRAMWORK_TO_DP='{}/{}.framework'.format(frameworks_to_dp,CEF_NAME)
-    # if not copyDir(CEF_FRAMWORK_DP,CEF_FRAMWORK_TO_DP):
-    #     return False
+    app_xuanlive_to_dp = '{}/{}.app'.format(T_TEMP_PATH, C_BUNDLE_CN_NAME)
+    if not copyDir(app_xuanlive_from_dp,app_xuanlive_to_dp):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    app_xuanlive_to_fp='{}/Contents/MacOS/{}'.format(app_xuanlive_to_dp,C_BUNDLE_EG_NAME)
+    if not lj_check_path(app_xuanlive_to_fp):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    app_avatar_to_dp = '{}/{}.app'.format(T_TEMP_PATH, C_BUNDLE_AVATAR_NAME)
+    app_avatar_from_dp = '{}/{}.app'.format(app_buil_out_dp, C_BUNDLE_AVATAR_NAME)
+    app_avatar_to_fp='{}/Contents/MacOS/{}'.format(app_xuanlive_to_dp,C_BUNDLE_AVATAR_NAME)
+    print('log line={}'.format(sys._getframe().f_lineno))
+    if not copyDir(app_avatar_from_dp,app_avatar_to_dp):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    app_avatar_from_fp='{}/Contents/MacOS/{}'.format(app_avatar_to_dp,C_BUNDLE_AVATAR_NAME)
+    if not lj_check_path(app_avatar_from_fp):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    zwutil.run_cmd('macdeployqt \'{}\''.format(app_avatar_to_dp))
+    if not copyFile(app_avatar_from_fp,app_avatar_to_fp):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    zwutil.run_cmd('macdeployqt \'{}\''.format(app_xuanlive_to_dp))
+    frameworks_to_dp = '{}/Contents/Frameworks'.format(app_xuanlive_to_dp)
+    if not lj_check_path(frameworks_to_dp):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    CEF_FRAMWORK_TO_DP='{}/{}.framework'.format(frameworks_to_dp,CEF_NAME)
+    if not copyDir(CEF_FRAMWORK_DP,CEF_FRAMWORK_TO_DP):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    os.system('cd \'{}\';xattr -c -r *'.format(frameworks_to_dp))
+    os.system('chmod +x \'{}\''.format(CEF_FRAMWORK_TO_DP))
 
-    # os.system('cd \'{}\';xattr -c -r *'.format(frameworks_to_dp))
-    # os.system('chmod +x \'{}\''.format(CEF_FRAMWORK_TO_DP))
+    obs_plugins_name='obs-plugins'
+    dir_name_list = ['data', 'ljdata',obs_plugins_name]
+    if not copyDirList(OBS_ROOT_DP,'{}/Contents'.format(app_xuanlive_to_dp),dir_name_list):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    obs_plugins_to_dp = '{}/Contents/{}'.format(app_xuanlive_to_dp, obs_plugins_name)
+    if not lj_check_path(obs_plugins_to_dp):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    obs_plugins_list = zwutil.getFileNamePaths(obs_plugins_to_dp,"")
+    LIB_NAME_DICT = {}
+    LIB_NAME_DICT[CEF_NAME]='@executable_path/../Frameworks/{}.framework/{}'.format(CEF_NAME,CEF_NAME)
+    for dp in THIRD_DIR_DP_LIST:
+        for suffix in C_LIB_SUFFIX_LIST:
+            obj_list = zwutil.getFileNamePaths(dp, suffix)
+            for fp, name in obj_list:
+                if '/debug/' in fp:
+                    print("{} is debug,ignore".format(fp))
+                    continue
+                shutil.copy(fp,frameworks_to_dp,follow_symlinks=False)
+                LIB_NAME_DICT[name]='@executable_path/../Frameworks/{}'.format(name)
 
-    # obs_plugins_name='obs-plugins'
-    # dir_name_list = ['data', 'ljdata',obs_plugins_name]
-    # if not copyDirList(OBS_ROOT_DP,'{}/Contents'.format(app_xuanlive_to_dp),dir_name_list):
-    #     return False
-    # obs_plugins_to_dp = '{}/Contents/{}'.format(app_xuanlive_to_dp, obs_plugins_name)
-    # if not lj_check_path(obs_plugins_to_dp):
-    #     return False
-    # obs_plugins_list = zwutil.getFileNamePaths(obs_plugins_to_dp,"")
-    # LIB_NAME_DICT = {}
-    # LIB_NAME_DICT[CEF_NAME]='@executable_path/../Frameworks/{}.framework/{}'.format(CEF_NAME,CEF_NAME)
-    # for dp in THIRD_DIR_DP_LIST:
-    #     for suffix in C_LIB_SUFFIX_LIST:
-    #         obj_list = zwutil.getFileNamePaths(dp, suffix)
-    #         for fp, name in obj_list:
-    #             if '/debug/' in fp:
-    #                 print("{} is debug,ignore".format(fp))
-    #                 continue
-    #             shutil.copy(fp,frameworks_to_dp,follow_symlinks=False)
-    #             LIB_NAME_DICT[name]='@executable_path/../Frameworks/{}'.format(name)
-
-    # for name in LIB_NAME_DICT.keys(): 
-    #     if name == CEF_NAME:
-    #         continue
-    #     lib_fp = '{}/{}'.format(frameworks_to_dp, name)
-    #     if not adjuestFileDepends(lib_fp,name,LIB_NAME_DICT):
-    #         return False
-
-    # for lib_fp,name in obs_plugins_list:
-    #     if not adjuestFileDepends(lib_fp,name,LIB_NAME_DICT):
-    #         return False
-
-    # if not adjuestFileDepends(app_xuanlive_fp,C_BUNDLE_EG_NAME,LIB_NAME_DICT):
-    #     return False
-    # if not adjuestFileDepends(app_avatar_to_fp,C_BUNDLE_AVATAR_NAME,LIB_NAME_DICT):
-    #     return False
-
+    print('log line={}'.format(sys._getframe().f_lineno))
+    for name in LIB_NAME_DICT.keys(): 
+        if name == CEF_NAME:
+            continue
+        lib_fp = '{}/{}'.format(frameworks_to_dp, name)
+        if not adjuestFileDepends(lib_fp,name,LIB_NAME_DICT):
+            return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    for lib_fp,name in obs_plugins_list:
+        if not adjuestFileDepends(lib_fp,name,LIB_NAME_DICT):
+            return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    if not adjuestFileDepends(app_xuanlive_to_fp,C_BUNDLE_EG_NAME,LIB_NAME_DICT):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    if not adjuestFileDepends(app_avatar_to_fp,C_BUNDLE_AVATAR_NAME,LIB_NAME_DICT):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
     
     C_PKG_PRJOECT_TO_DP='{}/{}'.format(T_TEMP_PATH,C_PKG_PROJECT_DIR_NAME)
-    # if not copyDir(C_PKG_PRJOECT_DP,C_PKG_PRJOECT_TO_DP):
-    #     return False
-
+    if not copyDir(C_PKG_PRJOECT_DP,C_PKG_PRJOECT_TO_DP):
+        return False
+    print('log line={}'.format(sys._getframe().f_lineno))
     C_PKG_PROJECT_FN = '{}/{}.pkgproj'.format(C_PKG_PRJOECT_TO_DP,C_BUNDLE_EG_NAME)
-    os.system('{} --verbose --identity \'{}\' \'{}\''.format(C_PAK_BUILD_BIN_FP,C_PKG_INSTALL_ID,C_PKG_PROJECT_FN))
+    os.system('{} --verbose --identity \'{}\' \'{}\''.format('packagesbuild',C_PKG_INSTALL_ID,C_PKG_PROJECT_FN))
     pkg_fp='{}/build/{}.pkg'.format(C_PKG_PRJOECT_TO_DP,C_BUNDLE_EG_NAME)
     if not lj_check_path(pkg_fp):
         return False
+    print('log line={}'.format(sys._getframe().f_lineno))
+    pkg_to_fp='{}/{}_{}.pkg'.format(out_dp,C_BUNDLE_EG_NAME,C_VERSION_INFO)
+    shutil.move(pkg_fp,pkg_to_fp)
+    if not lj_check_path(pkg_to_fp):
+        return False
+    os.system('cd \'{}\';open .'.format(out_dp))
     return True
 
 
@@ -389,11 +437,12 @@ need_codesign = True
 need_qmake = True
 need_make = True
 need_cef_app = True
+# cacha_dp='/Users/miaozw/Documents/TEMP/xuan_pkg'
 res = runPkg(project_dp, need_codesign=True, 
 need_qmake=True, need_make=True,need_update=True,out_dp='/Users/miaozw/Documents/release',
 temp_cacha_dp='/Users/miaozw/Documents/TEMP/xuan_pkg')
 # res = updateCode('/Users/miaozw/work/ljlive22')
-res = getVersionInfo('/Users/miaozw/work/ljlive22/ljobs/base/cversion_mac.cpp')
+# res = getVersionInfo('/Users/miaozw/work/ljlive22/ljobs/base/cversion_mac.cpp')
 # res = makeCode('/Users/miaozw/work/ljlive22/ljobs/ljobs.pro')
 print('res={}'.format(res))
 # test()
