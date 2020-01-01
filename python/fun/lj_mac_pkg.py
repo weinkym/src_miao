@@ -18,6 +18,11 @@ class LineInfo:
     lib_name = ''
     lib_path = ''
 
+def outTimeString(pre_str):
+    print('{} {}'.format(pre_str,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+
+def outConsuming(dt):
+    print('===={}ms'.format((datetime.datetime.now() - dt).microseconds / 1000.0))
 
 def is_system_lib_path(lib_fp):
     for valid in g_check_line_valid_list:
@@ -57,10 +62,54 @@ def check_otool_line(line):
 def getCMDLineContent(cmd, row=0):
     return zwutil.run_cmd(cmd).split('\n')[row]
 
+def getKeyNumber(line,key):
+    aduest_line = line.lstrip().replace(' ','')
+    print('aduest_line={}'.format(aduest_line))
+    res=''
+    index = aduest_line.find(key)
+    if index > 0:
+        i = index+1+len(key)
+        while i < len(aduest_line):
+            c=aduest_line[i]
+            # print('c={}'.format(c))
+            if c == ';':
+                break
+            res = res+c
+            i = i + 1
+    return res
+                
+
+
+def getVersionInfo(version_fp):
+    if not os.path.exists(version_fp):
+        return False
+    v_major=''
+    v_minor=''
+    v_patch=''
+    v_build=''
+    with open(version_fp, 'r') as f:
+        line_list = f.readlines()
+        print(line_list)
+        
+        for line in line_list:
+            if 'C_VERSION_MAJOR' in line:
+                v_major = getKeyNumber(line,'C_VERSION_MAJOR')
+            if 'C_VERSION_MINOR' in line:
+                v_minor = getKeyNumber(line,'C_VERSION_MINOR')
+            if 'C_VERSION_PATCH' in line:
+                v_patch = getKeyNumber(line,'C_VERSION_PATCH')
+            if 'C_VERSION_BUILD' in line:
+                v_build = getKeyNumber(line,'C_VERSION_BUILD')
+    return (v_major,v_minor,v_patch,v_build)
 
 def createPath(dp):
     if not os.path.exists(dp):
         os.makedirs(dp)
+    return os.path.exists(dp)
+
+def removeDir(dp):
+    if os.path.exists(dp):
+        shutil.rmtree(dp)
     return os.path.exists(dp)
 
 
@@ -176,11 +225,45 @@ def lj_create_temp_path(dp):
         return False
     return True
 
-def runPkg(project_dp, need_codesign, need_qmake, need_make, need_cef_app):
+def updateCode(project_dp):
+    if not lj_check_path(project_dp):
+        return False
+    # 用HEAD表示当前版本，上一个版本就是HEAD^，上上一个版本就是HEAD^^，当然往上100个版本写100个^比较容易数不过来，所以写成HEAD~100。
+    os.system('cd \'{}\';git checkout -b dev;git reset --hard HEAD;git pull origin dev'.format(project_dp))
+    return True
+
+def makeCode(pro_fp,need_qmake):
+    if not lj_check_path(pro_fp):
+        return False
+    info = zwutil.getPathFileNameInfo(pro_fp)
+    pro_dp = info[0]
+    pro_name = info[1]
+    pro_subffix = info[3]
+    print(info)
+    if not lj_check_path(pro_dp):
+        return False
+    if pro_subffix != '.pro':
+        return False
+
+    # os.system('qmake \'{}\' -spec macx-clang CONFIG+=x86_64'.format(pro_fp))
+    start_dt=datetime.datetime.now()
+    outTimeString('make start')
+    if need_qmake:
+        os.system('cd \'{}\';make clean;qmake \'{}\' -spec macx-clang CONFIG+=x86_64;make clean;make -j 4'.format(pro_dp,pro_name))
+    else:
+        os.system('cd \'{}\';make -j 4'.format(pro_dp))
+    outTimeString('make end')
+    outConsuming(start_dt)
+    return True
+
+
+def runPkg(project_dp, need_codesign, need_qmake, need_make,need_update,out_dp,temp_cacha_dp):
     if not os.path.exists(project_dp):
         print('{} is not exists'.format(project_dp))
         return False
 
+    # if need_update:
+    #     updateCode(project_dp)
     OBS_ROOT_DP = '{}/vendor/obs/mac'.format(project_dp)
     OBS_LIB_DP = '{}/vendor/obs/mac/lib/release'.format(project_dp)
     CEF_NAME='Chromium Embedded Framework'
@@ -188,9 +271,18 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make, need_cef_app):
     C_PAK_BUILD_BIN_FP=getCMDLineContent('which packagesbuild')
     C_PKG_PROJECT_DIR_NAME='pkg'
     C_PKG_PRJOECT_DP='{}/install/mac/{}'.format(project_dp,C_PKG_PROJECT_DIR_NAME)
-    app_buil_out_dp = '/Users/miaozw/work/ljlive/release/mac/32bit'
+
+    
+    app_buil_out_dp = '{}/release/mac/32bit'.format(project_dp)
     app_xuanlive_from_dp = '{}/{}.app'.format(app_buil_out_dp, C_BUNDLE_EG_NAME)
     app_avatar_from_dp = '{}/{}.app'.format(app_buil_out_dp, C_BUNDLE_AVATAR_NAME)
+    if need_make:
+        if not removeDir(app_xuanlive_from_dp) or not removeDir(app_avatar_from_dp):
+            return False
+        xuanlive_pro_fp='{}/ljobs/ljobs.pro'.format(project_dp)
+        avatar_pro_fp='{}/ljobs/agora/{}.pro'.format(project_dp,C_BUNDLE_AVATAR_NAME)
+        if not makeCode(xuanlive_pro_fp,need_qmake) or not makeCode(avatar_pro_fp,need_qmake):
+            return False
 
     THIRD_DIR_NAME_LIST = ['log4Qt', 'qjson']
     THIRD_DIR_DP_LIST = []
@@ -268,25 +360,24 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make, need_cef_app):
     #     return False
 
     
-    # C_PKG_PRJOECT_TO_DP='{}/{}'.format(T_TEMP_PATH,C_PKG_PROJECT_DIR_NAME)
+    C_PKG_PRJOECT_TO_DP='{}/{}'.format(T_TEMP_PATH,C_PKG_PROJECT_DIR_NAME)
     # if not copyDir(C_PKG_PRJOECT_DP,C_PKG_PRJOECT_TO_DP):
     #     return False
 
     C_PKG_PROJECT_FN = '{}/{}.pkgproj'.format(C_PKG_PRJOECT_TO_DP,C_BUNDLE_EG_NAME)
     os.system('{} --verbose --identity \'{}\' \'{}\''.format(C_PAK_BUILD_BIN_FP,C_PKG_INSTALL_ID,C_PKG_PROJECT_FN))
+    pkg_fp='{}/build/{}.pkg'.format(C_PKG_PRJOECT_TO_DP,C_BUNDLE_EG_NAME)
+    if not lj_check_path(pkg_fp):
+        return False
     return True
 
 
 def test():
-    C_PAK_BIN_FILE_PATH=getCMDLineContent('which packagesbuild')
-    print('res={}'.format(C_PAK_BIN_FILE_PATH))
-    # THIRD_DIR_NAME_LIST=['log4Qt','qjson']
-    # THIRD_DIR_DP_LIST=[]
-    # for name in THIRD_DIR_NAME_LIST:
-    #     THIRD_DIR_DP_LIST.append('{}/vendor/{}'.format(project_dp,name))
-    # for dp in THIRD_DIR_DP_LIST:
-    #     obj_list = zwutil.getFileNamePaths(dp,'.dylib')
-    #     print(obj_list)
+    starttime = datetime.datetime.now()
+    #long running
+    endtime = datetime.datetime.now()
+    res = (endtime - starttime).microseconds
+    print(res)
 
 # a=1
 # test()
@@ -298,6 +389,11 @@ need_codesign = True
 need_qmake = True
 need_make = True
 need_cef_app = True
-res = runPkg(project_dp, need_codesign, need_qmake, need_make, need_cef_app)
-# print('res={}'.format(res))
+res = runPkg(project_dp, need_codesign=True, 
+need_qmake=True, need_make=True,need_update=True,out_dp='/Users/miaozw/Documents/release',
+temp_cacha_dp='/Users/miaozw/Documents/TEMP/xuan_pkg')
+# res = updateCode('/Users/miaozw/work/ljlive22')
+res = getVersionInfo('/Users/miaozw/work/ljlive22/ljobs/base/cversion_mac.cpp')
+# res = makeCode('/Users/miaozw/work/ljlive22/ljobs/ljobs.pro')
+print('res={}'.format(res))
 # test()
