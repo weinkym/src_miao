@@ -50,6 +50,7 @@ def getDirPaths(path,suffix):
     return objList
 
 def run_cmd_out(cmd):
+    print('cmd={}'.format(cmd))
     popen = subprocess.Popen(cmd,
                          stdout = subprocess.PIPE,
                          stderr = subprocess.PIPE,
@@ -166,6 +167,7 @@ def createPath(dp):
 
 def removeDir(dp):
     if os.path.exists(dp):
+        # run_cmd_out('del /f /s /q \"{}\\*\"'.format(dp))
         shutil.rmtree(dp)
     if os.path.exists(dp):
         print('remove error path={}'.format(dp))
@@ -180,11 +182,11 @@ def removeFile(fp):
         return False
     return True
 
-def copyDir(src_dp, dst_dp):
+def copyDir(src_dp, dst_dp,need_remove=True):
     if not os.path.exists(src_dp):
         print('src_dp is not exists {}'.format(src_dp))
         return False
-    if os.path.exists(dst_dp):
+    if os.path.exists(dst_dp) and need_remove:
         print('dst_dp is exists ,remove {}'.format(dst_dp))
         shutil.rmtree(dst_dp)
 
@@ -194,10 +196,21 @@ def copyDir(src_dp, dst_dp):
         return False
     return True
 
+def copyDirFiles(src_dp, dst_dp):
+    if not os.path.exists(src_dp):
+        print('src_dp is not exists {}'.format(src_dp))
+        return False
+    # if not os.path.exists(dst_dp):
+    #     print('dst_dp is not exists {}'.format(dst_dp))
+    #     return False
+    cmd = 'xcopy \"{}\\*.*\" \"{}\\\" /s/e/y'.format(src_dp,dst_dp)
+    print('cmd={}'.format(cmd))
+    run_cmd_out(cmd)
+    return True
 
-def copyDirList(src_dp, dst_dp, dir_name_list):
+def copyDirList(src_dp, dst_dp, dir_name_list,need_remove=True):
     for name in dir_name_list:
-        if not copyDir('{}\\{}'.format(src_dp, name), '{}\\{}'.format(dst_dp, name)):
+        if not copyDirFiles('{}\\{}'.format(src_dp, name), '{}\\{}'.format(dst_dp, name)):
             print('copy is error name={},src_dp={},dst_dp={}'.format(
                 name, src_dp, dst_dp))
             return False
@@ -213,6 +226,19 @@ def copyFile(src_fp,dst_fp):
         os.remove(dst_fp)
     shutil.copy(src_fp,dst_fp,follow_symlinks=False)
     return os.path.exists(dst_fp)
+
+def copyFileToDir(fp,dp):
+    if not os.path.exists(fp):
+        print('fp is not exists {}'.format(fp))
+        return False
+    if not os.path.exists(dp):
+        print('dp is not exists {}'.format(dp))
+        return False
+
+    cmd = 'xcopy \"{}\" \"{}\" /s/e/y'.format(fp,dp)
+    print('cmd={}'.format(cmd))
+    run_cmd_out(cmd)
+    return True
 
 def adjuestFileDepends(lib_fp, lib_name, LIB_NAME_DICT):
     if not os.path.exists(lib_fp):
@@ -283,7 +309,8 @@ def lj_check_path(path):
 
 def lj_create_temp_path(dp):
     if os.path.exists(dp):
-        shutil.rmtree(dp)
+        if not removeDir(dp):
+            return False
     if os.path.exists(dp):
         print('{} can not removed'.format(dp))
         return False
@@ -345,18 +372,22 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make,need_update,out_dp,t
     print('log line={}'.format(sys._getframe().f_lineno))
     T_TEMP_PATH = temp_cacha_dp
     # T_TEMP_PATH = '{}\\TEMP_PKG_{}'.format(C_LJ_PROJECT_PATH,C_DATE_TIME_START.strftime('%Y%m%d'))
-    # if not lj_create_temp_path(T_TEMP_PATH):
-        # return False
+    if not lj_create_temp_path(T_TEMP_PATH):
+        return False
     T_TEMP_BIN_DP='{}\\win\\32bit'.format(T_TEMP_PATH)
-    # if not lj_create_temp_path(T_TEMP_BIN_DP):
-        # return False
+    if not lj_create_temp_path(T_TEMP_BIN_DP):
+        return False
 
     if need_update:
         updateCode(project_dp)
+
+    VENDOR_ROOT_DP = '{}\\vendor'.format(project_dp)
     OBS_ROOT_DP = '{}\\vendor\\obs\\win'.format(project_dp)
     OBS_LIB_DP = '{}\\vendor\\obs\\win\\lib\\release'.format(project_dp)
+    OBS_DEPENDS_LIB_DP = '{}\\vendor\\obs\\win\\dependencies2015\\win32'.format(project_dp)
     CEF_ROOT_DP='{}\\vendor\\cef\\win'.format(project_dp)
     CEF_RELEASE_DP='{}\\vendor\\cef\\win\\Release'.format(project_dp)
+    CEF_RESOURCES_DP='{}\\vendor\\cef\\win\\Resources'.format(project_dp)
     C_VERSION_FP='{}\\ljobs\\base\\cversion_win.cpp'.format(project_dp)
 
     BASE_LIB_DP='{}\\install\\win\\baselib'.format(project_dp)
@@ -368,9 +399,11 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make,need_update,out_dp,t
     SIGN_TOOP_FP="{}\\install\\win\\codesign\\tools\\SignBatch\\tool\\signtool.exe".format(project_dp)
 
 
+
     THIRD_DIR_NAME_LIST = ['log4Qt', 'qjson']
     THIRD_DIR_DP_LIST = []
     THIRD_DIR_DP_LIST.append(OBS_LIB_DP)
+    THIRD_DIR_DP_LIST.append(OBS_DEPENDS_LIB_DP)
     for name in THIRD_DIR_NAME_LIST:
         dp='{}\\vendor\\{}'.format(project_dp, name)
         THIRD_DIR_DP_LIST.append(dp)
@@ -378,8 +411,10 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make,need_update,out_dp,t
 
     check_path_list.append(OBS_ROOT_DP)
     check_path_list.append(OBS_LIB_DP)
+    check_path_list.append(VENDOR_ROOT_DP)
     check_path_list.append(CEF_ROOT_DP)
     check_path_list.append(CEF_RELEASE_DP)
+    check_path_list.append(CEF_RESOURCES_DP)
     check_path_list.append(C_VERSION_FP)
     check_path_list.append(NSIS_SCRIPT_FP)
     check_path_list.append(NSIS_BIN_FP)
@@ -422,28 +457,52 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make,need_update,out_dp,t
     if not copyFile(app_avatar_from_fp,app_avatar_to_fp):
         return False
   
+    print('log line={}'.format(sys._getframe().f_lineno))
     NSIS_SCRIPT_TO_FP = '{}/{}'.format(T_TEMP_PATH,NSIS_FILE_NAME)
-    if not copyFile(NSIS_SCRIPT_FP,NSIS_SCRIPT_TO_FP):
+    if not copyFileToDir(NSIS_SCRIPT_FP,T_TEMP_PATH):
         return False
     dir_name_list = ['data', 'ljdata','obs-plugins']
-    # if not copyDirList(OBS_ROOT_DP,T_TEMP_PATH,dir_name_list):
-    #     return False
+    obs_plugins_to_dp='{}\\{}\\32bit'.format(T_TEMP_PATH,'obs-plugins')
+    if not copyDirList(OBS_ROOT_DP,T_TEMP_PATH,dir_name_list):
+        return False
 
-    # if not copyDir(BASE_LIB_DP,T_TEMP_BIN_DP):
-    #      return False
+    if not copyDirFiles(BASE_LIB_DP,T_TEMP_BIN_DP):
+         return False
 
+    file_list=getFileNamePaths(VENDOR_ROOT_DP,'.dll')
+    ignore_list=['debug','Debug','\\cef\\','dependencies2013','win64','obs-plugins']
+    copy_name_dict={}
+    for fp,name in file_list:
+        ignore=False
+        for key in ignore_list:
+            if key in fp:
+                ignore=True
+                break
+        if ignore:
+            print('ignore debug lib {}'.format(fp))
+            continue
+        if name in copy_name_dict:
+            print('name is repeat,{} {}'.format(fp,copy_name_dict[name]))
+            return False
+        copy_name_dict[name] = fp
+        if not copyFileToDir(fp,T_TEMP_BIN_DP):
+            return False
+
+    print('log line={}'.format(sys._getframe().f_lineno))
+    if not copyDirFiles(CEF_RELEASE_DP,obs_plugins_to_dp):
+        return False
+
+    print('log line={}'.format(sys._getframe().f_lineno))
+    if not copyDirFiles(CEF_RESOURCES_DP,obs_plugins_to_dp):
+        return False
+
+    print('log line={}'.format(sys._getframe().f_lineno))
     cmd='\"{0}\" \"/DPRODUCT_VERSION={1}\" \"/DPRODUCT_EG_NAME={2}\" \"/DPRODUCT_CH_NAME={3}\" \"/DPRODUCT_OUTPUT_PATH={4}\" \"{5}\" '.format(
         NSIS_BIN_FP,C_VERSION_INFO,C_BUNDLE_EG_NAME,C_BUNDLE_CN_NAME,out_dp,NSIS_SCRIPT_TO_FP)
     run_cmd_out(cmd)
 
     # call %P_NSIS_EXE_FP% /DPRODUCT_VERSION=%C_PRODUCT_VERSION% /DPRODUCT_EG_NAME=%C_PRODUCT_EG_NAME% /DPRODUCT_CH_NAME=%C_PRODUCT_CH_NAME% /DPRODUCT_OUTPUT_PATH=%C_OUT_DP% %P_RUN_SCRIPT_PATH% 
 
-
-
-
-
-   
-   
     return True
 
 
