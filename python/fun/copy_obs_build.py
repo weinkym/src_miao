@@ -111,8 +111,11 @@ def adjuest_lib(fp):
             continue
         
         info = parse_otool_line(line)
-        if info.lib_path == info.lib_path:
+        if info.lib_path == info.lib_name:
             continue
+        if 'Qt' in info.lib_name:
+            continue
+
         cmd = 'install_name_tool -change \"{}\" \"{}\" \"{}\"'.format(
             info.lib_path, info.lib_name, fp)
         cmd_list.append(cmd)
@@ -165,11 +168,11 @@ def copy_build_lib(build_dp,to_root_dp,lib_subffix_list,need_adjuest=False):
     print('to_lib_dp={}'.format(to_lib_dp))
     print('to_root_dp={}'.format(to_root_dp))
 
-    # if not copyDir(from_release_dp,to_root_dp,'obs-plugins'):
-    #     return False
+    if not copyDir(from_release_dp,to_root_dp,'obs-plugins'):
+        return False
     # print('log line={}'.format(sys._getframe().f_lineno))
-    # if not copyDir(from_release_dp,to_root_dp,'data'):
-    #     return False
+    if not copyDir(from_release_dp,to_root_dp,'data'):
+        return False
     print('log line={}'.format(sys._getframe().f_lineno))
     if not os.path.exists(to_lib_dp):
         os.makedirs(to_lib_dp)
@@ -179,6 +182,7 @@ def copy_build_lib(build_dp,to_root_dp,lib_subffix_list,need_adjuest=False):
     for subffix in lib_subffix_list:
         lib_file_list+=zwutil.getFileNamePaths(build_dp,subffix)
         plugins_list += zwutil.getFileNamePaths(to_plugins_dp,subffix)
+        # plugins_list += zwutil.getFileNamePaths('',subffix)
 
     lib_fp_list=[]
     for path,name in lib_file_list:
@@ -188,9 +192,11 @@ def copy_build_lib(build_dp,to_root_dp,lib_subffix_list,need_adjuest=False):
             continue
         if "/plugins/" in path:
             continue
+        if "/frontend-plugins/" in path:
+            continue
         else: 
-            # if not obs_copy(path,name,to_lib_dp):
-            #     return False
+            if not obs_copy(path,name,to_lib_dp):
+                return False
             if not name.endswith(".a"):
                 lib_fp_list.append(os.path.join(to_lib_dp,name))
     
@@ -212,7 +218,7 @@ def test():
     copyDir(test_from_dp,test_to_dp,'data')
 
 g_lib_subffix_list=[".so",".dylib",".a"]
-build_dp="/Users/miaozw/Documents/TEMP/build-obs"
+build_dp="/Users/miaozw/Documents/TEMP/build-obs-1x"
 to_root_dp="/Users/miaozw/work/ljlive/vendor/obs/mac"
 copy_build_lib(build_dp,to_root_dp,g_lib_subffix_list,True)
 # test()

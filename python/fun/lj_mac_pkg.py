@@ -1,14 +1,10 @@
 #!/usr/local/bin/python3
-
 import datetime
 import os
 import shutil
 import subprocess
 import sys
 from shutil import copy2
-sys.path.append(os.getcwd())
-
-from zwpy import zwutil
 
 g_check_line_valid_list = ["/System/Library/Frameworks/", "/usr/lib/"]
 
@@ -17,6 +13,48 @@ class LineInfo:
     valid = False
     lib_name = ''
     lib_path = ''
+
+
+def getFilePaths(path,suffix):
+    fileList=[]
+    for parent,dirnames,filenames in os.walk(path,  topdown=False):
+        for filename in filenames:
+            if filename.endswith(suffix):
+                file_path=os.path.join(parent,filename)
+                fileList.append(file_path)
+                # print(file_path)
+    return fileList
+
+def getFileNamePaths(path,suffix):
+    fileList=[]
+    for parent,dirnames,filenames in os.walk(path,  topdown=False):
+        for filename in filenames:
+            if filename.endswith(suffix):
+                file_path=os.path.join(parent,filename)
+                fileList.append((file_path,filename))
+                # print(file_path)
+    return fileList
+
+def getPathFileNameInfo(path):
+    (file_path,file_name) = os.path.split(path)
+    (shot_name,suffix) = os.path.splitext(file_name)
+    return file_path,file_name,shot_name,suffix
+
+def getDirPaths(path,suffix):
+    objList=[]
+    for parent,dirnames,filenames in os.walk(path,  topdown=False):
+        for name in dirnames:
+            if name.endswith(suffix):
+                dp=os.path.join(parent,name)
+                objList.append(dp)
+                # print(dp)
+    return objList
+
+def run_cmd(cmd):
+    sub = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    sub.wait()
+    content=sub.stdout.read().decode("utf-8")
+    return content
 
 def outTimeString(pre_str):
     print('{} {}'.format(pre_str,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
@@ -43,7 +81,7 @@ def parse_otool_line(line):
     if index >= 0:
         line_info.lib_path = line[0:index]
         line_info.valid = True
-        info = zwutil.getPathFileNameInfo(line_info.lib_path)
+        info = getPathFileNameInfo(line_info.lib_path)
         # print(info)
         line_info.lib_name = info[1]
         # print(line_info.lib_name)
@@ -60,7 +98,7 @@ def check_otool_line(line):
 
 
 def getCMDLineContent(cmd, row=0):
-    return zwutil.run_cmd(cmd).split('\n')[row]
+    return run_cmd(cmd).split('\n')[row]
 
 def getKeyNumber(line,key):
     aduest_line = line.lstrip().replace(' ','')
@@ -155,7 +193,7 @@ def adjuestFileDepends(lib_fp, lib_name, LIB_NAME_DICT):
         print('lib_fp is not exists {}'.format(lib_fp))
         return False
     os.system("install_name_tool -id \"{}\" \"{}\"".format(lib_name, lib_fp))
-    res = zwutil.run_cmd("otool -L \"{}\"".format(lib_fp))
+    res = run_cmd("otool -L \"{}\"".format(lib_fp))
     lineList = res.split("\n")
     adjust_cmd_list = []
     for line in lineList[1:]:
@@ -206,7 +244,7 @@ C_BUNDLE_CN_NAME = "绚星直播"
 C_BUNDLE_AVATAR_NAME = "agora_avatar_push"
 C_LIB_SUFFIX_LIST = ['.so', '.dylib']
 
-# C_USER_LOCAT_PATH=zwutil.run_cmd('cd;pwd;').replace('\n','')
+# C_USER_LOCAT_PATH=run_cmd('cd;pwd;').replace('\n','')
 C_USER_LOCAT_PATH = getCMDLineContent('cd;pwd;')
 C_QTBIN_PATH = "{}/Qt5.7.1/5.7/clang_64/bin".format(C_USER_LOCAT_PATH)
 C_QT_MACDEPLOYQT_FILE_PATH = '{}/macdeployqt'.format(C_QTBIN_PATH)
@@ -238,7 +276,7 @@ def updateCode(project_dp):
 def makeCode(pro_fp,need_qmake):
     if not lj_check_path(pro_fp):
         return False
-    info = zwutil.getPathFileNameInfo(pro_fp)
+    info = getPathFileNameInfo(pro_fp)
     pro_dp = info[0]
     pro_name = info[1]
     pro_subffix = info[3]
@@ -345,11 +383,11 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make,need_update,out_dp,t
     if not lj_check_path(app_avatar_from_fp):
         return False
     print('log line={}'.format(sys._getframe().f_lineno))
-    zwutil.run_cmd('macdeployqt \'{}\''.format(app_avatar_to_dp))
+    run_cmd('macdeployqt \'{}\''.format(app_avatar_to_dp))
     if not copyFile(app_avatar_from_fp,app_avatar_to_fp):
         return False
     print('log line={}'.format(sys._getframe().f_lineno))
-    zwutil.run_cmd('macdeployqt \'{}\''.format(app_xuanlive_to_dp))
+    run_cmd('macdeployqt \'{}\''.format(app_xuanlive_to_dp))
     frameworks_to_dp = '{}/Contents/Frameworks'.format(app_xuanlive_to_dp)
     if not lj_check_path(frameworks_to_dp):
         return False
@@ -370,12 +408,12 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make,need_update,out_dp,t
     if not lj_check_path(obs_plugins_to_dp):
         return False
     print('log line={}'.format(sys._getframe().f_lineno))
-    obs_plugins_list = zwutil.getFileNamePaths(obs_plugins_to_dp,"")
+    obs_plugins_list = getFileNamePaths(obs_plugins_to_dp,"")
     LIB_NAME_DICT = {}
     LIB_NAME_DICT[CEF_NAME]='@executable_path/../Frameworks/{}.framework/{}'.format(CEF_NAME,CEF_NAME)
     for dp in THIRD_DIR_DP_LIST:
         for suffix in C_LIB_SUFFIX_LIST:
-            obj_list = zwutil.getFileNamePaths(dp, suffix)
+            obj_list = getFileNamePaths(dp, suffix)
             for fp, name in obj_list:
                 if '/debug/' in fp:
                     print("{} is debug,ignore".format(fp))
@@ -420,6 +458,20 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make,need_update,out_dp,t
     return True
 
 
+def start(project_dp,output):
+    if not lj_check_path(project_dp) or not lj_check_path(output):
+        return False
+    temp_dp = '{}/TEMP_RUN_PKG_{}'.format(output,datetime.datetime.now().strftime('%Y%m%d'))
+    res = runPkg(project_dp,need_codesign=True,need_qmake=True,need_make=True,need_update=True,out_dp=output,temp_cacha_dp=temp_dp)
+    if lj_check_path(temp_dp):
+        shutil.rmtree(temp_dp)
+    if res:
+        print("run pkg is finished")
+    else:
+        print("run pkg is error")
+
+
+
 def test():
     starttime = datetime.datetime.now()
     #long running
@@ -427,9 +479,6 @@ def test():
     res = (endtime - starttime).microseconds
     print(res)
 
-# a=1
-# test()
-# print(a)
 
 
 project_dp = '/Users/miaozw/work/ljlive'

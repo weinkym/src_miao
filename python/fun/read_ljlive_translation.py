@@ -1,7 +1,15 @@
 import xlrd
 import sys
+import os
 
+# sys.path.append('/Users/miaozw/work/ljlive/ljobs/translations')
+# sys.path.append("../zwpy")
+sys.path.append(os.getcwd())
+# from zwpy import langconv
 from langconv import *
+
+# from langconv import *
+# import langconv
 
 class LJCN_EG_DATA:
     key_src = ""
@@ -242,7 +250,8 @@ def lj_create_releasenote(table,filepath):
 
 filename = "/Users/miaozw/work/ljlive/ljobs/translations/all.xlsx"
 summary_table_name = "ALL"
-source_table_name = "结果"
+source_table_name = "已汉化"
+# source_table_name = "结果"
 special_table_name = "特殊"
 releasenote_table_name = "releasenote"
 
