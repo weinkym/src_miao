@@ -4,170 +4,59 @@ import sys,os
 sys.path.append(os.getcwd())
 import subprocess
 from zwpy import zwutil
-import mac_otool as OTL
+import mac_utils as OTL
 
-def copyD2D(dp,to_dp):
-    if not os.path.exists(dp):
-        print('dp={} is not exists'.format(dp))
-        return False
 
-    if not os.path.exists(to_dp):
-        print('to_dp={} is not exists'.format(to_dp))
-        return False
+def lj_obs_archive(app_dp,plugins_dp,data_dp_list,entitlements_fp,third_lib_list,out_dp):
+    build_dp=OTL.createDs(out_dp,'TEMP')
+    OTL.copyD2D(app_dp,build_dp)
+    app_name=OTL.getDirname(app_dp)
+    contens_dp='{}/{}/Contents'.format(build_dp,app_name)
+    os.system("cd \"{}\";macdeployqt {}".format(build_dp,app_name))
+    frameworks_dp = OTL.createDs(contens_dp,'Frameworks')
+    for dp in data_dp_list:
+        OTL.copyD2D(dp,contens_dp)
+    OTL.copyF2D(entitlements_fp,contens_dp)
 
-    cmd='cp -R \'{}\' \'{}\''.format(dp,to_dp)
-    zwutil.run_cmd(cmd)
-    return True
-    
-def copyDFS2D(dp,to_dp):
-    if not os.path.exists(dp):
-        print('dp={} is not exists'.format(dp))
-        return False
+    for fp,name in third_lib_list:
+        OTL.copyF2D(fp,frameworks_dp)
+    name_list=OTL.adjuestLibs(frameworks_dp)
 
-    if not os.path.exists(to_dp):
-        print('to_dp={} is not exists'.format(to_dp))
-        return False
+    OTL.copyD2D(plugins_dp,contens_dp)
+    new_plugins_dp='{}/{}'.format(contens_dp,OTL.getDirname(plugins_dp))
+    obj_list=OTL.getFiles(new_plugins_dp,['.so'],[])
+    for fp,name in obj_list:
+        OTL.adjuestLibToRpath(fp,name_list)
+        OTL.adjuestRapth(fp,['@executable_path/../Frameworks'])
 
-    cmd='cd \'{}\';cp -R ./* \'{}\''.format(dp,to_dp)
-    zwutil.run_cmd(cmd)
-    return True
+    app_process_name=app_name.replace('.app','')
+    app_fp=contens_dp='{}/MacOS/{}'.format(contens_dp,app_process_name)
+    OTL.adjuestRapth(app_fp,['@executable_path/../Frameworks'])
+    OTL.adjuestLibToRpath(app_fp,name_list)
 
-def copyF2D(fp,to_dp):
-    if not os.path.islink(fp):
-        if not os.path.exists(fp):
-            print('fp={} is not exists'.format(fp))
-            return False
+def run_lj_obs_archive():
+    project_dp='/Users/miaozw/work/ljlive'
+    entitlements_fp=os.path.join(project_dp,'ljobs/ljlive.entitlements')
+    version_fp=os.path.join(project_dp,'ljobs/base/cversion_mac.cpp')
+    vendor_dp=os.path.join(project_dp,'vendor')
+    app_dp=os.path.join(project_dp,'bin/mac/release/ljlive.app')
+    plugins_dp=os.path.join(vendor_dp,'obs/mac/obs-plugins')
+    data_dp_list=[]
+    data_dp_list.append(os.path.join(vendor_dp,'obs/mac/ljdata'))
+    data_dp_list.append(os.path.join(vendor_dp,'obs/mac/data'))
+    python_data_dp=os.path.join(vendor_dp,'python/lib、python/site-packages')
+    print('app_dp={}'.format(app_dp))
+    out_dp="/Users/miaozw/Documents/TEMP"
+    third_lib_list=OTL.getFiles(vendor_dp,['.so','.dylib'],['/obs-plugins/','debug'])
+    exists_name_list=[]
+    for fp,name in third_lib_list:
+        if name in exists_name_list:
+            print('name is repeat name={},fp={},fp={}'.format(name,fp,exists_name_list[name][1]))
+        else:
+            exists_name_list.append((name,fp))
+    lj_obs_archive(app_dp,plugins_dp,data_dp_list,entitlements_fp,third_lib_list,out_dp)
 
-    if not os.path.exists(to_dp):
-        print('to_dp={} is not exists'.format(to_dp))
-        return False
-    cmd='cd \'{}\';cp -a \'{}\' ./'.format(to_dp,fp)
-    zwutil.run_cmd(cmd)
-    return True
-
-def createDs(root_dp,childs_dp):
-    dp=os.path.join(root_dp,childs_dp)
-    if os.path.exists(dp):
-        return dp
-    if not os.path.exists(root_dp):
-        print('root_dp={} is not exists'.format(root_dp))
-        return ''
-    cmd='cd \'{}\';mkdir - \'{}\''.format(root_dp,childs_dp)
-    zwutil.run_cmd(cmd)
-    return dp
-def getDirname(dp):
-    if not os.path.exists(dp):
-        print('dp={} is not exists'.format(dp))
-        return ""
-    p_dp=os.path.dirname(dp)
-    index=1
-    if p_dp == '/':
-        index=0
-    return dp[len(p_dp)+index:]
-#===============
-def lj_getLibs(dp,lib_subfix_list,ignore_list):
-    lib_obj_list=[]
-    for subfix in lib_subfix_list:
-        lib_obj_list += zwutil.getFileNamePaths(dp,subfix)
-    # ignore_list=['/debug/','/obs-plugins/']
-    obj_list=[]
-    for fp,name in lib_obj_list:
-        is_valid=True
-        for ignore in ignore_list:
-            if ignore in fp:
-                is_valid = False
-                break 
-        if not is_valid:
-            continue
-        obj_list.append((fp,name))
-    return obj_list
-
-def lj_copyLibs(dp,frameworks_dp):
-    lib_subfix_list=['.so','.dylib']
-    ignore_list=['/debug/','/obs-plugins/']
-    lib_obj_list=lj_getLibs(dep_dp,lib_subfix_list,ignore_list)
-    for fp,name in lib_obj_list:
-        print('name={}'.format(fp))
-        copyF2D(fp,frameworks_dp)
-
-#===============
-def lj_set_rpath(fp,check_name_list):
-    obj_list = OTL.getLibDeps(fp)
-    for obj in obj_list:
-        if '@rpath/Qt' in obj.lib_path:
-            continue
-        if not obj.lib_name in check_name_list:
-            print("obj={} can not found".format(obj))
-            return False
-        new_path = "@rpath/{}".format(obj.lib_name)
-        if new_path == obj.lib_path:
-            continue
-        OTL.changeDPath(fp,obj.lib_path,new_path)
-    return True    
-
-def lj_adjust_lib(dp):
-    if not os.path.exists(dp):
-        print('dp={} is not exists'.format(dp))
-        return False
-    lib_subfix_list=['.so','.dylib']
-    lib_obj_list=lj_getLibs(dp,lib_subfix_list,'')
-    exisit_name_list=[]
-    for fp,name in lib_obj_list:
-        exisit_name_list.append(name)
-
-    default_rpath_list = OTL.getDefaultRpathList()
-    default_rpath_list.append('/Users/miaozw/Qt5.7.1/5.7/clang_64/lib')
-    default_rpath_list.append('@executable_path/Frameworks')
-    
-
-    for fp,name in lib_obj_list:
-        # obj_list = OTL.getLibDeps(fp)
-        if not lj_set_rpath(fp,exisit_name_list):
-            return False
-        rpath_list =OTL.getLibRpaths(fp)
-        # for obj in obj_list:
-        #     if '/Qt' in obj.lib_path:
-        #         continue
-        #     if not obj.lib_name in exisit_name_list:
-        #         print("obj={} can not found,rpath_list={}".format(obj,rpath_list))
-        #         return False
-        #     new_path = "@rpath/{}".format(obj.lib_name)
-        #     if new_path == obj.lib_path:
-        #         continue
-        #     OTL.changeDPath(fp,obj.lib_path,new_path)    
-        for obj in default_rpath_list:
-            if obj not in rpath_list:
-                OTL.addRpath(fp,obj)
-        # break
-
-def lj_adjuestApp(fp,name_list):
-    lj_set_rpath(fp,name_list)
-    default_rpath_list = OTL.getDefaultRpathList()
-    default_rpath_list.append('/Users/miaozw/Qt5.7.1/5.7/clang_64/lib')
-    default_rpath_list.append('@executable_path/../Frameworks')
-    rpath_list =OTL.getLibRpaths(fp)
-    for obj in default_rpath_list:
-        if obj not in rpath_list:
-            OTL.addRpath(fp,obj)
-
-def test2():
-    dp='/Users/miaozw/build-test_http2-Qt_5_7_1_clang_64-Release/test_http2.app/Contents/Frameworks'
-    lib_subfix_list=['.so','.dylib']
-    lib_obj_list=lj_getLibs(dp,lib_subfix_list,'')
-    for fp,name in lib_obj_list:
-        obj_list = OTL.getLibDeps(fp)
-        for obj in obj_list:
-            if '@rpath/Qt' in obj.lib_path:
-                continue
-            if 'ssl' not in obj.lib_name and 'crypto' not in obj.lib_name:
-                continue
-                # print("fp={},obj={}".format(fp,obj))
-            new_path = "@loader_path/{}".format(obj.lib_name)
-            if new_path == obj.lib_path:
-                continue
-            OTL.changeDPath(fp,obj.lib_path,new_path)
-
-test2()
+run_lj_obs_archive()
 
 def test():
     dep_dp='/Users/miaozw/work/ljlive/vendor'
@@ -182,7 +71,7 @@ def test():
     # lj_adjust_lib(frameworks_dp)
 
     lib_subfix_list=['.so','.dylib']
-    lib_obj_list=lj_getLibs(frameworks_dp,lib_subfix_list,'')
+    lib_obj_list=getFiles(frameworks_dp,lib_subfix_list,'')
     exisit_name_list=[]
     for fp,name in lib_obj_list:
         exisit_name_list.append(name)

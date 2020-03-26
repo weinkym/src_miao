@@ -11,9 +11,11 @@ def getFilePaths(path,suffix):
                 # print(file_path)
     return fileList
 
-def getFileNamePaths(path,suffix):
+def getFileNamePaths(path,suffix,deep=True):
     fileList=[]
     for parent,dirnames,filenames in os.walk(path,  topdown=False):
+        if not deep and parent != path:
+            continue
         for filename in filenames:
             if filename.endswith(suffix):
                 file_path=os.path.join(parent,filename)
@@ -26,9 +28,11 @@ def getPathFileNameInfo(path):
     (shot_name,suffix) = os.path.splitext(file_name)
     return file_path,file_name,shot_name,suffix
 
-def getDirPaths(path,suffix):
+def getDirPaths(path,suffix,deep=True):
     objList=[]
     for parent,dirnames,filenames in os.walk(path,  topdown=False):
+        if not deep and parent != path:
+            continue
         for name in dirnames:
             if name.endswith(suffix):
                 dp=os.path.join(parent,name)

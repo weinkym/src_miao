@@ -112,16 +112,6 @@ def changeDPath(fp,old,new):
 def test():
     dp='/Users/miaozw/work/ljlive/ljobs/Release/ljlive.app/Contents/MacOS'
     fp='{}/ljlive'.format(dp)
-    # obj_list = getLibDeps(fp)
-    # os.system("install_name_tool -add_rpath \"@loader_path/../{}\" \"{}\"".format('Frameworks',fp))
-    # for obj in obj_list:
-    #     print(obj)
-    #     if 'Qt' in obj.lib_path:
-    #         continue
-    #     new_path='@rpath/{}'.format(obj.lib_name)
-    #     if new_path == obj.lib_path:
-    #         continue
-    #     os.system("install_name_tool -change \"{}\" \"{}\" \"{}\"".format(obj.lib_path,new_path,fp))
     obj_list = getLibRpaths(fp)
     for obj in obj_list:
         print(obj)
