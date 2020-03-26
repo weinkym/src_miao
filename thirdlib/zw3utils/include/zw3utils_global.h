@@ -1,0 +1,12 @@
+#ifndef ZW3UTILS_GLOBAL_H
+#define ZW3UTILS_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(ZW3UTILS_LIBRARY)
+#  define ZW3UTILSSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define ZW3UTILSSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // ZW3UTILS_GLOBAL_H
