@@ -35,24 +35,26 @@ def parse_otool_line(line):
     return line_info
 
 def test():
-    fp='/Users/miaozw/Documents/ffmpeg-3.4.7/build/bin/ffmpeg'
-    res=run_cmd("otool -L \"{}\"".format(fp))
-    lineList=res.split("\n")
-    cmd_list=[]
-    print('fp={}'.format(fp))
-    for line in lineList[1:]:
-        line=line.lstrip()
-        if 'build' not in line:
-            continue
-        info = parse_otool_line(line)
-        cmd = 'install_name_tool -change \"{}\" \"@executable_path/{}\" \"{}\"'.format(
-            info.lib_path, info.lib_name, fp)
-        cmd_list.append(cmd)
-        
-        print('libname={},path={}'.format(info.lib_name,info.lib_path))
-    for cmd in cmd_list:
-        print('cmd={}'.format(cmd))
-        os.system(cmd)
+    path="/Users/miaozw/Documents/TEMP"
+    delete_list=[]
+    delete_suffix_list=['.o','.user','.pyc','Makefile','moc_']
+    for parent,dirnames,filenames in os.walk(path,  topdown=False):
+        for filename in filenames:
+            found=False
+            for obj in delete_suffix_list:
+                if obj in filename:
+                    found=True
+                    break
+            if found:
+                delete_list.append(os.path.join(parent,filename))
+    
+    for obj in delete_list:
+        os.system("rm -f \"{}\"".format(obj))
+        print(obj)
+
+
+
+
 test()
 # img = Image.open("/Users/miaozw/Pictures/11.jpg")
 # img = img.resize((136,80))
