@@ -1,7 +1,7 @@
 import sys,os
 sys.path.append(os.getcwd())
 import subprocess
-import public_defines as PB
+# import public_defines as PB
 from zwpy import zwutil
 
 g_check_line_valid_list = ["/System/Library/Frameworks/", "/usr/lib/"]
@@ -109,12 +109,106 @@ def changeDPath(fp,old,new):
     print("cmd='{}'".format(cmd))
     os.system(cmd)
 
+def copyD2D(dp,to_dp):
+    if not os.path.exists(dp):
+        print('dp={} is not exists'.format(dp))
+        return False
 
+    if not os.path.exists(to_dp):
+        print('to_dp={} is not exists'.format(to_dp))
+        return False
 
-def test():
-    dp='/Users/miaozw/work/ljlive/ljobs/Release/ljlive.app/Contents/MacOS'
-    fp='{}/ljlive'.format(dp)
-    obj_list = getLibRpaths(fp)
+    cmd='cp -R \'{}\' \'{}\''.format(dp,to_dp)
+    zwutil.run_cmd(cmd)
+    return True
+    
+def copyDFS2D(dp,to_dp):
+    if not os.path.exists(dp):
+        print('dp={} is not exists'.format(dp))
+        return False
+
+    if not os.path.exists(to_dp):
+        print('to_dp={} is not exists'.format(to_dp))
+        return False
+
+    cmd='cd \'{}\';cp -R ./* \'{}\''.format(dp,to_dp)
+    zwutil.run_cmd(cmd)
+    return True
+
+def copyF2D(fp,to_dp):
+    if not os.path.islink(fp):
+        if not os.path.exists(fp):
+            print('fp={} is not exists'.format(fp))
+            return False
+
+    if not os.path.exists(to_dp):
+        print('to_dp={} is not exists'.format(to_dp))
+        return False
+    cmd='cd \'{}\';cp -a \'{}\' ./'.format(to_dp,fp)
+    zwutil.run_cmd(cmd)
+    return True
+
+def createDs(root_dp,childs_dp):
+    dp=os.path.join(root_dp,childs_dp)
+    if os.path.exists(dp):
+        return dp
+    if not os.path.exists(root_dp):
+        print('root_dp={} is not exists'.format(root_dp))
+        return ''
+    cmd='cd \'{}\';mkdir - \'{}\''.format(root_dp,childs_dp)
+    zwutil.run_cmd(cmd)
+    return dp
+
+def getDirname(dp):
+    if not os.path.exists(dp):
+        print('dp={} is not exists'.format(dp))
+        return ""
+    p_dp=os.path.dirname(dp)
+    index=1
+    if p_dp == '/':
+        index=0
+    return dp[len(p_dp)+index:]
+
+def getFiles(dp,subffix_list,ignore_list,deep=True):
+    res_list=[]
+    for obj in subffix_list:
+        obj_list = zwutil.getFileNamePaths(dp,obj,deep)
+        for fp,name in obj_list:
+            ignore=False
+            for ig in ignore_list:
+                if ig in fp:
+                    ignore=True
+                    break
+            if ignore:
+                continue
+            res_list.append((fp,name))
+    return res_list
+
+def adjuestLibToRpath(fp,exists_name_list):
+    obj_list = getLibDeps(fp)
     for obj in obj_list:
-        print(obj)
-# test()
+        if '@rpath/Qt' in obj.lib_path:
+            continue
+        if isSystemPath(obj.lib_path):
+            continue
+        new='@rpath/{}'.format(obj.lib_name)
+        if new == obj.lib_path:
+            continue
+        changeDPath(fp,obj.lib_path,new)
+
+def adjuestLibs(dp):
+    obj_list=[]
+    for obj in ['.so','.dylib']:
+        obj_list += zwutil.getFileNamePaths(dp,obj,False)
+
+    exists_name_list=[]
+    for fp,name in obj_list:
+        if not name in exists_name_list:
+            exists_name_list.append(name)
+        else:
+            print("name is repeat========todo")
+    
+    for fp,name in obj_list:
+        adjuestLibToRpath(fp,exists_name_list)
+        adjuestRapth(fp,'@loader_path/')
+

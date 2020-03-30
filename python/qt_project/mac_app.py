@@ -6,13 +6,25 @@ import subprocess
 from zwpy import zwutil
 import mac_utils as OTL
 
+G_IDENT_APP='Developer ID Application: Jiangsu Yunxuetang Network Technology  Co.,Ltd (6F8YPTA92C)'
+G_IDENT_INSTALL=''
+
+def codesignApp(app_dp):
+    framework_name=''
+    for parent,dirnames,filenames in os.walk(path,  topdown=False):
+        for obj in dirnames:
+            # name=OTL.getDirname(obj)
+            name=obj
+            if name.endwith(framework_name):
+                print("name={}".format(obj))
 
 def lj_obs_archive(app_dp,plugins_dp,data_dp_list,entitlements_fp,third_lib_list,out_dp):
     build_dp=OTL.createDs(out_dp,'TEMP')
     OTL.copyD2D(app_dp,build_dp)
     app_name=OTL.getDirname(app_dp)
     contens_dp='{}/{}/Contents'.format(build_dp,app_name)
-    os.system("cd \"{}\";macdeployqt {}".format(build_dp,app_name))
+    # os.system("cd \"{}\";macdeployqt {}".format(build_dp,app_name))
+    os.system("cd \"{}\";/Users/avc/Qt5.7.1/5.7/clang_64/bin/macdeployqt {}".format(build_dp,app_name))
     frameworks_dp = OTL.createDs(contens_dp,'Frameworks')
     for dp in data_dp_list:
         OTL.copyD2D(dp,contens_dp)
@@ -35,7 +47,7 @@ def lj_obs_archive(app_dp,plugins_dp,data_dp_list,entitlements_fp,third_lib_list
     OTL.adjuestLibToRpath(app_fp,name_list)
 
 def run_lj_obs_archive():
-    project_dp='/Users/miaozw/work/ljlive'
+    project_dp='/Users/avc/work/ljlive'
     entitlements_fp=os.path.join(project_dp,'ljobs/ljlive.entitlements')
     version_fp=os.path.join(project_dp,'ljobs/base/cversion_mac.cpp')
     vendor_dp=os.path.join(project_dp,'vendor')
@@ -46,7 +58,7 @@ def run_lj_obs_archive():
     data_dp_list.append(os.path.join(vendor_dp,'obs/mac/data'))
     python_data_dp=os.path.join(vendor_dp,'python/lib、python/site-packages')
     print('app_dp={}'.format(app_dp))
-    out_dp="/Users/miaozw/Documents/TEMP"
+    out_dp="/Users/avc/Documents/TEMP"
     third_lib_list=OTL.getFiles(vendor_dp,['.so','.dylib'],['/obs-plugins/','debug'])
     exists_name_list=[]
     for fp,name in third_lib_list:
@@ -59,8 +71,8 @@ def run_lj_obs_archive():
 run_lj_obs_archive()
 
 def test():
-    dep_dp='/Users/miaozw/work/ljlive/vendor'
-    app_fp='/Users/miaozw/work/ljlive/bin/mac/release/ljlive.app/Contents/MacOS/ljlive'
+    dep_dp='/Users/avc/work/ljlive/vendor'
+    app_fp='/Users/avc/work/ljlive/bin/mac/release/ljlive.app/Contents/MacOS/ljlive'
     macos_dp=os.path.dirname(app_fp)
     contens_dp=os.path.dirname(macos_dp)
     # frameworks_dp=os.path.join(contens_dp,'Frameworks')
@@ -77,3 +89,6 @@ def test():
         exisit_name_list.append(name)
 
     lj_adjuestApp(app_fp,exisit_name_list)
+
+# res = zwutil.run_cmd("/Users/avc/Qt5.7.1/5.7/clang_64/bin/macdeployqt")
+# print(res)
