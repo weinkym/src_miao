@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "zshadowengine.h"
 
 namespace Ui {
 class MainWindow;
@@ -14,6 +15,12 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+protected:
+    void paintEvent(QPaintEvent *event);
+
+
+    qreal getAgnle(qreal angle);
 
 private:
     Ui::MainWindow *ui;

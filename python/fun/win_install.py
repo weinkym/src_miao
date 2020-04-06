@@ -235,7 +235,7 @@ def copyFileToDir(fp,dp):
         print('dp is not exists {}'.format(dp))
         return False
 
-    cmd = 'xcopy \"{}\" \"{}\" /s/e/y'.format(fp,dp)
+    cmd = 'xcopy \"{}\" \"{}\\\" /y'.format(fp,dp)
     print('cmd={}'.format(cmd))
     run_cmd_out(cmd)
     return True
@@ -378,16 +378,16 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make,need_update,out_dp,t
     if not lj_create_temp_path(T_TEMP_BIN_DP):
         return False
 
-    if need_update:
-        updateCode(project_dp)
+    # if need_update:
+    #     updateCode(project_dp)
 
     VENDOR_ROOT_DP = '{}\\vendor'.format(project_dp)
     OBS_ROOT_DP = '{}\\vendor\\obs\\win'.format(project_dp)
     OBS_LIB_DP = '{}\\vendor\\obs\\win\\lib\\release'.format(project_dp)
     OBS_DEPENDS_LIB_DP = '{}\\vendor\\obs\\win\\dependencies2015\\win32'.format(project_dp)
-    CEF_ROOT_DP='{}\\vendor\\cef\\win'.format(project_dp)
-    CEF_RELEASE_DP='{}\\vendor\\cef\\win\\Release'.format(project_dp)
-    CEF_RESOURCES_DP='{}\\vendor\\cef\\win\\Resources'.format(project_dp)
+    CEF_ROOT_DP='{}\\vendor\\additional_install_files\\cef\\win'.format(project_dp)
+    CEF_RELEASE_DP='{}\\Release'.format(CEF_ROOT_DP)
+    CEF_RESOURCES_DP='{}\\Resources'.format(CEF_ROOT_DP)
     C_VERSION_FP='{}\\ljobs\\base\\cversion_win.cpp'.format(project_dp)
 
     BASE_LIB_DP='{}\\install\\win\\baselib'.format(project_dp)
@@ -400,14 +400,14 @@ def runPkg(project_dp, need_codesign, need_qmake, need_make,need_update,out_dp,t
 
 
 
-    THIRD_DIR_NAME_LIST = ['log4Qt', 'qjson']
-    THIRD_DIR_DP_LIST = []
-    THIRD_DIR_DP_LIST.append(OBS_LIB_DP)
-    THIRD_DIR_DP_LIST.append(OBS_DEPENDS_LIB_DP)
-    for name in THIRD_DIR_NAME_LIST:
-        dp='{}\\vendor\\{}'.format(project_dp, name)
-        THIRD_DIR_DP_LIST.append(dp)
-        check_path_list.append(dp)
+    # THIRD_DIR_NAME_LIST = ['log4Qt', 'qjson']
+    # THIRD_DIR_DP_LIST = []
+    # THIRD_DIR_DP_LIST.append(OBS_LIB_DP)
+    # THIRD_DIR_DP_LIST.append(OBS_DEPENDS_LIB_DP)
+    # for name in THIRD_DIR_NAME_LIST:
+    #     dp='{}\\vendor\\{}'.format(project_dp, name)
+    #     THIRD_DIR_DP_LIST.append(dp)
+    #     check_path_list.append(dp)
 
     check_path_list.append(OBS_ROOT_DP)
     check_path_list.append(OBS_LIB_DP)

@@ -10,10 +10,15 @@ class ZShadowEngine
 public:
     ZShadowEngine();
     ~ZShadowEngine();
+    static qreal getAgnle(qreal angle);
 
     void setColor(const QColor &color);
     void setRadius(int radius);
     void painterShadow(QWidget *widget);
+
+    void painterShadow(QPainter *painter,const QRect &rect);
+
+    void painterShadow(QPainter *painter,const QRect &rect,int angle,int height,int position,const QColor &color);
 
 private:
     QBrush getBrush(const QPoint &center,int radius);
