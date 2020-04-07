@@ -210,5 +210,5 @@ def adjuestLibs(dp):
     
     for fp,name in obj_list:
         adjuestLibToRpath(fp,exists_name_list)
-        adjuestRapth(fp,'@loader_path/')
+        adjuestRapth(fp,['@loader_path/'])
 

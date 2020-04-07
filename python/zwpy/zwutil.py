@@ -11,13 +11,13 @@ def getFilePaths(path,suffix):
                 # print(file_path)
     return fileList
 
-def getFileNamePaths(path,suffix,deep=True):
+def getFileNamePaths(path,key,deep=True,is_prefix = False):
     fileList=[]
     for parent,dirnames,filenames in os.walk(path,  topdown=False):
         if not deep and parent != path:
             continue
         for filename in filenames:
-            if filename.endswith(suffix):
+            if (is_prefix and filename.startswith(key)) or (not is_prefix and filename.endswith(key)):
                 file_path=os.path.join(parent,filename)
                 fileList.append((file_path,filename))
                 # print(file_path)
@@ -28,16 +28,15 @@ def getPathFileNameInfo(path):
     (shot_name,suffix) = os.path.splitext(file_name)
     return file_path,file_name,shot_name,suffix
 
-def getDirPaths(path,suffix,deep=True):
+def getDirPaths(path,key,deep=True,is_prefix = False):
     objList=[]
+    print('=======')
     for parent,dirnames,filenames in os.walk(path,  topdown=False):
         if not deep and parent != path:
             continue
         for name in dirnames:
-            if name.endswith(suffix):
-                dp=os.path.join(parent,name)
-                objList.append(dp)
-                # print(dp)
+            if (is_prefix and name.startswith(key)) or (not is_prefix and name.endswith(key)):
+                objList.append((os.path.join(parent,name),name))
     return objList
 
 def run_cmd(cmd):

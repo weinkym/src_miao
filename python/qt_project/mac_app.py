@@ -9,16 +9,48 @@ import mac_utils as OTL
 G_IDENT_APP='Developer ID Application: Jiangsu Yunxuetang Network Technology  Co.,Ltd (6F8YPTA92C)'
 G_IDENT_INSTALL=''
 
-def codesignApp(app_dp):
-    framework_name=''
-    for parent,dirnames,filenames in os.walk(path,  topdown=False):
-        for obj in dirnames:
-            # name=OTL.getDirname(obj)
-            name=obj
-            if name.endwith(framework_name):
-                print("name={}".format(obj))
+def codesignFile(fp):
+    entitlements_fp='/Users/avc/Documents/TEMP/TEMP/ljlive.app/Contents/ljlive.entitlements'
+    cmd='codesign -s \"{}\" --options \"runtime\" \"{}\"'.format(G_IDENT_APP,fp)
+    if(fp.endswith('.app')):
+        cmd='codesign -f -o runtime --entitlements \"{}\" --timestamp --deep -s "{}" -i "cn.yunxuetang.ljlivepc" \"{}\"'.format(entitlements_fp,G_IDENT_APP,fp)
+    
+    print('cmd={}'.format(cmd))
+    res=zwutil.run_cmd(cmd)
+    print('res={}'.format(res))
 
-def lj_obs_archive(app_dp,plugins_dp,data_dp_list,entitlements_fp,third_lib_list,out_dp):
+def codesignApp(app_dp):
+    framework_name='.framework'
+    ignore_suffix_list=['.effect','.ini','.png','.qss','.txt','.icns','.conf','.lproj','.pcm','.inc','.json','.py','.pyc']
+    obj_list=[]
+    for parent,dirnames,filenames in os.walk(app_dp,  topdown=False):
+        if framework_name in parent:
+            for name in dirnames:
+                if name.endswith('.app'):
+                    codesignApp(os.path.join(parent,name))
+            continue
+        
+        for name in dirnames:
+            if name.endswith(framework_name):
+                fp=os.path.join(parent,name)
+                obj_list.append((fp,name))
+            
+
+        for name in filenames:
+            ignore=False
+            for obj in ignore_suffix_list:
+                if obj in name:
+                    ignore=True
+            if ignore:
+                continue
+            fp=os.path.join(parent,name)
+            obj_list.append((fp,name))
+    for fp,name in obj_list:
+        codesignFile(fp)
+    codesignFile(app_dp)
+
+
+def lj_obs_archive(app_dp,plugins_dp,data_dp_list,entitlements_fp,third_lib_list,out_dp,python_data_dp):
     build_dp=OTL.createDs(out_dp,'TEMP')
     OTL.copyD2D(app_dp,build_dp)
     app_name=OTL.getDirname(app_dp)
@@ -28,6 +60,10 @@ def lj_obs_archive(app_dp,plugins_dp,data_dp_list,entitlements_fp,third_lib_list
     frameworks_dp = OTL.createDs(contens_dp,'Frameworks')
     for dp in data_dp_list:
         OTL.copyD2D(dp,contens_dp)
+    
+    OTL.copyD2D(python_data_dp,'{}/data'.format(contens_dp))
+    # print('python_data_dp={}'.format(python_data_dp))
+    # return
     OTL.copyF2D(entitlements_fp,contens_dp)
 
     for fp,name in third_lib_list:
@@ -46,6 +82,89 @@ def lj_obs_archive(app_dp,plugins_dp,data_dp_list,entitlements_fp,third_lib_list
     OTL.adjuestRapth(app_fp,['@executable_path/../Frameworks'])
     OTL.adjuestLibToRpath(app_fp,name_list)
 
+def getDmgList(name):
+    obj_list=[]
+    for obj in zwutil.run_cmd('cd /Volumes;ls').split('\n'):
+        print(obj)
+        if obj.startswith(name):
+            obj_list.append(obj)
+    return obj_list
+
+def createDmg(app_dp,dmg_fp,out_dp,dmg_name):
+    dmg_dp=''
+    cn_name='临境直播'
+    volume_dp='/Volumes'
+    obj_list=getDmgList(cn_name)
+    for obj in obj_list:
+        zwutil.run_cmd('cd /Volumes;hdiutil detach \"{}\" -force'.format(obj))
+    obj_list=getDmgList(cn_name)
+    if len(obj_list) > 0:
+        return False
+    
+    zwutil.run_cmd('hdiutil attach \"{}\"'.format(dmg_fp))
+    obj_list=getDmgList(cn_name)
+    if len(obj_list)  != 1:
+        return False
+    if obj_list[0] != cn_name:
+        return False
+    app_name='{}.app'.format(cn_name)
+    to_path='{}/{}'.format(volume_dp,cn_name)
+    old_path='{}/{}'.format(to_path,app_name)
+    if os.path.exists(old_path):
+        zwutil.run_cmd('rm -rf  \"{}\"'.format(old_path))
+
+    if os.path.exists(old_path):
+        return False
+
+    OTL.copyD2D(app_dp,to_path)
+    new_name=OTL.getDirname(app_dp)
+    if new_name != cn_name:
+        cmd='cd \"{}\";mv \"{}\" \"{}\"'.format(to_path,new_name,app_name)
+        print(cmd)
+        zwutil.run_cmd(cmd)
+    zwutil.run_cmd('hdiutil detach \"{}\" -force'.format(to_path))
+    zwutil.run_cmd('cd \"{}\";hdiutil convert \"{}\" -format UDZO -o \"{}.dmg\" -ov'.format(out_dp,dmg_fp,dmg_name))
+    print("finished")
+
+def getKeyNumber(line,key):
+    aduest_line = line.lstrip().replace(' ','')
+    print('aduest_line={}'.format(aduest_line))
+    res=''
+    index = aduest_line.find(key)
+    if index > 0:
+        i = index+1+len(key)
+        while i < len(aduest_line):
+            c=aduest_line[i]
+            # print('c={}'.format(c))
+            if c == ';':
+                break
+            res = res+c
+            i = i + 1
+    return res
+
+def getVersionInfo(fp):
+    if not os.path.exists(fp):
+        return False
+    v_major=''
+    v_minor=''
+    v_patch=''
+    v_build=''
+    with open(fp, 'r') as f:
+        line_list = f.readlines()
+        print(line_list)
+        
+        for line in line_list:
+            if 'C_VERSION_MAJOR' in line:
+                v_major = getKeyNumber(line,'C_VERSION_MAJOR')
+            if 'C_VERSION_MINOR' in line:
+                v_minor = getKeyNumber(line,'C_VERSION_MINOR')
+            if 'C_VERSION_PATCH' in line:
+                v_patch = getKeyNumber(line,'C_VERSION_PATCH')
+            if 'C_VERSION_BUILD' in line:
+                v_build = getKeyNumber(line,'C_VERSION_BUILD')
+    return '{}.{}.{}.{}'.format(v_major,v_minor,v_patch,v_build)
+
+
 def run_lj_obs_archive():
     project_dp='/Users/avc/work/ljlive'
     entitlements_fp=os.path.join(project_dp,'ljobs/ljlive.entitlements')
@@ -56,8 +175,8 @@ def run_lj_obs_archive():
     data_dp_list=[]
     data_dp_list.append(os.path.join(vendor_dp,'obs/mac/ljdata'))
     data_dp_list.append(os.path.join(vendor_dp,'obs/mac/data'))
-    python_data_dp=os.path.join(vendor_dp,'python/lib、python/site-packages')
-    print('app_dp={}'.format(app_dp))
+    python_data_dp=os.path.join(vendor_dp,'python/lib/site-packages')
+    print('python_data_dp={}'.format(python_data_dp))
     out_dp="/Users/avc/Documents/TEMP"
     third_lib_list=OTL.getFiles(vendor_dp,['.so','.dylib'],['/obs-plugins/','debug'])
     exists_name_list=[]
@@ -66,29 +185,31 @@ def run_lj_obs_archive():
             print('name is repeat name={},fp={},fp={}'.format(name,fp,exists_name_list[name][1]))
         else:
             exists_name_list.append((name,fp))
-    lj_obs_archive(app_dp,plugins_dp,data_dp_list,entitlements_fp,third_lib_list,out_dp)
+    lj_obs_archive(app_dp,plugins_dp,data_dp_list,entitlements_fp,third_lib_list,out_dp,python_data_dp)
 
-run_lj_obs_archive()
+# run_lj_obs_archive()
 
 def test():
-    dep_dp='/Users/avc/work/ljlive/vendor'
-    app_fp='/Users/avc/work/ljlive/bin/mac/release/ljlive.app/Contents/MacOS/ljlive'
-    macos_dp=os.path.dirname(app_fp)
-    contens_dp=os.path.dirname(macos_dp)
-    # frameworks_dp=os.path.join(contens_dp,'Frameworks')
-    frameworks_dp = createDs(contens_dp,'Frameworks')
-    print('contens_dp={}'.format(contens_dp))
-    print('frameworks_dp={}'.format(frameworks_dp))
-    # lj_copyLibs(dep_dp,frameworks_dp)
-    # lj_adjust_lib(frameworks_dp)
+    # dep_dp='/Users/avc/Documents/TEMP/TEMP'
+    # app_fp='/Users/avc/Downloads/TEMP/ljlive.app/Contents/MacOS/ljlive'
+    obj_list = OTL.getFiles('/Users/avc/Documents/TEMP/TEMP/ljlive.app/Contents/Frameworks',['.so','.dylib'],[],False)
+    for fp,name in obj_list:
+        print(fp)
+        rpath_list = OTL.getLibRpaths(fp)
+        print(rpath_list)
+    rpath_list = OTL.getLibRpaths('/Users/avc/Documents/TEMP/TEMP/ljlive.app/Contents/MacOS/ljlive')
+    print(rpath_list)
 
-    lib_subfix_list=['.so','.dylib']
-    lib_obj_list=getFiles(frameworks_dp,lib_subfix_list,'')
-    exisit_name_list=[]
-    for fp,name in lib_obj_list:
-        exisit_name_list.append(name)
+# test()
+app_dp='/Users/avc/Documents/TEMP/TEMP/ljlive.app'
+verson_info=getVersionInfo('/Users/avc/work/ljlive/ljobs/base/cversion_mac.cpp')
+dmg_name='ljlive{}'.format(verson_info)
 
-    lj_adjuestApp(app_fp,exisit_name_list)
-
+# run_lj_obs_archive()
+# codesignApp(app_dp)
+createDmg(app_dp,'/Users/avc/work/release/ljlive-release.dmg','/Users/avc/Documents/TEMP',dmg_name)   
 # res = zwutil.run_cmd("/Users/avc/Qt5.7.1/5.7/clang_64/bin/macdeployqt")
 # print(res)
+print('app_dp={}'.format(app_dp))
+print('verson_info={}'.format(verson_info))
+print('dmg_name={}'.format(dmg_name))

@@ -187,7 +187,7 @@ def lj_test(summary_table,source_table,special_table):
     # print(len(source_data))
     # print(len(special_data))
 
-    file_object = open('/Users/miaozw/work/ljlive/ljobs/translations/language.txt', 'w')
+    file_object = open('/Users/avc/work/ljlive/ljobs/translations/language.txt', 'w')
 
     all_data = dict(source_data, **special_data)
     for (d, obj) in all_data.items():
@@ -248,7 +248,7 @@ def lj_create_releasenote(table,filepath):
 # exit()
 
 
-filename = "/Users/miaozw/work/ljlive/ljobs/translations/all.xlsx"
+filename = "/Users/avc/work/ljlive/ljobs/translations/all.xlsx"
 summary_table_name = "ALL"
 source_table_name = "已汉化"
 # source_table_name = "结果"
@@ -263,7 +263,7 @@ releasenote_table = work_book.sheet_by_name(releasenote_table_name)
 
 lj_test(summary_table,source_table,special_table)
 
-lj_create_releasenote(releasenote_table,"/Users/miaozw/work/ljlive/ljobs/translations/releasenote.txt")
+lj_create_releasenote(releasenote_table,"/Users/avc/work/ljlive/ljobs/translations/releasenote.txt")
 # tempstr="asdfadf"
 # tempstr = lj_check_string(tempstr)
 # print(tempstr[0])
