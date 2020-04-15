@@ -5,10 +5,24 @@ sys.path.append(os.getcwd())
 import subprocess
 from zwpy import zwutil
 import mac_utils as OTL
+import biplist
 
 G_IDENT_APP='Developer ID Application: Jiangsu Yunxuetang Network Technology  Co.,Ltd (6F8YPTA92C)'
 G_IDENT_INSTALL=''
 
+class VersionInfo:
+    def __init__(self):
+        self.major = 0
+        self.minor = 0
+        self.patch = 0
+        self.build = 0
+    def __str__(self):
+        return self.fullVersion()
+    def fullVersion(self):
+        return '{}.{}.{}.{}'.format(self.major,self.minor,self.patch,self.build)
+    def shortVersion(self):
+        return '{}.{}.{}'.format(self.major,self.minor,self.patch)
+        
 def codesignFile(fp):
     entitlements_fp='/Users/avc/Documents/TEMP/TEMP/ljlive.app/Contents/ljlive.entitlements'
     cmd='codesign -s \"{}\" --options \"runtime\" \"{}\"'.format(G_IDENT_APP,fp)
@@ -145,25 +159,27 @@ def getKeyNumber(line,key):
 def getVersionInfo(fp):
     if not os.path.exists(fp):
         return False
-    v_major=''
-    v_minor=''
-    v_patch=''
-    v_build=''
+    info = VersionInfo()
     with open(fp, 'r') as f:
         line_list = f.readlines()
         print(line_list)
         
         for line in line_list:
             if 'C_VERSION_MAJOR' in line:
-                v_major = getKeyNumber(line,'C_VERSION_MAJOR')
+                info.major = getKeyNumber(line,'C_VERSION_MAJOR')
             if 'C_VERSION_MINOR' in line:
-                v_minor = getKeyNumber(line,'C_VERSION_MINOR')
+                info.minor = getKeyNumber(line,'C_VERSION_MINOR')
             if 'C_VERSION_PATCH' in line:
-                v_patch = getKeyNumber(line,'C_VERSION_PATCH')
+                info.patch = getKeyNumber(line,'C_VERSION_PATCH')
             if 'C_VERSION_BUILD' in line:
-                v_build = getKeyNumber(line,'C_VERSION_BUILD')
-    return '{}.{}.{}.{}'.format(v_major,v_minor,v_patch,v_build)
+                info.build = getKeyNumber(line,'C_VERSION_BUILD')
+    return info
 
+def updatePlistVersion(fp,info):
+    plist=biplist.readPlist(fp)
+    plist['CFBundleShortVersionString']=info.shortVersion()
+    plist['CFBundleVersion']=info.fullVersion()
+    biplist.writePlist(plist,fp,binary=False)
 
 def run_lj_obs_archive():
     project_dp='/Users/avc/work/ljlive'
@@ -187,7 +203,6 @@ def run_lj_obs_archive():
             exists_name_list.append((name,fp))
     lj_obs_archive(app_dp,plugins_dp,data_dp_list,entitlements_fp,third_lib_list,out_dp,python_data_dp)
 
-# run_lj_obs_archive()
 
 def test():
     # dep_dp='/Users/avc/Documents/TEMP/TEMP'
@@ -203,13 +218,15 @@ def test():
 # test()
 app_dp='/Users/avc/Documents/TEMP/TEMP/ljlive.app'
 verson_info=getVersionInfo('/Users/avc/work/ljlive/ljobs/base/cversion_mac.cpp')
-dmg_name='ljlive{}'.format(verson_info)
-
+dmg_name='ljlive{}'.format(verson_info.fullVersion())
+plist_fp='/Users/avc/work/ljlive/ljobs/ljlive.plist'
+updatePlistVersion(plist_fp,verson_info)
 # run_lj_obs_archive()
 # codesignApp(app_dp)
-createDmg(app_dp,'/Users/avc/work/release/ljlive-release.dmg','/Users/avc/Documents/TEMP',dmg_name)   
+# createDmg(app_dp,'/Users/avc/work/release/ljlive-release.dmg','/Users/avc/Documents/TEMP',dmg_name)   
 # res = zwutil.run_cmd("/Users/avc/Qt5.7.1/5.7/clang_64/bin/macdeployqt")
 # print(res)
 print('app_dp={}'.format(app_dp))
 print('verson_info={}'.format(verson_info))
 print('dmg_name={}'.format(dmg_name))
+print('plist_fp={}'.format(plist_fp))
