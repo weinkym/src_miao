@@ -1,7 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "cbaseutils.h"
 #include "ctestdialog.h"
+#include "cuiutils.h"
 #include <QDataStream>
 #include <QDateTime>
 #include <QMainWindow>

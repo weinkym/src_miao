@@ -1,5 +1,8 @@
 #include "cuiutils.h"
+#include "clogsetting.h"
 #include <QHBoxLayout>
+#include <QPainter>
+#include <QSvgRenderer>
 
 CUIUtils::CUIUtils()
 {
@@ -125,4 +128,30 @@ void CUIUtils::setFullChildWidget(QWidget *parent, QWidget *childWidget, const Q
         layout->addWidget(childWidget);
         parent->setLayout(layout);
     }
+}
+
+QPixmap CUIUtils::getSvgFilePixmap(const QString &filePath, const QSize &size, int devicePixelRatio)
+{
+    if(devicePixelRatio != 2)
+    {
+        devicePixelRatio = 1;
+    }
+
+    QSvgRenderer svgRender(filePath);
+    if(svgRender.isValid())
+    {
+        QSize baseSize = (size.isValid() && size.width() > 0 && size.height() > 0) ? size : svgRender.defaultSize();
+        C_LOG_OUT_V3(baseSize, size, svgRender.defaultSize());
+        QPixmap pixmap(baseSize * devicePixelRatio);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        svgRender.render(&painter, QRectF(0, 0, pixmap.width(), pixmap.height()));
+        pixmap.setDevicePixelRatio(devicePixelRatio);
+        return pixmap;
+    }
+    else
+    {
+        C_LOG_WARNING(QString("load svg file is error,fp=%1").arg(filePath));
+    }
+    return QPixmap();
 }

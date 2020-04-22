@@ -17,6 +17,11 @@
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="styleSheet">
+       <string notr="true">QWidget{
+background:#ffffff;
+}</string>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -70,12 +75,54 @@ background:#fff0f0;</string>
          <rect>
           <x>70</x>
           <y>180</y>
-          <width>113</width>
-          <height>32</height>
+          <width>101</width>
+          <height>81</height>
          </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">image:url(:/res/test.svg);
+background:#fff0f0;</string>
         </property>
         <property name="text">
          <string>PushButton</string>
+        </property>
+       </widget>
+       <widget class="QWidget" name="widget" native="true">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>70</y>
+          <width>91</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QWidget{
+image:url(:/res/test.svg);
+background:#fff0f0;
+}
+QWidget:hover{
+image:url(:/res/test02.svg);
+}</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_2">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>140</y>
+          <width>121</width>
+          <height>111</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="source.qrc">:/res/test.svg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
         </property>
        </widget>
       </widget>
@@ -117,6 +164,8 @@ background:#fff0f0;</string>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="source.qrc"/>
+ </resources>
  <connections/>
 </ui>

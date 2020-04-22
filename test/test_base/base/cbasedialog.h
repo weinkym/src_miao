@@ -31,6 +31,7 @@ public:
     QUuid getUuid() const;
     ShowType getShowType() const;
     void startShow();
+    QString getDescription() const;
 
 protected:
     void keyPressEvent(QKeyEvent *event);

@@ -1,4 +1,5 @@
 #include "cbasedialog.h"
+#include "clogsetting.h"
 #include <QKeyEvent>
 #include <QUuid>
 
@@ -33,7 +34,7 @@ CBaseDialog::ShowType CBaseDialog::getShowType() const
 
 void CBaseDialog::startShow()
 {
-    //    C_LOG_OUT_VALUE(showType);
+    C_LOG_INFO(QString("dialog show,%1").arg(this->getDescription()));
     this->hide();
     switch(m_showType)
     {
@@ -61,6 +62,12 @@ void CBaseDialog::startShow()
     this->show();
 }
 
+QString CBaseDialog::getDescription() const
+{
+    QString className = this->metaObject()->className();
+    return C_LOG_P3(className, m_showType, m_uuid);
+}
+
 void CBaseDialog::keyPressEvent(QKeyEvent *event)
 {
     if(!event->modifiers() || (event->modifiers() & Qt::KeypadModifier && event->key() == Qt::Key_Enter))
@@ -86,6 +93,7 @@ void CBaseDialog::accept()
 
 void CBaseDialog::closeEvent(QCloseEvent *event)
 {
+    C_LOG_INFO(QString("dialog close,%1").arg(this->getDescription()));
     QDialog::closeEvent(event);
     emit sigClosed(m_uuid, m_showType);
 }
