@@ -1,10 +1,10 @@
-#ifndef CDIALOG_H
-#define CDIALOG_H
+#ifndef CBASEDIALOG_H
+#define CBASEDIALOG_H
 #include <QDialog>
 #include <QUuid>
 #include <QVariant>
 
-class CDialog : public QDialog
+class CBaseDialog : public QDialog
 {
     Q_OBJECT
 public:
@@ -26,10 +26,11 @@ public:
         void *param;
         QVariant result;
     };
-    explicit CDialog(ShowType showType, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
-    ~CDialog();
+    explicit CBaseDialog(ShowType showType, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+    ~CBaseDialog();
     QUuid getUuid() const;
     ShowType getShowType() const;
+    void startShow();
 
 protected:
     void keyPressEvent(QKeyEvent *event);
@@ -44,10 +45,9 @@ signals:
     void sigClosed(const QUuid &uuid, int showType);
 
 private:
-    friend class CDialogManager;
+    friend class CBaseDialogManager;
     ShowType m_showType;
     QUuid m_uuid;
     CallbackObject m_defaultCallbackObj;
 };
-
-#endif // CDIALOG_H
+#endif // CBASEDIALOG_H

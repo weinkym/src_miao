@@ -22,19 +22,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+include(./base/base.pri)
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    cwidget.cpp \
-    cdialog.cpp \
-    cdialogmanager.cpp
+    cdialogmanager.cpp \
+    ctestdialog.cpp
 
 HEADERS  += mainwindow.h \
-    cwidget.h \
-    cdialog.h \
-    cdialogmanager.h
+    cdialogmanager.h \
+    ctestdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    ctestdialog.ui
 
 RESOURCES += \
     source.qrc

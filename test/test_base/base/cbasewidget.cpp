@@ -1,18 +1,25 @@
-#include "cwidget.h"
+#include "cbasewidget.h"
 #include <QPainter>
 #include <QStyleOption>
+#include <QUuid>
 
-CWidget::CWidget(CWidget::QWidget *parent, Qt::WindowFlags f)
+CBaseWidget::CBaseWidget(CBaseWidget::QWidget *parent, Qt::WindowFlags f)
     : QWidget(parent, f)
+    , m_uuid(QUuid::createUuid())
 {
     this->setAttribute(Qt::WA_StyledBackground, true);
 }
 
-CWidget::~CWidget()
+CBaseWidget::~CBaseWidget()
 {
 }
 
-//void CWidget::paintEvent(QPaintEvent *e)
+QUuid CBaseWidget::getUuid() const
+{
+    return m_uuid;
+}
+
+//void CBaseWidget::paintEvent(QPaintEvent *e)
 //{
 //    Q_UNUSED(e);
 //    QStyleOption opt;

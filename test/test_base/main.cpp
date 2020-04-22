@@ -1,5 +1,3 @@
-#include "cdialog.h"
-#include "cwidget.h"
 
 #include "mainwindow.h"
 #include <QApplication>
@@ -10,7 +8,7 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
     //    QWidget w;
-    //    //    w.show();
+    //    w.show();
 
     //    QSize size(400, 400);
     //    CWidget *cw = new CWidget(&w);

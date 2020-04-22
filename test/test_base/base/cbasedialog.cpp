@@ -1,8 +1,8 @@
-#include "cdialog.h"
+#include "cbasedialog.h"
 #include <QKeyEvent>
 #include <QUuid>
 
-CDialog::CDialog(CDialog::ShowType showType, QWidget *parent, Qt::WindowFlags f)
+CBaseDialog::CBaseDialog(CBaseDialog::ShowType showType, QWidget *parent, Qt::WindowFlags f)
     : QDialog(parent, f)
     , m_showType(showType)
     , m_uuid(QUuid::createUuid())
@@ -17,21 +17,51 @@ CDialog::CDialog(CDialog::ShowType showType, QWidget *parent, Qt::WindowFlags f)
     //    setWindowTitle(CLJConfigUtils::getLJLiveString());
 }
 
-CDialog::~CDialog()
+CBaseDialog::~CBaseDialog()
 {
 }
 
-QUuid CDialog::getUuid() const
+QUuid CBaseDialog::getUuid() const
 {
     return m_uuid;
 }
 
-CDialog::ShowType CDialog::getShowType() const
+CBaseDialog::ShowType CBaseDialog::getShowType() const
 {
     return m_showType;
 }
 
-void CDialog::keyPressEvent(QKeyEvent *event)
+void CBaseDialog::startShow()
+{
+    //    C_LOG_OUT_VALUE(showType);
+    this->hide();
+    switch(m_showType)
+    {
+    case SHOW_TYPE_NORMAL:
+    {
+        this->setModal(false);
+        this->show();
+        break;
+    }
+    case SHOW_TYPE_HALF_MODAL:
+    {
+        this->setModal(true);
+        this->show();
+        break;
+    }
+    case SHOW_TYPE_NORMAL_MODAL:
+    {
+        this->setModal(false);
+        this->exec();
+        break;
+    }
+    default:
+        break;
+    }
+    this->show();
+}
+
+void CBaseDialog::keyPressEvent(QKeyEvent *event)
 {
     if(!event->modifiers() || (event->modifiers() & Qt::KeypadModifier && event->key() == Qt::Key_Enter))
     {
@@ -48,24 +78,24 @@ void CDialog::keyPressEvent(QKeyEvent *event)
     return QDialog::keyPressEvent(event);
 }
 
-void CDialog::accept()
+void CBaseDialog::accept()
 {
     QDialog::accept();
     doCallback(m_defaultCallbackObj);
 }
 
-void CDialog::closeEvent(QCloseEvent *event)
+void CBaseDialog::closeEvent(QCloseEvent *event)
 {
     QDialog::closeEvent(event);
     emit sigClosed(m_uuid, m_showType);
 }
 
-void CDialog::setDefaultCallback(CDialog::CallbackObject obj)
+void CBaseDialog::setDefaultCallback(CBaseDialog::CallbackObject obj)
 {
     m_defaultCallbackObj = obj;
 }
 
-void CDialog::doCallback(CDialog::CallbackObject obj)
+void CBaseDialog::doCallback(CBaseDialog::CallbackObject obj)
 {
     //todo delayCallbackMS 使用逻辑
     if(obj.callback)
