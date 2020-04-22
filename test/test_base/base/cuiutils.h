@@ -14,6 +14,7 @@ public:
 
     static void setFullChildWidget(QWidget *parent, QWidget *childWidget, const QMargins &margins = QMargins());
     static QPixmap getSvgFilePixmap(const QString &filePath, const QSize &size, int devicePixelRatio = 1);
+    static void setLabelText(QLabel *label, const QString &text, int maxWidth = 0);
 };
 
 #endif // CUIUTILS_H

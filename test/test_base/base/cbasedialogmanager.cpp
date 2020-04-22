@@ -68,7 +68,7 @@ QSharedPointer<CBaseDialog> CBaseDialogManager::takeDialog(const QUuid &uuid, QL
     return dialog;
 }
 
-void CBaseDialogManager::onClosed(const QUuid &uuid, int showType)
+void CBaseDialogManager::onDialogClosed(const QUuid &uuid, int showType)
 {
     C_LOG_OUT_V2(uuid, showType);
     QSharedPointer<CBaseDialog> dialog = takeDialog(uuid, m_showDialogList);

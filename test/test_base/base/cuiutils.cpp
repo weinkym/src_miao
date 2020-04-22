@@ -155,3 +155,16 @@ QPixmap CUIUtils::getSvgFilePixmap(const QString &filePath, const QSize &size, i
     }
     return QPixmap();
 }
+
+void CUIUtils::setLabelText(QLabel *label, const QString &text, int maxWidth)
+{
+    if(label == NULL)
+    {
+        return;
+    }
+    if(maxWidth <= 0)
+    {
+        maxWidth = label->width();
+    }
+    label->setText(elidedTextList(text, label->font(), maxWidth, 1).join(""));
+}

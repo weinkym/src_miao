@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui svg
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,11 +27,13 @@ include(./base/base.pri)
 SOURCES += main.cpp\
         mainwindow.cpp \
     cdialogmanager.cpp \
-    ctestdialog.cpp
+    ctestdialog.cpp \
+    ctestwidget.cpp
 
 HEADERS  += mainwindow.h \
     cdialogmanager.h \
-    ctestdialog.h
+    ctestdialog.h \
+    ctestwidget.h
 
 FORMS    += mainwindow.ui \
     ctestdialog.ui

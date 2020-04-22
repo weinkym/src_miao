@@ -45,8 +45,13 @@ void MainWindow::onTestSlot()
     //    ui->label_2->setMaximumSize(pixmap->size() / 2);
     //    ui->label_2->setPixmap(*pixmap);
     //    ui->label_2->setScaledContents(false);
-    QPixmap pixmap = CUIUtils::getSvgFilePixmap(QString(":/res/test.svg"), QSize(256, 256), 2);
+    //    QPixmap pixmap = CUIUtils::getSvgFilePixmap(QString(":/res/test.svg"), QSize(256, 256), 2);
+    QPixmap pixmap = CUIUtils::getSvgFilePixmap(QString(":/res/test.svg"), QSize(0, 0), 2);
     ui->label_2->setMinimumSize(pixmap.size() / 2);
     ui->label_2->setMaximumSize(pixmap.size() / 2);
     ui->label_2->setPixmap(pixmap);
+
+    CUIUtils::setLabelText(ui->label_text, "012345678901234567890123456789");
+
+    ui->widget_3->setSvgFile(QString(":/res/test0%1.svg").arg(qrand() % 2 + 1));
 }
