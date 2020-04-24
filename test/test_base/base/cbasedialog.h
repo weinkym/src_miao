@@ -3,6 +3,7 @@
 #include <QDialog>
 #include <QUuid>
 #include <QVariant>
+#include <functional>
 
 class CBaseDialog : public QDialog
 {

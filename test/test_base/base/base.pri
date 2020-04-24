@@ -16,7 +16,8 @@ HEADERS += \
     $$PWD/cuiutils.h \
     $$PWD/cbaseutils.h \
     $$PWD/cjsonutils.h \
-    $$PWD/widgets/csvgwidget.h
+    $$PWD/widgets/csvgwidget.h \
+    $$PWD/cdownloadobject.h
 
 SOURCES += \
     $$PWD/cbaserequester.cpp \
@@ -29,4 +30,5 @@ SOURCES += \
     $$PWD/cuiutils.cpp \
     $$PWD/cbaseutils.cpp \
     $$PWD/cjsonutils.cpp \
-    $$PWD/widgets/csvgwidget.cpp
+    $$PWD/widgets/csvgwidget.cpp \
+    $$PWD/cdownloadobject.cpp
