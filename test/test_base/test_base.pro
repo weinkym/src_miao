@@ -28,12 +28,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     cdialogmanager.cpp \
     ctestdialog.cpp \
-    ctestwidget.cpp
+    ctestwidget.cpp \
+    ctestobject.cpp
 
 HEADERS  += mainwindow.h \
     cdialogmanager.h \
     ctestdialog.h \
-    ctestwidget.h
+    ctestwidget.h \
+    ctestobject.h
 
 FORMS    += mainwindow.ui \
     ctestdialog.ui

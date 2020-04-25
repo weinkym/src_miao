@@ -2,6 +2,7 @@ QT *= network svg
 
 INCLUDEPATH += $$PWD
 INCLUDEPATH += $$PWD/widgets
+INCLUDEPATH += $$PWD/download
 
 include($$PWD/log/log.pri)
 
@@ -17,7 +18,9 @@ HEADERS += \
     $$PWD/cbaseutils.h \
     $$PWD/cjsonutils.h \
     $$PWD/widgets/csvgwidget.h \
-    $$PWD/cdownloadobject.h
+    $$PWD/download/cdownloadobject.h \
+    $$PWD/download/cdownloadsettings.h \
+    $$PWD/download/crangedata.h
 
 SOURCES += \
     $$PWD/cbaserequester.cpp \
@@ -31,4 +34,6 @@ SOURCES += \
     $$PWD/cbaseutils.cpp \
     $$PWD/cjsonutils.cpp \
     $$PWD/widgets/csvgwidget.cpp \
-    $$PWD/cdownloadobject.cpp
+    $$PWD/download/cdownloadobject.cpp \
+    $$PWD/download/cdownloadsettings.cpp \
+    $$PWD/download/crangedata.cpp
