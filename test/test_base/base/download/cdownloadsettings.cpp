@@ -1,21 +1,20 @@
 #include "cdownloadsettings.h"
+#include "clogsetting.h"
 #include <QDebug>
 #include <QFile>
 #include <QSettings>
 
 CDownloadSettings::CDownloadSettings(const QString &filePath)
-    : m_isValid(false)
-    , m_fileSize(0)
+    : m_fileSize(0)
     , m_chunkSize(1024 * 1024)
     , m_threadCount(4)
     , m_rangeData(0, 0)
-    , m_saveFilePath("")
     , m_filePath(filePath)
     , m_timestamp("")
 {
     do
     {
-        QSettings settings(filePath, QSettings::IniFormat);
+        QSettings settings(getSettingsFile(m_filePath), QSettings::IniFormat);
         m_chunkSize = settings.value(QString("chunkSize"), 0).toULongLong();
         m_fileSize = settings.value(QString("fileSize"), 0).toULongLong();
         m_timestamp = settings.value(QString("timestamp")).toByteArray();
@@ -23,28 +22,42 @@ CDownloadSettings::CDownloadSettings(const QString &filePath)
     } while(0);
 }
 
-CDownloadSettings::CDownloadSettings(const QString &saveFilePath, quint64 fileSize, const QByteArray &timestamp)
-    : m_isValid(false)
-    , m_fileSize(fileSize)
-    , m_chunkSize(1024 * 1024)
-    , m_threadCount(4)
-    , m_rangeData(0, 0)
-    , m_saveFilePath(saveFilePath)
-    , m_filePath(saveFilePath + "cfg.ini")
-    , m_timestamp(timestamp)
+//CDownloadSettings::CDownloadSettings(const QString &saveFilePath, quint64 fileSize, const QByteArray &timestamp)
+//    : m_isValid(false)
+//    , m_fileSize(fileSize)
+//    , m_chunkSize(1024 * 1024)
+//    , m_threadCount(4)
+//    , m_rangeData(0, 0)
+//    , m_saveFilePath(saveFilePath)
+//    , m_filePath(saveFilePath + "cfg.ini")
+//    , m_timestamp(timestamp)
 
+//{
+//    do
+//    {
+//        if(m_chunkSize < fileSize)
+//        {
+//            m_chunkSize = fileSize;
+//        }
+//        if(fileSize > 0)
+//        {
+//            m_rangeData = CRangeData(0, getChunkCount(m_fileSize, m_chunkSize) - 1);
+//        }
+//    } while(0);
+//}
+
+void CDownloadSettings::update(const QString &filePath, quint64 fileSize, const QByteArray &timestamp)
 {
-    do
+    C_LOG_OUT_V6(fileSize, m_fileSize, m_filePath, filePath, m_timestamp, timestamp);
+    if(fileSize != m_fileSize || m_timestamp != timestamp || m_filePath != filePath || !isValid())
     {
-        if(m_chunkSize < fileSize)
-        {
-            m_chunkSize = fileSize;
-        }
-        if(fileSize > 0)
-        {
-            m_rangeData = CRangeData(0, getChunkCount(m_fileSize, m_chunkSize) - 1);
-        }
-    } while(0);
+        m_filePath = filePath;
+        m_fileSize = fileSize;
+        m_chunkSize = 1024 * 1024;
+        //    int m_threadCount;
+        m_timestamp = timestamp;
+        updateRangeData();
+    }
 }
 
 CDownloadSettings::~CDownloadSettings()
@@ -58,7 +71,7 @@ bool CDownloadSettings::isValid() const
     bool isValid = false;
     do
     {
-        if(!QFile::exists(m_saveFilePath))
+        if(!QFile::exists(m_filePath))
         {
             break;
         }
@@ -74,7 +87,7 @@ bool CDownloadSettings::isValid() const
         {
             break;
         }
-        QFile info(m_saveFilePath);
+        QFile info(m_filePath);
         if(info.size() != m_fileSize)
         {
             break;
@@ -105,7 +118,7 @@ quint64 CDownloadSettings::getChunkCount(quint64 fileSize, quint64 chunkSize)
 
 qint64 CDownloadSettings::writeToFile(quint64 index, const QByteArray &data)
 {
-    QFile file(m_saveFilePath);
+    QFile file(m_filePath);
     if(file.open(QIODevice::ReadWrite))
     {
         file.seek(index * m_chunkSize);
@@ -121,7 +134,7 @@ qint64 CDownloadSettings::writeToFile(quint64 index, const QByteArray &data)
 
 bool CDownloadSettings::isFinished() const
 {
-    return m_rangeData.isFinished();
+    return isValid() && m_rangeData.isFinished();
 }
 
 int CDownloadSettings::getChunkSize() const
@@ -148,22 +161,50 @@ quint64 CDownloadSettings::getIndexChunkSize(quint64 index) const
     return chunkSize;
 }
 
-quint64 CDownloadSettings::getIndexPos(quint64 index) const
+quint64 CDownloadSettings::getIndexPos(quint64 index, bool &ok) const
 {
     if(index > getMax() || index < 0)
     {
-        return -1;
+        ok = false;
+        return 0;
     }
+    ok = true;
     quint64 chunkSize = m_chunkSize * index;
     return chunkSize;
 }
 
+quint64 CDownloadSettings::getFreeIndex(bool &ok)
+{
+    return m_rangeData.getFreeIndex(ok);
+}
+
+QString CDownloadSettings::getSettingsFile(const QString &filePath)
+{
+    return filePath + ".cfg.ini";
+}
+
 void CDownloadSettings::saveSettings()
 {
-    QSettings settings(m_filePath, QSettings::IniFormat);
+    QSettings settings(getSettingsFile(m_filePath), QSettings::IniFormat);
     settings.setValue("chunkSize", m_chunkSize);
     settings.setValue("fileSize", m_fileSize);
     settings.setValue("timestamp", m_timestamp);
     settings.setValue("rangData", m_rangeData.toFormatString());
     settings.sync();
+}
+
+void CDownloadSettings::updateRangeData()
+{
+    if(m_chunkSize > m_fileSize)
+    {
+        m_chunkSize = m_fileSize;
+    }
+    if(m_fileSize > 0)
+    {
+        m_rangeData = CRangeData(0, getChunkCount(m_fileSize, m_chunkSize) - 1);
+    }
+    else
+    {
+        m_rangeData = CRangeData(0, 0);
+    }
 }

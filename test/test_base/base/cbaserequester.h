@@ -8,15 +8,19 @@ class CBaseRequester : public QObject
 {
     Q_OBJECT
 public:
-    CBaseRequester();
+    CBaseRequester(QObject *parent = nullptr);
     ~CBaseRequester();
 
 protected:
     QUuid request(CBaseRequestAction *action);
     virtual void doRequestFinished(bool ok, const CBaseRequestAction::Data &data) = 0;
+    void cancel(const QUuid &uuid);
 
 private slots:
     void onRequestFinished(const CBaseRequestAction::Data &data);
+
+signals:
+    void sigCancel(const QUuid &id);
 };
 
 #endif // CBASEREQUESTER_H

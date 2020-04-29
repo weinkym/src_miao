@@ -22,9 +22,9 @@ private:
     QNetworkReply *postByteArray(CBaseRequestAction *action);
     QNetworkReply *putByteArray(CBaseRequestAction *action);
     QNetworkReply *postWithttachment(CBaseRequestAction *action);
+    QNetworkReply *head(CBaseRequestAction *action);
     QNetworkReply *get(CBaseRequestAction *action);
     QNetworkReply *patchByteArray(CBaseRequestAction *action);
-    QNetworkReply *patchMulti(CBaseRequestAction *action);
     QNetworkReply *deleteResource(CBaseRequestAction *action);
     void recoverNetworkAccessible();
 

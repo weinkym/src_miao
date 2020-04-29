@@ -20,7 +20,8 @@ HEADERS += \
     $$PWD/widgets/csvgwidget.h \
     $$PWD/download/cdownloadobject.h \
     $$PWD/download/cdownloadsettings.h \
-    $$PWD/download/crangedata.h
+    $$PWD/download/crangedata.h \
+    $$PWD/download/cdownloadrequestaction.h
 
 SOURCES += \
     $$PWD/cbaserequester.cpp \
@@ -36,4 +37,5 @@ SOURCES += \
     $$PWD/widgets/csvgwidget.cpp \
     $$PWD/download/cdownloadobject.cpp \
     $$PWD/download/cdownloadsettings.cpp \
-    $$PWD/download/crangedata.cpp
+    $$PWD/download/crangedata.cpp \
+    $$PWD/download/cdownloadrequestaction.cpp

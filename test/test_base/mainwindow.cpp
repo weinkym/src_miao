@@ -7,9 +7,11 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_downloadObject(NULL)
 {
     ui->setupUi(this);
     connect(ui->widget_click, SIGNAL(sigClicked(QUuid)), this, SLOT(onTestSlot()));
+    m_downloadObject = new CDownloadObject("/Users/avc/Documents/TEMP/QQMusicMac_Mgr.dmg", "https://dldir1.qq.com/music/clntupate/mac/QQMusicMac_Mgr.dmg");
 }
 
 MainWindow::~MainWindow()
@@ -29,7 +31,8 @@ void MainWindow::on_pushButton_clicked()
     //    });
     //    dlg->startShow();
 
-    onTestSlot();
+    //    onTestSlot();
+    m_downloadObject->start();
 }
 
 void MainWindow::onTestSlot()

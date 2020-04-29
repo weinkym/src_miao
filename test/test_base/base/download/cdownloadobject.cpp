@@ -1,19 +1,38 @@
 #include "cdownloadobject.h"
+#include "cdownloadrequestaction.h"
+#include "cdownloadsettings.h"
 #include "clogsetting.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QPointer>
 #include <QSettings>
 #include <QTimer>
+
+static bool createTempile(const QString &filePath, quint64 size)
+{
+    qDebug() << __LINE__ << __FUNCTION__;
+    QFile file(filePath);
+    if(file.open(QIODevice::WriteOnly))
+    {
+        QByteArray data(size, '\0');
+        qint64 writeSize = file.write(data);
+        file.close();
+        qDebug() << __LINE__ << __FUNCTION__ << writeSize;
+        return writeSize == size;
+    }
+    return false;
+}
 
 const QString CDownloadObject::m_tmpSuffix = QLatin1String(".tmp");
 
 CDownloadObject::CDownloadObject(const QString &saveFilePath, const QString &url, QNetworkAccessManager *networkAccessManager, QObject *parent)
-    : QObject(parent)
+    : CBaseRequester(parent)
     , m_networkAccessMgr(networkAccessManager)
     , m_reply(NULL)
     , m_timeoutTimer(NULL)
+    , m_downloadSettings(new CDownloadSettings(saveFilePath))
     , m_status(STATUS_NORMAL)
     , m_url(url)
     , m_filePath(saveFilePath)
@@ -22,6 +41,15 @@ CDownloadObject::CDownloadObject(const QString &saveFilePath, const QString &url
     m_timeoutTimer->setInterval(45 * 1000);
     m_timeoutTimer->setSingleShot(true);
     connect(m_timeoutTimer, SIGNAL(timeout()), this, SLOT(onRequestTimeout()));
+}
+
+CDownloadObject::~CDownloadObject()
+{
+    if(m_downloadSettings)
+    {
+        delete m_downloadSettings;
+        m_downloadSettings = NULL;
+    }
 }
 
 void CDownloadObject::start()
@@ -44,11 +72,23 @@ void CDownloadObject::start()
     if(!m_networkAccessMgr)
         m_networkAccessMgr = new QNetworkAccessManager(this);
 
-    QString settingsFile = m_filePath + ".cfg.ini";
-    QString tmpFileName = m_filePath + ".tmp";
-    m_downloadInfo = DownloadInfo(settingsFile);
+    //    QString settingsFile = m_filePath + ".cfg.ini";
+    //    QString tmpFileName = m_filePath + ".tmp";
+    //    m_downloadInfo = DownloadInfo(settingsFile);
+    setStatus(STATUS_REQUEST_HEAD);
 
-    //todo 修改后重新下载逻辑
+    //    if(m_downloadSettings->isFinished())
+    //    {
+    //        setStatus(STATUS_FINISHED);
+    //    }
+    //    else if(m_downloadSettings->isValid())
+    //    {
+    //        requestPartial();
+    //    }
+    //    else
+    //    {
+    //        setStatus(STATUS_REQUEST_HEAD);
+    //    }
 }
 
 void CDownloadObject::downloadFile(const QString &filePath, const QString &url, bool fullDownload)
@@ -162,34 +202,16 @@ void CDownloadObject::setStatus(Status status)
     m_timeoutTimer->stop();
     m_status = status;
     emit sigStateUpdated(m_status);
-}
-
-void CDownloadObject::sendHttpHeadRequest()
-{
-    C_LOG_FUNCTION;
-    //    if(m_status == CPB::TRANSFER_STATE_CANCEL)
-    //    {
-    //        return;
-    //    }
-
-    //    if(m_networkAccessMgr == NULL)
-    //    {
-    //        m_networkAccessMgr = new QNetworkAccessManager(this);
-    //    }
-
-    QUrl url = QUrl(m_url);
-    QNetworkRequest req(url);
-    req.setRawHeader("Accept-Encoding", "none");
-    //    req.setHeader(QNetworkRequest::CookieHeader, CBizUtil::getLoginCookies());
-    m_reply = m_networkAccessMgr->head(req);
-    connect(m_reply, SIGNAL(finished()), this, SLOT(onHttpFinished()));
-    connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onDownloadNetworkError(QNetworkReply::NetworkError)));
-
-    if(m_timeoutTimer->isActive())
+    switch(m_status)
     {
-        m_timeoutTimer->stop();
+    case STATUS_REQUEST_HEAD:
+    {
+        requestHead();
+        break;
     }
-    m_timeoutTimer->start();
+    default:
+        break;
+    }
 }
 
 void CDownloadObject::sendHttpPartialGetRequest()
@@ -323,18 +345,72 @@ void CDownloadObject::saveToFile(const QByteArray &dataArray, const QString &fil
     }
 }
 
+void CDownloadObject::doRequestFinished(bool ok, const CBaseRequestAction::Data &data)
+{
+    C_LOG_OUT_V(ok);
+    if(!ok)
+    {
+        cancel();
+        return;
+    }
+    C_LOG_INFO("=======");
+    if(m_headRequestUuid == data.uuid)
+    {
+        C_LOG_INFO("=======");
+        bool needRequestAll = true;
+        quint64 fileSize = data.rawHeaderMap.value("Content-Length").toULongLong();
+        C_LOG_OUT_V(fileSize);
+        if(fileSize > 0)
+        {
+            if(!QFile::exists(m_filePath))
+            {
+                createTempile(m_filePath, fileSize);
+            }
+            needRequestAll = false;
+            m_downloadSettings->update(m_filePath, fileSize, data.rawHeaderMap.value("Last-Modified"));
+            if(m_downloadSettings->isFinished())
+            {
+                setStatus(STATUS_FINISHED);
+            }
+            else if(m_downloadSettings->isValid())
+            {
+                requestPartial();
+            }
+            else
+            {
+                needRequestAll = true;
+            }
+        }
+        if(needRequestAll)
+        {
+            //TODO
+            //            request()
+        }
+        C_LOG_OUT_V(needRequestAll);
+        return;
+    }
+    if(m_partUuidMap.contains(data.uuid))
+    {
+        C_LOG_INFO("=======");
+        m_downloadSettings->writeToFile(m_partUuidMap.value(data.uuid), data.replyArray);
+        m_partUuidMap.remove(data.uuid);
+    }
+    if(m_downloadSettings->isFinished())
+    {
+        C_LOG_INFO("=======");
+        setStatus(STATUS_FINISHED);
+    }
+    else
+    {
+        C_LOG_INFO("=======");
+        requestPartial();
+    }
+}
+
 void CDownloadObject::requestHead()
 {
-    setStatus(STATUS_REQUEST_HEAD);
-    QUrl url = QUrl(m_url);
-    QNetworkRequest req(url);
-    req.setRawHeader("Accept-Encoding", "none");
-    //    req.setHeader(QNetworkRequest::CookieHeader, CBizUtil::getLoginCookies());
-    m_reply = m_networkAccessMgr->head(req);
-    connect(m_reply, SIGNAL(finished()), this, SLOT(onRequestFinished()));
-    //    connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onDownloadNetworkError(QNetworkReply::NetworkError)));
-
-    m_timeoutTimer->start();
+    CDownloadRequestAction *action = CDownloadRequestAction::createHeadAction(m_url);
+    m_headRequestUuid = this->request(action);
 }
 
 void CDownloadObject::doError(const QString &error)
@@ -347,44 +423,36 @@ void CDownloadObject::doError(const QString &error)
 
 void CDownloadObject::requestPartial()
 {
-    if(m_status == STATUS_REQUEST_PARTIAL)
+    C_LOG_FUNCTION;
+    bool ok = false;
+    do
     {
-        return;
-    }
-    if(m_downloadInfo.complete >= m_downloadInfo.fileSize)
-    {
-        C_LOG_WARNING(QString("Invalid args, complete = %1, filesize = %2").arg(m_downloadInfo.complete).arg(m_downloadInfo.fileSize));
-        return;
-    }
-
-    QUrl url = QUrl(m_url);
-    QNetworkRequest req(m_url);
-    C_LOG_DEBUG(QString("complete=%1,filesize=%2,CHUNK_SIZE=%3, url:=%4").arg(m_downloadInfo.complete).arg(m_downloadInfo.fileSize).arg(CHUNK_SIZE).arg(m_url));
-
-    quint64 finishedDownloadSize = m_downloadInfo.complete + m_dataCache.size();
-    if(finishedDownloadSize + CHUNK_SIZE > m_downloadInfo.fileSize)
-    {
-        QString s = QString("bytes=%1-%2").arg(finishedDownloadSize).arg(QString(""));
-        req.setRawHeader("Range", s.toUtf8());
-        C_LOG_DEBUG(QString("Range:%1").arg(s));
-    }
-    else
-    {
-        QString s = QString("bytes=%1-%2").arg(finishedDownloadSize).arg(finishedDownloadSize + CHUNK_SIZE - 1);
-        req.setRawHeader("Range", s.toUtf8());
-        C_LOG_DEBUG(QString("Range:%1").arg(s));
-    }
-    //    req.setHeader(QNetworkRequest::CookieHeader, CBizUtil::getLoginCookies());
-    m_reply = m_networkAccessMgr->get(req);
-    connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError)),
-        this, SLOT(onDownloadNetworkError(QNetworkReply::NetworkError)));
-    connect(m_reply, SIGNAL(finished()), this, SLOT(onHttpFinished()));
-
-    if(m_timeoutTimer->isActive())
-    {
-        m_timeoutTimer->stop();
-    }
-    m_timeoutTimer->start();
+        quint64 index = m_downloadSettings->getFreeIndex(ok);
+        C_LOG_OUT_V2(index, ok);
+        if(!ok)
+        {
+            break;
+        }
+        quint64 size = m_downloadSettings->getIndexChunkSize(index);
+        C_LOG_OUT_V2(size, ok);
+        if(size == 0)
+        {
+            break;
+        }
+        quint64 pos = m_downloadSettings->getIndexPos(index, ok);
+        C_LOG_OUT_V2(pos, ok);
+        if(!ok)
+        {
+            break;
+        }
+        if(ok)
+        {
+            CDownloadRequestAction *action = CDownloadRequestAction::createPartAction(m_url, pos, pos + size - 1);
+            QUuid uuid = this->request(action);
+            C_LOG_OUT_V4(uuid, index, pos, size);
+            m_partUuidMap.insert(uuid, index);
+        }
+    } while(ok && m_partUuidMap.count() < 1);
 }
 
 void CDownloadObject::onHttpFinished()

@@ -1,5 +1,6 @@
 #include "crangedata.h"
-#include <QDebug>
+#include "clogsetting.h"
+
 const char *G_SQUARE_BRACKET_L = "[";
 const char *G_SQUARE_BRACKET_R = "]";
 const char *G_SEPARATOR = ",";
@@ -72,6 +73,7 @@ void CRangeData::remove(quint64 index)
     {
         return;
     }
+    m_doingIndexList.removeAll(index);
 
     for(quint64 i = 0; i < m_dataList.count(); ++i)
     {
@@ -129,6 +131,44 @@ quint64 CRangeData::getMax() const
     return 0;
 }
 
+quint64 CRangeData::getFreeIndex(bool &ok)
+{
+    C_LOG_OUT_V2(isValid(), m_dataList.isEmpty());
+    ok = false;
+    if(!isValid() || m_dataList.isEmpty())
+    {
+        return 0;
+    }
+    for(auto obj : m_dataList)
+    {
+        for(int i = obj.first; i <= obj.second; ++i)
+        {
+            if(appendDoingIndex(obj.first))
+            {
+                ok = true;
+                break;
+            }
+        }
+        if(ok)
+        {
+            break;
+        }
+    }
+    C_LOG_OUT_V2(ok, m_doingIndexList.isEmpty());
+    if(ok)
+    {
+        if(!m_doingIndexList.isEmpty())
+        {
+            return m_doingIndexList.last();
+        }
+        else
+        {
+            C_LOG_WARNING("m_doingIndexList is empty");
+        }
+    }
+    return 0;
+}
+
 QList<QPair<quint64, quint64> > CRangeData::removePairOne(const QPair<quint64, quint64> &obj, quint64 index)
 {
     QList<QPair<quint64, quint64> > objList;
@@ -153,4 +193,14 @@ QList<QPair<quint64, quint64> > CRangeData::removePairOne(const QPair<quint64, q
     }
     qDebug() << __LINE__ << __FUNCTION__ << index << objList.count();
     return objList;
+}
+
+bool CRangeData::appendDoingIndex(quint64 index)
+{
+    if(m_doingIndexList.contains(index))
+    {
+        return false;
+    }
+    m_doingIndexList.append(index);
+    return true;
 }

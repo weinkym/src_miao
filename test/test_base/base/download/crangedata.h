@@ -14,13 +14,16 @@ public:
     bool isValid() const;
     QString toFormatString() const;
     quint64 getMax() const;
+    quint64 getFreeIndex(bool &ok);
 
 private:
     QList<QPair<quint64, quint64> > removePairOne(const QPair<quint64, quint64> &obj, quint64 index);
+    bool appendDoingIndex(quint64 index);
 
 private:
     bool m_isValid;
     QList<QPair<quint64, quint64> > m_dataList;
+    QList<quint64> m_doingIndexList;
 };
 
 #endif // CRANGEDATA_H

@@ -13,31 +13,24 @@ class CBaseRequestAction : public QObject
 {
     Q_OBJECT
 public:
-    enum Operation
+    enum RequestType
     {
-        Undefine = 0, /*!< 未定义操作 */
-        PostByteArray, /*!< 发送文本信息 */
-        PostWithttachment, /*!< 发送QHttpMultiPart */
-        Get, /*!< 请求数据 */
-        Delete, /*!< 删除数据 */
-        PatchByteArray, /*!< 更新文本数据 */
-        PatchMultimedia, /*!< 更新多媒体数据 */
-        PutByteArray
-    };
-    enum Type
-    {
-        TYPE_NODEFINED = 0,
-        TYPE_REQUEST_SUMMARIES, //srs summaries message
-        TYPE_REQUEST_ROOMS,
-        TYPE_REQUEST_POST_SUMMARIES,
+        REQUEST_TYPE_UNDEFINED = 0, /*!< 未定义操作 */
+        REQUEST_TYPE_POST,
+        REQUEST_TYPE_POST_MULTI_PART, /*!< 发送QHttpMultiPart */
+        REQUEST_TYPE_HEAD,
+        REQUEST_TYPE_GET,
+        REQUEST_TYPE_DELETE,
+        REQUEST_TYPE_PATCH,
+        REQUEST_TYPE_PUT
     };
     struct Data
     {
         Data();
-        Type type;
         int networkErrorCode;
         int statusCode;
 
+        QString actionName;
         QUuid uuid;
         QDateTime startTime;
         QDateTime endTime;
@@ -45,15 +38,17 @@ public:
         QVariant value;
         QVariant errorValue;
         QVariant customValue;
+        QHash<QByteArray, QByteArray> rawHeaderMap;
     };
 
-    explicit CBaseRequestAction(Type type, QObject *parent = 0);
+    explicit CBaseRequestAction(QObject *parent = 0);
     virtual ~CBaseRequestAction();
-    CBaseRequestAction::Type getType() const;
+    //    CBaseRequestAction::RequestType getType() const;
     QUuid getUuid() { return m_replayStatusData.uuid; }
 
 protected:
-    virtual Operation getOperation() const = 0;
+    virtual QString getActionName() const = 0;
+    virtual RequestType getRequestType() const = 0;
     virtual QNetworkRequest getRequest() const = 0;
     virtual QByteArray getByteArray() const;
     virtual QHttpMultiPart *getMultiPart();
@@ -69,6 +64,7 @@ protected slots:
     void onReplyError(QNetworkReply::NetworkError error);
     void onIgnoreSSlErrors(const QList<QSslError> &sslErrors);
     void onHttpTimeout();
+    void onCancel(const QUuid &uuid);
 
 signals:
     void sigCancel();

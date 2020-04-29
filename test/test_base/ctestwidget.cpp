@@ -22,6 +22,6 @@ void CTestWidget::paintEvent(QPaintEvent *event)
 
 void CTestWidget::onRepaintNeeded()
 {
-    C_LOG_FUNCTION;
+    //    C_LOG_FUNCTION;
     this->update();
 }

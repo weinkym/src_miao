@@ -1,13 +1,14 @@
 #ifndef CDOWNLOADOBJECT_H
 #define CDOWNLOADOBJECT_H
+#include "cbaserequester.h"
 #include <QNetworkReply>
-#include <QObject>
 
 class QTimer;
 class QNetworkReply;
 class QNetworkAccessManager;
+class CDownloadSettings;
 
-class CDownloadObject : public QObject
+class CDownloadObject : public CBaseRequester
 {
     Q_OBJECT
 public:
@@ -38,14 +39,14 @@ public:
         QByteArray timestamp;
     };
 
-    CDownloadObject(const QString &saveFilePath, const QString &url, QNetworkAccessManager *networkAccessManager, QObject *parent = 0);
+    CDownloadObject(const QString &saveFilePath, const QString &url, QNetworkAccessManager *networkAccessManager = 0, QObject *parent = 0);
+    ~CDownloadObject();
     void start();
     void downloadFile(const QString &filePath, const QString &url, bool fullDownload = false);
     void cancel();
 
 protected:
     void setStatus(Status status);
-    void sendHttpHeadRequest();
     void sendHttpPartialGetRequest();
     void sendHttpAllGetRequest();
 
@@ -53,11 +54,12 @@ protected:
     QString getSettingsFile();
     void touchFile(const QString &filename);
     void saveToFile(const QByteArray &dataArray, const QString &fileName, quint64 pos);
-    void requestHead();
+    void doRequestFinished(bool ok, const CBaseRequestAction::Data &data);
 
 private:
     void doError(const QString &error);
     void requestPartial();
+    void requestHead();
 
 private slots:
     void onHttpFinished();
@@ -81,13 +83,16 @@ public:
     QNetworkAccessManager *m_networkAccessMgr;
     QNetworkReply *m_reply;
     QTimer *m_timeoutTimer;
-
+    CDownloadSettings *m_downloadSettings;
     Status m_status;
     QString m_url;
     QString m_filePath;
     QString m_lastError;
     DownloadInfo m_downloadInfo;
     QByteArray m_dataCache;
+    QUuid m_headRequestUuid;
+    QList<QUuid> m_requestUuidList;
+    QHash<QUuid, int> m_partUuidMap;
 };
 
 #endif // CDOWNLOADOBJECT_H

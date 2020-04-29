@@ -39,30 +39,33 @@ bool CRequestAccessManager::request(CBaseRequestAction *action)
     {
         return false;
     }
-    CBaseRequestAction::Operation operation = action->getOperation();
+    CBaseRequestAction::RequestType operation = action->getRequestType();
     C_LOG_OUT_V2(operation, action->metaObject()->className());
     QNetworkReply *reply = NULL;
     switch(operation)
     {
-    case CBaseRequestAction::PostByteArray:
+    case CBaseRequestAction::REQUEST_TYPE_POST:
         reply = postByteArray(action);
         break;
-    case CBaseRequestAction::Get:
+    case CBaseRequestAction::REQUEST_TYPE_HEAD:
+        reply = head(action);
+        break;
+    case CBaseRequestAction::REQUEST_TYPE_GET:
         reply = get(action);
         break;
-    case CBaseRequestAction::PatchByteArray:
+    case CBaseRequestAction::REQUEST_TYPE_PATCH:
         reply = patchByteArray(action);
         break;
-    case CBaseRequestAction::PatchMultimedia:
-        reply = patchMulti(action);
-        break;
-    case CBaseRequestAction::PostWithttachment:
+        //    case CBaseRequestAction::REQUEST_TYPE_PATCH:
+        //        reply = patchMulti(action);
+        //        break;
+    case CBaseRequestAction::REQUEST_TYPE_POST_MULTI_PART:
         reply = postWithttachment(action);
         break;
-    case CBaseRequestAction::Delete:
+    case CBaseRequestAction::REQUEST_TYPE_DELETE:
         reply = deleteResource(action);
         break;
-    case CBaseRequestAction::PutByteArray:
+    case CBaseRequestAction::REQUEST_TYPE_PUT:
         reply = putByteArray(action);
         break;
     default:
@@ -104,6 +107,13 @@ QNetworkReply *CRequestAccessManager::postWithttachment(CBaseRequestAction *acti
     return m_access->post(request, multiPart);
 }
 
+QNetworkReply *CRequestAccessManager::head(CBaseRequestAction *action)
+{
+    C_LOG_FUNCTION;
+    QNetworkRequest request = action->getRequest();
+    return m_access->head(request);
+}
+
 QNetworkReply *CRequestAccessManager::get(CBaseRequestAction *action)
 {
     C_LOG_FUNCTION;
@@ -114,18 +124,6 @@ QNetworkReply *CRequestAccessManager::get(CBaseRequestAction *action)
 QNetworkReply *CRequestAccessManager::patchByteArray(CBaseRequestAction *action)
 {
     C_LOG_FUNCTION;
-    QNetworkRequest request = action->getRequest();
-    QByteArray array = action->getByteArray();
-    QBuffer *buffer = new QBuffer;
-    buffer->setData(array);
-    QString patchString = array;
-    QNetworkReply *reply = m_access->sendCustomRequest(request, QByteArray("PATCH"), buffer);
-    buffer->setParent(reply);
-    return reply;
-}
-
-QNetworkReply *CRequestAccessManager::patchMulti(CBaseRequestAction *action)
-{
     QNetworkRequest request = action->getRequest();
     QByteArray array = action->getByteArray();
     QBuffer *buffer = new QBuffer;

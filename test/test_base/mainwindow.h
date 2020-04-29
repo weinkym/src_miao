@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "cbaseutils.h"
+#include "cdownloadobject.h"
 #include "ctestdialog.h"
 #include "cuiutils.h"
 #include <QDataStream>
@@ -29,6 +30,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    CDownloadObject *m_downloadObject;
 };
 
 #endif // MAINWINDOW_H

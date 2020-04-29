@@ -24,18 +24,18 @@ CTestObject::CTestObject(const QString &filePath, QObject *parent)
     , m_downloadSettings(NULL)
     , m_filePath(filePath)
 {
-    QFileInfo info(filePath);
-    m_saveFilePath = QString("%1/TT_%2").arg(info.absolutePath()).arg(info.fileName());
-    qDebug() << __LINE__ << __FUNCTION__ << m_saveFilePath;
-    m_downloadSettings = new CDownloadSettings(m_saveFilePath, info.size(), "");
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
-    m_timer.setInterval(1000);
-    m_timer.setSingleShot(true);
+    //    QFileInfo info(filePath);
+    //    m_saveFilePath = QString("%1/TT_%2").arg(info.absolutePath()).arg(info.fileName());
+    //    qDebug() << __LINE__ << __FUNCTION__ << m_saveFilePath;
+    //    m_downloadSettings = new CDownloadSettings(m_saveFilePath, info.size(), "");
+    //    connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
+    //    m_timer.setInterval(1000);
+    //    m_timer.setSingleShot(true);
 
-    for(quint64 i = 0; i <= m_downloadSettings->getMax(); ++i)
-    {
-        m_indexList.append(i);
-    }
+    //    for(quint64 i = 0; i <= m_downloadSettings->getMax(); ++i)
+    //    {
+    //        m_indexList.append(i);
+    //    }
 }
 
 CTestObject::~CTestObject()
@@ -55,25 +55,25 @@ void CTestObject::start()
 
 void CTestObject::onTimeout()
 {
-    if(m_indexList.isEmpty())
-    {
-        return;
-    }
-    int index = qrand() % m_indexList.count();
-    m_indexList.removeAt(index);
-    QFile file(m_filePath);
-    qint64 pos = m_downloadSettings->getIndexPos(index);
-    qint64 readSize = m_downloadSettings->getIndexChunkSize(index);
-    if(file.open(QIODevice::ReadOnly) && file.seek(pos))
-    {
-        QByteArray data = file.read(readSize);
-        m_downloadSettings->writeToFile(index, data);
-        file.close();
-    }
-    if(m_indexList.isEmpty())
-    {
-        emit sigFinished(true);
-        return;
-    }
-    m_timer.start();
+    //    if(m_indexList.isEmpty())
+    //    {
+    //        return;
+    //    }
+    //    int index = qrand() % m_indexList.count();
+    //    m_indexList.removeAt(index);
+    //    QFile file(m_filePath);
+    //    qint64 pos = m_downloadSettings->getIndexPos(index);
+    //    qint64 readSize = m_downloadSettings->getIndexChunkSize(index);
+    //    if(file.open(QIODevice::ReadOnly) && file.seek(pos))
+    //    {
+    //        QByteArray data = file.read(readSize);
+    //        m_downloadSettings->writeToFile(index, data);
+    //        file.close();
+    //    }
+    //    if(m_indexList.isEmpty())
+    //    {
+    //        emit sigFinished(true);
+    //        return;
+    //    }
+    //    m_timer.start();
 }
