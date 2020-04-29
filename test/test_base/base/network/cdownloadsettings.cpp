@@ -6,45 +6,22 @@
 
 CDownloadSettings::CDownloadSettings(const QString &filePath)
     : m_fileSize(0)
+    , m_downloadSize(0)
     , m_chunkSize(1024 * 1024)
-    , m_threadCount(4)
     , m_rangeData(0, 0)
     , m_filePath(filePath)
     , m_timestamp("")
 {
     do
     {
-        QSettings settings(getSettingsFile(m_filePath), QSettings::IniFormat);
+        QSettings settings(getSettingsFile(), QSettings::IniFormat);
         m_chunkSize = settings.value(QString("chunkSize"), 0).toULongLong();
         m_fileSize = settings.value(QString("fileSize"), 0).toULongLong();
+        m_downloadSize = settings.value(QString("downloadSize"), 0).toULongLong();
         m_timestamp = settings.value(QString("timestamp")).toByteArray();
         m_rangeData = CRangeData(settings.value(QString("rangData")).toString());
     } while(0);
 }
-
-//CDownloadSettings::CDownloadSettings(const QString &saveFilePath, quint64 fileSize, const QByteArray &timestamp)
-//    : m_isValid(false)
-//    , m_fileSize(fileSize)
-//    , m_chunkSize(1024 * 1024)
-//    , m_threadCount(4)
-//    , m_rangeData(0, 0)
-//    , m_saveFilePath(saveFilePath)
-//    , m_filePath(saveFilePath + "cfg.ini")
-//    , m_timestamp(timestamp)
-
-//{
-//    do
-//    {
-//        if(m_chunkSize < fileSize)
-//        {
-//            m_chunkSize = fileSize;
-//        }
-//        if(fileSize > 0)
-//        {
-//            m_rangeData = CRangeData(0, getChunkCount(m_fileSize, m_chunkSize) - 1);
-//        }
-//    } while(0);
-//}
 
 void CDownloadSettings::update(const QString &filePath, quint64 fileSize, const QByteArray &timestamp)
 {
@@ -53,8 +30,8 @@ void CDownloadSettings::update(const QString &filePath, quint64 fileSize, const 
     {
         m_filePath = filePath;
         m_fileSize = fileSize;
+        m_downloadSize = 0;
         m_chunkSize = 1024 * 1024;
-        //    int m_threadCount;
         m_timestamp = timestamp;
         updateRangeData();
     }
@@ -66,8 +43,6 @@ CDownloadSettings::~CDownloadSettings()
 
 bool CDownloadSettings::isValid() const
 {
-    //todo file path md5 验证
-    //ini last mod 验证
     bool isValid = false;
     do
     {
@@ -83,7 +58,7 @@ bool CDownloadSettings::isValid() const
         {
             break;
         }
-        if(!m_rangeData.isValid())
+        if(m_downloadSize > m_fileSize)
         {
             break;
         }
@@ -92,7 +67,7 @@ bool CDownloadSettings::isValid() const
         {
             break;
         }
-        isValid = m_rangeData.getMax() <= (getChunkCount(m_fileSize, m_chunkSize) - 1);
+        isValid = m_rangeData.isValid();
     } while(0);
 
     return isValid;
@@ -126,7 +101,8 @@ qint64 CDownloadSettings::writeToFile(quint64 index, const QByteArray &data)
         file.close();
         m_rangeData.remove(index);
         saveSettings();
-        qDebug() << __LINE__ << __FUNCTION__ << index << size;
+        C_LOG_OUT_V2(index, size);
+        m_downloadSize += size;
         return size;
     }
     return -1;
@@ -134,6 +110,7 @@ qint64 CDownloadSettings::writeToFile(quint64 index, const QByteArray &data)
 
 bool CDownloadSettings::isFinished() const
 {
+    C_LOG_OUT_V2(isValid(), m_rangeData.isFinished());
     return isValid() && m_rangeData.isFinished();
 }
 
@@ -178,16 +155,32 @@ quint64 CDownloadSettings::getFreeIndex(bool &ok)
     return m_rangeData.getFreeIndex(ok);
 }
 
+QString CDownloadSettings::getSettingsFile()
+{
+    return getSettingsFile(m_filePath);
+}
+
 QString CDownloadSettings::getSettingsFile(const QString &filePath)
 {
     return filePath + ".cfg.ini";
 }
 
+qint64 CDownloadSettings::getFileSize() const
+{
+    return m_fileSize;
+}
+
+qint64 CDownloadSettings::getDownloadSize() const
+{
+    return m_downloadSize;
+}
+
 void CDownloadSettings::saveSettings()
 {
-    QSettings settings(getSettingsFile(m_filePath), QSettings::IniFormat);
+    QSettings settings(getSettingsFile(), QSettings::IniFormat);
     settings.setValue("chunkSize", m_chunkSize);
     settings.setValue("fileSize", m_fileSize);
+    settings.setValue("downloadSize", m_downloadSize);
     settings.setValue("timestamp", m_timestamp);
     settings.setValue("rangData", m_rangeData.toFormatString());
     settings.sync();

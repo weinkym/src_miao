@@ -27,6 +27,7 @@ public:
 private slots:
     void on_pushButton_clicked();
     void onTestSlot();
+    void onProcessUpdated(quint64 complete, quint64 fileSize);
 
 private:
     Ui::MainWindow *ui;

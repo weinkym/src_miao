@@ -32,7 +32,7 @@ background:#ffffff;
        <widget class="CClickWidget" name="widget_click" native="true">
         <property name="geometry">
          <rect>
-          <x>210</x>
+          <x>230</x>
           <y>10</y>
           <width>151</width>
           <height>141</height>
@@ -57,17 +57,6 @@ background:#ffffff;
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="styleSheet">
-            <string notr="true">image:url(:/res/test.svg);
-background:#fff0f0;</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
        <widget class="QPushButton" name="pushButton">
@@ -164,11 +153,41 @@ background:rgba(255, 0, 0, 0)
        <widget class="CSvgWidget" name="widget_3" native="true">
         <property name="geometry">
          <rect>
-          <x>40</x>
-          <y>30</y>
+          <x>20</x>
+          <y>110</y>
           <width>111</width>
           <height>111</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>300</y>
+          <width>431</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="value">
+         <number>24</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>230</x>
+          <y>130</y>
+          <width>151</width>
+          <height>141</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">image:url(:/res/test.svg);
+background:#fff0f0;</string>
+        </property>
+        <property name="text">
+         <string/>
         </property>
        </widget>
        <zorder>widget_click</zorder>
@@ -178,6 +197,8 @@ background:rgba(255, 0, 0, 0)
        <zorder>label_2</zorder>
        <zorder>widget_2</zorder>
        <zorder>widget_3</zorder>
+       <zorder>progressBar</zorder>
+       <zorder>label</zorder>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">

@@ -2,40 +2,40 @@ QT *= network svg
 
 INCLUDEPATH += $$PWD
 INCLUDEPATH += $$PWD/widgets
-INCLUDEPATH += $$PWD/download
+INCLUDEPATH += $$PWD/network
 
 include($$PWD/log/log.pri)
 
 HEADERS += \
-    $$PWD/cbaserequester.h \
-    $$PWD/cbaserequestaction.h \
     $$PWD/cbasewidget.h \
     $$PWD/cbasedialog.h \
     $$PWD/cbasedialogmanager.h \
-    $$PWD/crequestaccessmanager.h \
     $$PWD/widgets/cclickwidget.h \
     $$PWD/cuiutils.h \
     $$PWD/cbaseutils.h \
     $$PWD/cjsonutils.h \
     $$PWD/widgets/csvgwidget.h \
-    $$PWD/download/cdownloadobject.h \
-    $$PWD/download/cdownloadsettings.h \
-    $$PWD/download/crangedata.h \
-    $$PWD/download/cdownloadrequestaction.h
+    $$PWD/network/cbaserequestaction.h \
+    $$PWD/network/cbaserequester.h \
+    $$PWD/network/cdownloadobject.h \
+    $$PWD/network/cdownloadrequestaction.h \
+    $$PWD/network/cdownloadsettings.h \
+    $$PWD/network/crangedata.h \
+    $$PWD/network/crequestaccessmanager.h
 
 SOURCES += \
-    $$PWD/cbaserequester.cpp \
-    $$PWD/cbaserequestaction.cpp \
     $$PWD/cbasewidget.cpp \
     $$PWD/cbasedialog.cpp \
     $$PWD/cbasedialogmanager.cpp \
-    $$PWD/crequestaccessmanager.cpp \
     $$PWD/widgets/cclickwidget.cpp \
     $$PWD/cuiutils.cpp \
     $$PWD/cbaseutils.cpp \
     $$PWD/cjsonutils.cpp \
     $$PWD/widgets/csvgwidget.cpp \
-    $$PWD/download/cdownloadobject.cpp \
-    $$PWD/download/cdownloadsettings.cpp \
-    $$PWD/download/crangedata.cpp \
-    $$PWD/download/cdownloadrequestaction.cpp
+    $$PWD/network/cbaserequestaction.cpp \
+    $$PWD/network/cbaserequester.cpp \
+    $$PWD/network/cdownloadobject.cpp \
+    $$PWD/network/cdownloadrequestaction.cpp \
+    $$PWD/network/cdownloadsettings.cpp \
+    $$PWD/network/crangedata.cpp \
+    $$PWD/network/crequestaccessmanager.cpp

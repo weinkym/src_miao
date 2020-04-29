@@ -1,8 +1,6 @@
 #include "crangedata.h"
 #include "clogsetting.h"
 
-const char *G_SQUARE_BRACKET_L = "[";
-const char *G_SQUARE_BRACKET_R = "]";
 const char *G_SEPARATOR = ",";
 
 CRangeData::CRangeData(quint64 min, quint64 max)
@@ -19,6 +17,7 @@ CRangeData::CRangeData(const QString &formatString)
         QStringList objList = formatString.split(G_SEPARATOR);
         if(objList.isEmpty())
         {
+            m_isValid = true;
             break;
         }
         quint64 count = objList.count();

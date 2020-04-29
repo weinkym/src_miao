@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     connect(ui->widget_click, SIGNAL(sigClicked(QUuid)), this, SLOT(onTestSlot()));
     m_downloadObject = new CDownloadObject("/Users/avc/Documents/TEMP/QQMusicMac_Mgr.dmg", "https://dldir1.qq.com/music/clntupate/mac/QQMusicMac_Mgr.dmg");
+    connect(m_downloadObject, SIGNAL(sigProcessUpdated(quint64, quint64)), this, SLOT(onProcessUpdated(quint64, quint64)));
 }
 
 MainWindow::~MainWindow()
@@ -57,4 +58,10 @@ void MainWindow::onTestSlot()
     CUIUtils::setLabelText(ui->label_text, "012345678901234567890123456789");
 
     ui->widget_3->setSvgFile(QString(":/res/test0%1.svg").arg(qrand() % 2 + 1));
+}
+
+void MainWindow::onProcessUpdated(quint64 complete, quint64 fileSize)
+{
+    ui->progressBar->setMaximum(fileSize);
+    ui->progressBar->setValue(complete);
 }

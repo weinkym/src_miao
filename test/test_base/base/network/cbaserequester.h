@@ -14,7 +14,7 @@ public:
 protected:
     QUuid request(CBaseRequestAction *action);
     virtual void doRequestFinished(bool ok, const CBaseRequestAction::Data &data) = 0;
-    void cancel(const QUuid &uuid);
+    void stopReqeust(const QUuid &uuid);
 
 private slots:
     void onRequestFinished(const CBaseRequestAction::Data &data);

@@ -22,7 +22,7 @@ QUuid CBaseRequester::request(CBaseRequestAction *action)
     return uuid;
 }
 
-void CBaseRequester::cancel(const QUuid &uuid)
+void CBaseRequester::stopReqeust(const QUuid &uuid)
 {
     C_LOG_OUT_V(uuid);
     emit sigCancel(uuid);

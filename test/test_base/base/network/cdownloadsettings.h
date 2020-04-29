@@ -8,8 +8,6 @@ class CDownloadSettings
 {
 public:
     CDownloadSettings(const QString &filePath);
-    //    CDownloadSettings(const QString &saveFilePath, quint64 fileSize, const QByteArray &timestamp);
-
     void update(const QString &filePath, quint64 fileSize, const QByteArray &timestamp);
 
     ~CDownloadSettings();
@@ -22,8 +20,11 @@ public:
     quint64 getIndexChunkSize(quint64 index) const;
     quint64 getIndexPos(quint64 index, bool &ok) const;
     quint64 getFreeIndex(bool &ok);
+    QString getSettingsFile();
 
     static QString getSettingsFile(const QString &filePath);
+    qint64 getFileSize() const;
+    qint64 getDownloadSize() const;
 
 private:
     void saveSettings();
@@ -32,8 +33,8 @@ private:
 private:
     bool m_isValid;
     quint64 m_fileSize;
+    quint64 m_downloadSize;
     int m_chunkSize;
-    int m_threadCount;
     CRangeData m_rangeData;
     QString m_filePath;
     QByteArray m_timestamp;
