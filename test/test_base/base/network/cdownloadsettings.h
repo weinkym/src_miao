@@ -21,6 +21,7 @@ public:
     quint64 getIndexPos(quint64 index, bool &ok) const;
     quint64 getFreeIndex(bool &ok);
     QString getSettingsFile();
+    QString getTempFile() const;
 
     static QString getSettingsFile(const QString &filePath);
     qint64 getFileSize() const;
@@ -31,7 +32,7 @@ private:
     void updateRangeData();
 
 private:
-    bool m_isValid;
+    //    bool m_isValid;
     quint64 m_fileSize;
     quint64 m_downloadSize;
     int m_chunkSize;

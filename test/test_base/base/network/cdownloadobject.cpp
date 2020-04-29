@@ -10,21 +10,6 @@
 #include <QSettings>
 #include <QTimer>
 
-static bool createTempile(const QString &filePath, quint64 size)
-{
-    qDebug() << __LINE__ << __FUNCTION__;
-    QFile file(filePath);
-    if(file.open(QIODevice::WriteOnly))
-    {
-        QByteArray data(size, '\0');
-        qint64 writeSize = file.write(data);
-        file.close();
-        qDebug() << __LINE__ << __FUNCTION__ << writeSize;
-        return writeSize == size;
-    }
-    return false;
-}
-
 CDownloadObject::CDownloadObject(const QString &saveFilePath, const QString &url, QObject *parent)
     : CBaseRequester(parent)
     , m_downloadSettings(new CDownloadSettings(saveFilePath))
@@ -106,6 +91,12 @@ void CDownloadObject::setStatus(Status status)
         }
         break;
     }
+        //    case STATUS_CREATE_FILE:
+        //    {
+        //        createTempile(m_filePath, fileSize);
+        //        requestPartial();
+        //        break;
+        //    }
     default:
         break;
     }
@@ -133,12 +124,15 @@ void CDownloadObject::doRequestFinished(bool ok, const CBaseRequestAction::Data 
         C_LOG_OUT_V(fileSize);
         if(fileSize > 0)
         {
-            if(!QFile::exists(m_filePath))
+            QFileInfo fileInfo(m_filePath);
+            if(fileInfo.exists() && fileInfo.size() == fileSize)
             {
-                createTempile(m_filePath, fileSize);
+                setStatus(STATUS_FINISHED);
+                return;
             }
             needRequestAll = false;
             m_downloadSettings->update(m_filePath, fileSize, data.rawHeaderMap.value("Last-Modified"));
+
             if(m_downloadSettings->isFinished())
             {
                 setStatus(STATUS_FINISHED);
@@ -192,6 +186,7 @@ void CDownloadObject::doError(const QString &error)
 void CDownloadObject::requestPartial()
 {
     C_LOG_FUNCTION;
+    setStatus(STATUS_REQUEST_PARTIAL);
     bool ok = false;
     do
     {

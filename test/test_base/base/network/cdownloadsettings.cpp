@@ -1,7 +1,9 @@
 #include "cdownloadsettings.h"
+#include "cbaseutils.h"
 #include "clogsetting.h"
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include <QSettings>
 
 CDownloadSettings::CDownloadSettings(const QString &filePath)
@@ -26,7 +28,8 @@ CDownloadSettings::CDownloadSettings(const QString &filePath)
 void CDownloadSettings::update(const QString &filePath, quint64 fileSize, const QByteArray &timestamp)
 {
     C_LOG_OUT_V6(fileSize, m_fileSize, m_filePath, filePath, m_timestamp, timestamp);
-    if(fileSize != m_fileSize || m_timestamp != timestamp || m_filePath != filePath || !isValid())
+    QFileInfo info(getTempFile());
+    if(!info.exists() || info.size() != m_fileSize || fileSize != m_fileSize || m_timestamp != timestamp || m_filePath != filePath || !isValid())
     {
         m_filePath = filePath;
         m_fileSize = fileSize;
@@ -34,6 +37,8 @@ void CDownloadSettings::update(const QString &filePath, quint64 fileSize, const 
         m_chunkSize = 1024 * 1024;
         m_timestamp = timestamp;
         updateRangeData();
+        bool createOk = CBaseUtils::createTempile(getTempFile(), m_fileSize);
+        C_LOG_OUT_V(createOk);
     }
 }
 
@@ -46,7 +51,8 @@ bool CDownloadSettings::isValid() const
     bool isValid = false;
     do
     {
-        if(!QFile::exists(m_filePath))
+        QFileInfo info(getTempFile());
+        if(!m_rangeData.isFinished() && (!info.exists() || info.size() != m_fileSize))
         {
             break;
         }
@@ -59,11 +65,6 @@ bool CDownloadSettings::isValid() const
             break;
         }
         if(m_downloadSize > m_fileSize)
-        {
-            break;
-        }
-        QFile info(m_filePath);
-        if(info.size() != m_fileSize)
         {
             break;
         }
@@ -93,7 +94,7 @@ quint64 CDownloadSettings::getChunkCount(quint64 fileSize, quint64 chunkSize)
 
 qint64 CDownloadSettings::writeToFile(quint64 index, const QByteArray &data)
 {
-    QFile file(m_filePath);
+    QFile file(getTempFile());
     if(file.open(QIODevice::ReadWrite))
     {
         file.seek(index * m_chunkSize);
@@ -103,6 +104,11 @@ qint64 CDownloadSettings::writeToFile(quint64 index, const QByteArray &data)
         saveSettings();
         C_LOG_OUT_V2(index, size);
         m_downloadSize += size;
+        if(isFinished())
+        {
+            bool renameOk = QFile::rename(getTempFile(), m_filePath);
+            C_LOG_OUT_V(renameOk);
+        }
         return size;
     }
     return -1;
@@ -158,6 +164,11 @@ quint64 CDownloadSettings::getFreeIndex(bool &ok)
 QString CDownloadSettings::getSettingsFile()
 {
     return getSettingsFile(m_filePath);
+}
+
+QString CDownloadSettings::getTempFile() const
+{
+    return m_filePath + ".temp";
 }
 
 QString CDownloadSettings::getSettingsFile(const QString &filePath)

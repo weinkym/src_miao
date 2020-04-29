@@ -20,6 +20,7 @@ public:
     enum Status
     {
         STATUS_NORMAL,
+        STATUS_CREATE_FILE,
         STATUS_STARTINGT,
         STATUS_REQUEST_HEAD,
         STATUS_REQUEST_PARTIAL,
