@@ -1,38 +1,33 @@
 #!/usr/local/bin/python3
-
-import sys,os
+import sys
+import os
 import datetime
 import time
-
 sys.path.append(os.getcwd())
 import subprocess
 from zwpy import zwutil
 from shutil import copy2
 import json
 
-def createVa(k,v):
-    pass
+from zwpy import zwutil
 
-def creatList(k,objList):
 
-def createStruct(key,value):
-    if isinstance(value,str):
-        return "QString {};\n".format(value)
-    else if isinstance(value,int):
-        return "int {};\n".format(value)
-    else if isinstance(value,list):
-        obj_name="{}_item".format(key)
-        return "QList<{}> {};\n".format(obj_name,key)
-    else if isinstance(value,dict):
-        return "{} {}".format(key,).format(createStruct())
-    else:
-        print("error")
-def test():
-    fp_test='/Users/miaozw/Documents/TEMP/test.json'
-    fp_w='/Users/miaozw/Documents/TEMP/struct.txt'
-    dict_struct={}
-    root_name="TEST_STRUCT"
-    with open(fp_test,'r') as fr:
-        data = json.load(fr)
-        print(data.keys())
-test()
+def test(fp):
+    cmd = 'cd /Users/avc/work/ljlive222/ljobs;clang-format -i \"{}\" -style=file '.format(
+        fp)
+    os.system(cmd)
+
+
+def test2():
+    dp = '/Users/avc/work/ljlive222/ljobs'
+    filter_list = ['.cpp', '.h']
+    for filter in filter_list:
+        file_list = zwutil.getFileNamePaths(dp, filter)
+        for fp, name in file_list:
+            if 'ljobs/obs/UI' in fp:
+                continue
+            test(fp)
+
+
+fp = '/Users/avc/work/ljlive222/ljobs/document/cwebclouddocitemwidget.cpp'
+test2()

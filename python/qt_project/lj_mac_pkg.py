@@ -14,7 +14,6 @@ class LineInfo:
     lib_name = ''
     lib_path = ''
 
-
 def getFilePaths(path,suffix):
     fileList=[]
     for parent,dirnames,filenames in os.walk(path,  topdown=False):

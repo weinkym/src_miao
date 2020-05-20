@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 from enum import Enum
 import time
 import zhconv
+import copy
 
 sys.path.append(os.getcwd())
 import subprocess
@@ -76,24 +77,42 @@ def createElement(name, parent=None):
 
 
 class TSMessage:
-    def __init__(self):
-        self.filename = ''
-        self.line = ''
-        self.source = ''
-        self.translation = ''
-        self.type = ''
-        self.tail = '\n'
-        self.location_tail = '\n'
-        self.source_tail = '\n'
-        self.translation_tail = '\n'
-        self.text = ''
-        self.location_text = ''
-        self.source_text = ''
-        self.translation_text = ''
+    def __init__(self, other=None):
+        if other is None:
+            self.filename = ''
+            self.line = ''
+            self.source = ''
+            self.translation = ''
+            self.type = ''
+            self.tail = '\n'
+            self.location_tail = '\n'
+            self.source_tail = '\n'
+            self.translation_tail = '\n'
+            self.text = ''
+            self.location_text = ''
+            self.source_text = ''
+            self.translation_text = ''
+        else:
+            self.filename = other.filename
+            self.line = other.line
+            self.source = other.source
+            self.translation = other.translation
+            self.type = other.type
+            self.tail = other.tail
+            self.location_tail = other.location_tail
+            self.source_tail = other.source_tail
+            self.translation_tail = other.translation_tail
+            self.text = other.text
+            self.location_text = other.location_text
+            self.source_text = other.source_text
+            self.translation_text = other.translation_text
 
     def __str__(self):
         return 'source={},line={},filename={},translation={},type={}'.format(
             self.source, self.line, self.filename, self.translation, self.type)
+
+    def __copy__(self):
+        return self
 
     def toElement(self):
         element = createElement('message')
@@ -107,7 +126,7 @@ class TSMessage:
 
         translation_element = createElement('translation', element)
         translation_element.text = self.translation
-        if '' == self.translation or self.translation_text == None:
+        if '' == self.translation or self.translation is None:
             translation_element.set('type', 'unfinished')
         return element
 
@@ -399,7 +418,7 @@ def updateTs(pro_fp, check_ts_fp, lupdate_fp):
         return False
 
     old_time = 0
-    if os.path.exists(lupdate_fp):
+    if os.path.exists(check_ts_fp):
         old_time = os.path.getmtime(check_ts_fp)
 
     res = UTils.run_cmd('\"{}\" \"{}\"'.format(lupdate_fp, pro_fp))
@@ -436,7 +455,7 @@ def doUpdate(pro_fp, source_ts_fp, source_excel_fp, lupdate_fp, lrelease_fp):
     if not updateTs(pro_fp, source_ts_fp, lupdate_fp):
         return False
 
-    ts_data_obj = parseTsFile(ts_fp)
+    ts_data_obj = parseTsFile(source_ts_fp)
     summary_table_name = "ALL"
     source_table_name = "已汉化"
     special_table_name = "特殊"
@@ -474,7 +493,7 @@ def doUpdate(pro_fp, source_ts_fp, source_excel_fp, lupdate_fp, lrelease_fp):
 
         for message in content.message_list:
             #todo 待完善
-            if '../obs/UI' in message.filename:
+            if '../obs/UI' in message.filename and 'OBSBasic.ui' not in message.filename:
                 continue
             if message.source in g_excep_source_id_list:
                 continue
@@ -484,13 +503,13 @@ def doUpdate(pro_fp, source_ts_fp, source_excel_fp, lupdate_fp, lrelease_fp):
             ts_data = result_tb_dict[message.source]
 
             message.translation = ts_data.getEG()
-            content_eg.message_list.append(message)
+            content_eg.message_list.append(TSMessage(message))
 
             message.translation = ts_data.cn
-            content_cn.message_list.append(message)
+            content_cn.message_list.append(TSMessage(message))
 
             message.translation = zhconv.convert(ts_data.cn, 'zh-tw')
-            content_tw.message_list.append(message)
+            content_tw.message_list.append(TSMessage(message))
 
         ts_data_obj_eg.content_list.append(content_eg)
         ts_data_obj_cn.content_list.append(content_cn)
@@ -498,18 +517,42 @@ def doUpdate(pro_fp, source_ts_fp, source_excel_fp, lupdate_fp, lrelease_fp):
 
     pro_name = os.path.basename(pro_fp)
     pro_name = pro_name.replace('.pro', '')
+    pro_name = 'ljlive'
     out_dp = os.path.dirname(source_ts_fp)
-    # lrelease_fp = ''
+
     update(ts_data_obj_eg, pro_name, lrelease_fp, out_dp)
     update(ts_data_obj_cn, pro_name, lrelease_fp, out_dp)
     update(ts_data_obj_tw, pro_name, lrelease_fp, out_dp)
 
 
+def doUpdateReleasenote(fp, excel_fp):
+    work_book = xlrd.open_workbook(excel_fp)
+    tb = work_book.sheet_by_name("releasenote")
+    if tb is None:
+        doLog(LogLevel.info, 'releasenote table is none')
+        return False
+    num_col = tb.ncols
+    num_row = tb.nrows
+    with open(fp, 'w') as f:
+        for row in range(2, num_row):
+            key = getTableCellValue(tb, row, 0)
+            cn = getTableCellValue(tb, row, 1)
+            eg = getTableCellValue(tb, row, 2)
+            if key == 'END':
+                break
+            f.write('CN{}{}\n'.format(key, cn))
+            f.write('TW{}{}\n'.format(key, zhconv.convert(cn, 'zh-tw')))
+            f.write('EG{}{}\n'.format(key, eg))
+
+
 if __name__ == "__main__":
-    excel_fp = '/Users/avc/Documents/TEMP/all.xlsx'
-    ts_fp = '/Users/avc/Documents/TEMP/ljlive_zh_CN.ts'
-    pro_fp = '/Users/avc/work/ljlive/ljobs/ljobs.pro'
-    check_ts_fp = '/Users/avc/work/ljlive/ljobs/translations/ljlive_zh_CN.ts'
+    # excel_fp = '/Users/avc/Documents/TEMP/all.xlsx'
+    excel_fp = '/Users/avc/work/ljlive222/ljobs/translations/all.xlsx'
+    # ts_fp = '/Users/avc/Documents/TEMP/ljlive_zh_CN.ts'
+    pro_fp = '/Users/avc/work/ljlive222/ljobs/ljobs.pro'
+    check_ts_fp = '/Users/avc/work/ljlive222/ljobs/translations/ljlive_zh_CN.ts'
+    releasenote_fp = '/Users/avc/work/ljlive222/ljobs/translations/releasenote.txt'
     lupdate_fp = '/Users/avc/Qt5.7.1/5.7/clang_64/bin/lupdate'
     lrelease_fp = '/Users/avc/Qt5.7.1/5.7/clang_64/bin/lrelease'
     doUpdate(pro_fp, check_ts_fp, excel_fp, lupdate_fp, lrelease_fp)
+    # doUpdateReleasenote(releasenote_fp, excel_fp)
