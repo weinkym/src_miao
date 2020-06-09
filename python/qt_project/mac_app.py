@@ -29,37 +29,47 @@ class VersionInfo:
         return '{}.{}.{}'.format(self.major, self.minor, self.patch)
 
 
-def codesignFile(fp):
-    entitlements_fp = '/Users/avc/Documents/TEMP/TEMP/ljlive.app/Contents/ljlive.entitlements'
-    cmd = 'codesign -f -s \"{}\" --options \"runtime\" \"{}\"'.format(
-        G_IDENT_APP, fp)
-    if (fp.endswith('.app')):
-        cmd = 'codesign -f -o runtime --entitlements \"{}\" --timestamp --deep -s "{}" -i "cn.yunxuetang.ljlivepc" \"{}\"'.format(
+def codesignFile(fp, entitlements_fp):
+    cmd = 'codesign -f -s \"{}\" \"{}\"'.format(G_IDENT_APP, fp)
+    name = OTL.getDirname(fp)
+    if (fp.endswith('.app')
+            or ('.' not in name and ('obs-plugins' in fp or 'MacOS' in fp))):
+        cmd = 'codesign -f -o runtime --entitlements \"{}\" --timestamp --deep -s \"{}\" -i "cn.yunxuetang.ljlivepc" \"{}\"'.format(
             entitlements_fp, G_IDENT_APP, fp)
-
     print('cmd={}'.format(cmd))
     res = zwutil.run_cmd(cmd)
     print('res={}'.format(res))
 
 
-def codesignApp(app_dp):
+def codesignApp(app_dp, entitlements_fp):
     framework_name = '.framework'
     ignore_suffix_list = [
         '.effect', '.ini', '.png', '.qss', '.txt', '.icns', '.conf', '.lproj',
-        '.pcm', '.inc', '.json', '.py', '.pyc'
+        '.pcm', '.inc', '.json', '.py', '.pyc', '.pak'
     ]
     obj_list = []
+    app_dp_list = []
     for parent, dirnames, filenames in os.walk(app_dp, topdown=False):
-        if framework_name in parent:
-            for name in dirnames:
-                if name.endswith('.app'):
-                    codesignApp(os.path.join(parent, name))
+        # if framework_name in parent:
+        #     for name in dirnames:
+        #         if name.endswith('.app'):
+        #             codesignApp(os.path.join(parent, name), entitlements_fp)
+        #     continue
+        is_app_path = False
+        for dp in app_dp_list:
+            if dp in parent:
+                is_app_path = True
+                break
+        if is_app_path:
             continue
 
         for name in dirnames:
+            tp = os.path.join(parent, name)
             if name.endswith(framework_name):
-                fp = os.path.join(parent, name)
-                obj_list.append((fp, name))
+                obj_list.append((tp, name))
+            if name.endswith('.app'):
+                app_dp_list.append(tp)
+                codesignApp(tp, entitlements_fp)
 
         for name in filenames:
             ignore = False
@@ -70,12 +80,14 @@ def codesignApp(app_dp):
                 continue
             fp = os.path.join(parent, name)
             obj_list.append((fp, name))
+            # if 'Chromium Embedded Framework.framework' in fp:
+            # print('fp={}'.format(fp))
     for fp, name in obj_list:
         if os.path.islink(fp):
             continue
-        codesignFile(fp)
-    codesignFile(app_dp)
-    os.systemp('spctl -a -vvvv \"{}\"'.format(app_dp))
+        codesignFile(fp, entitlements_fp)
+    codesignFile(app_dp, entitlements_fp)
+    os.system('spctl -a -vvvv \"{}\"'.format(app_dp))
 
 
 def lj_obs_archive(app_dp, plugins_dp, data_dp_list, entitlements_fp,
@@ -112,6 +124,52 @@ def lj_obs_archive(app_dp, plugins_dp, data_dp_list, entitlements_fp,
     OTL.adjuestLibToRpath(app_fp, name_list)
 
 
+def lj_obs_archive2(app_dp, data_dp_list, entitlements_fp, lib_list,
+                    frameworks_dp_list, out_dp, agora_app_fp):
+    build_dp = OTL.createDs(out_dp, 'TEMP')
+    OTL.copyD2D(app_dp, build_dp)
+
+    app_name = OTL.getDirname(app_dp)
+    contens_dp = '{}/{}/Contents'.format(build_dp, app_name)
+    macos_dp = '{}/MacOS'.format(contens_dp)
+    OTL.copyD2D(agora_app_fp, macos_dp)
+    agora_app_name = OTL.getDirname(agora_app_fp)
+    to_agora_app_fp = '{}/{}'.format(macos_dp, agora_app_name)
+    OTL.adjuestRapth(to_agora_app_fp, ['@executable_path/../Frameworks'])
+
+    # os.system("cd \"{}\";macdeployqt {}".format(build_dp,app_name))
+    os.system("cd \"{}\";macdeployqt {}".format(build_dp, app_name))
+
+    for dp in data_dp_list:
+        OTL.copyD2D(dp, contens_dp)
+
+    OTL.copyF2D(entitlements_fp, contens_dp)
+    frameworks_dp = OTL.createDs(contens_dp, 'Frameworks')
+    for dp in frameworks_dp_list:
+        OTL.copyD2D(dp, frameworks_dp)
+
+    for fp, name in lib_list:
+        OTL.copyF2D(fp, frameworks_dp)
+    name_list = OTL.adjuestLibs(frameworks_dp)
+
+    plugins_dp = '{}/obs-plugins'.format(contens_dp)
+    obj_list = OTL.getFiles(plugins_dp, ['.so'], [])
+    for fp, name in obj_list:
+        OTL.adjuestLibToRpath(fp, name_list)
+        rp_list = ['@executable_path/../Frameworks']
+        if 'obs-browser' in name:
+            rp_list.append(
+                '@executable_path/../Frameworks/Chromium Embedded Framework.framework'
+            )
+        OTL.adjuestRapth(fp, rp_list)
+
+    app_process_name = app_name.replace('.app', '')
+    app_fp = '{}/{}'.format(macos_dp, app_process_name)
+    OTL.adjuestRapth(app_fp, ['@executable_path/../Frameworks'])
+    OTL.adjuestLibToRpath(app_fp, name_list)
+    # os.system('open \"{}/{}\"'.format(build_dp, app_name))
+
+
 def getDmgList(name):
     obj_list = []
     for obj in zwutil.run_cmd('cd /Volumes;ls').split('\n'):
@@ -121,9 +179,8 @@ def getDmgList(name):
     return obj_list
 
 
-def createDmg(app_dp, dmg_fp, out_dp, dmg_name):
+def createDmg(app_dp, dmg_fp, out_dp, dmg_name, cn_name):
     dmg_dp = ''
-    cn_name = '临境直播'
     volume_dp = '/Volumes'
     obj_list = getDmgList(cn_name)
     for obj in obj_list:
@@ -210,6 +267,12 @@ def run_lj_obs_archive():
     version_fp = os.path.join(project_dp, 'ljobs/base/cversion_mac.cpp')
     vendor_dp = os.path.join(project_dp, 'vendor')
     app_dp = os.path.join(project_dp, 'bin/mac/release/ljlive.app')
+    plugins_dp = os.path.join(vendor_dp, 'obs/mac/obs-plugins')
+    data_dp_list = []
+    data_dp_list.append(os.path.join(vendor_dp, 'obs/mac/ljdata'))
+    data_dp_list.append(os.path.join(vendor_dp, 'obs/mac/data'))
+    python_data_dp = os.path.join(vendor_dp, 'python/lib/site-packages')
+
     # app_dp = os.path.join(
     #     '/Users/avc/Library/Developer/Xcode/Archives/2020-05-08/ljlive 2020-5-8, 9.21 AM.xcarchive/Products/Applications/ljlive.app'
     # )
@@ -233,43 +296,41 @@ def run_lj_obs_archive():
                    third_lib_list, out_dp, python_data_dp)
 
 
-def test():
-    # dep_dp='/Users/avc/Documents/TEMP/TEMP'
-    # app_fp='/Users/avc/Downloads/TEMP/ljlive.app/Contents/MacOS/ljlive'
-    lib_nmae_dict = {}
-    obj_list = OTL.getFiles('/Users/avc/work/ljlive/vendor/ffmpeg/mac/lib',
-                            ['.so', '.dylib'], [], False)
+def run_lj_obs_archive2():
+    project_dp = '/Users/avc/work/ljlive222'
+    entitlements_fp = os.path.join(project_dp, 'ljobs/ljlive.entitlements')
+    # version_fp = os.path.join(project_dp, 'ljobs/base/cversion_mac.cpp')
+    frameworks_dp_list = []
+    cef_framworks_dp = '/Users/avc/work/cef/cef_3538/Release/Chromium Embedded Framework.framework'
+    frameworks_dp_list.append(cef_framworks_dp)
 
-    for fp, name in obj_list:
-        lib_nmae_dict[name] = name
+    vendor_dp = os.path.join(project_dp, 'vendor')
+    app_dp = os.path.join(project_dp, 'bin/mac/release/XuanLive.app')
+    agora_app_fp = os.path.join(
+        project_dp,
+        'bin/mac/release/agora_avatar_push.app/Contents/MacOS/agora_avatar_push'
+    )
 
-    obj_list = OTL.getFiles(
-        '/Users/avc/work/ljlive/vendor/obs/mac/lib/release', ['.so', '.dylib'],
-        [], False)
-    for fp, name in obj_list:
-        lib_nmae_dict[name] = name
-
-    obj_list = OTL.getFiles(
-        '/Users/avc/work/ljlive/vendor/obs/mac/obs-plugins', ['.so', '.dylib'],
-        [], False)
-
-    for fp, name in obj_list:
-        if os.path.islink(fp):
-            continue
-        rpath_list = OTL.getLibDeps(fp)
-        print(fp)
-        OTL.resetRpath(fp)
-        OTL.addRpath(fp, '/Users/avc/work/ljlive/vendor/obs/mac/lib/release')
-        os.system("install_name_tool -id \"@rpath/{}\" \"{}\"".format(
-            name, fp))
-        for obj in rpath_list:
-            if obj.lib_name in lib_nmae_dict:
-                OTL.changeDPath(fp, obj.lib_path,
-                                '@rpath/{}'.format(obj.lib_name))
-        # print(rpath_list)
-    # rpath_list = OTL.getLibRpaths(
-    # '/Users/avc/Documents/TEMP/TEMP/ljlive.app/Contents/MacOS/ljlive')
-    # print(rpath_list)
+    # plugins_dp = os.path.join(vendor_dp, 'obs/mac/obs-plugins')
+    data_dp_list = []
+    data_dp_list.append(os.path.join(vendor_dp, 'obs/mac/ljdata'))
+    data_dp_list.append(os.path.join(vendor_dp, 'obs/mac/data'))
+    data_dp_list.append(os.path.join(vendor_dp, 'obs/mac/obs-plugins'))
+    out_dp = "/Users/avc/Documents/TEMP"
+    lib_list = OTL.getFiles(vendor_dp, ['.so', '.dylib'],
+                            ['/obs-plugins/', 'debug'])
+    exists_name_list = []
+    for fp, name in lib_list:
+        if name in exists_name_list:
+            print('name is repeat name={},fp={},fp={}'.format(
+                name, fp, exists_name_list[name][1]))
+        else:
+            exists_name_list.append((name, fp))
+    print("app_dp={}".format(app_dp))
+    # print("lib_list={}".format(lib_list))
+    print("agora_app_fp={}".format(agora_app_fp))
+    lj_obs_archive2(app_dp, data_dp_list, entitlements_fp, lib_list,
+                    frameworks_dp_list, out_dp, agora_app_fp)
 
 
 def changLibId(dp):
@@ -297,39 +358,63 @@ def changLibId(dp):
         os.system('codesign -f -s \"{}\" \"{}\"'.format(G_IDENT_APP, fp))
 
 
+def test1():
+    app_root = '/Users/avc/Documents/TEMP/TEMP'
+    cn_name = '绚星直播'
+    eg_name = 'ljlive'
+    app_dp = '{}/{}.app'.format(app_root, eg_name)
+    app_cn_dp = '{}/{}.app'.format(app_root, cn_name)
+
+    project_dp = '/Users/avc/work/ljlive'
+    verson_info = getVersionInfo(
+        '{}/ljobs/base/cversion_mac.cpp'.format(project_dp))
+    dmg_name = 'ljlive{}'.format(verson_info.fullVersion())
+    plist_fp = '/{}/ljobs/ljlive.plist'.format(project_dp)
+    entitlements_fp = '/Users/avc/work/ljlive/ljobs/ljlive.entitlements'
+    print('app_dp={}'.format(app_dp))
+    print('verson_info={}'.format(verson_info))
+    print('dmg_name={}'.format(dmg_name))
+    print('plist_fp={}'.format(plist_fp))
+
+    # updatePlistVersion(plist_fp, verson_info)
+
+    # if os.path.exists(app_dp):
+    #     os.system('rm -rf \"{}\"'.format(app_dp))
+    # if os.path.exists(app_cn_dp):
+    #     os.system('rm -rf \"{}\"'.format(app_cn_dp))
+    # run_lj_obs_archive()
+    # os.system('cd \"{}\";mv {}.app {}.app'.format(app_root, eg_name, cn_name))
+
+    # codesignApp(app_cn_dp, entitlements_fp)
+
+    # createDmg(app_cn_dp, '/Users/avc/work/release/xuanlive-release.dmg',
+    #   '/Users/avc/Documents/TEMP', dmg_name, cn_name)
+
+
 def test2():
-    # fp = '/Users/avc/Documents/TEMP/build-1.x/rundir/Release/bin/obs'
-    # fp = '/Users/avc/Documents/TEMP/build-obs2507/rundir/Release/bin/obs'
-    # fp = '/Users/avc/Documents/TEMP/build-obs1903/rundir/Release/bin/obs'
-    # OTL.addRpath(fp, '/Users/avc/Qt5.7.1/5.7/clang_64/lib')
-    # OTL.deleteRpath(fp, '/Users/avc/Qt5.7.1/5.7/clang_64/lib')
-    # OTL.addRpath(fp, '/Users/avc/Qt5.12.8/5.12.8/clang_64/lib')
-    # OTL.addRpath(fp, '/Users/avc/work/ljlive/vendor/ffmpeg/mac/lib')
-    # changLibId('/Users/avc/work/ljlive/vendor')
-    pass
+    app_dp = '/Users/avc/Documents/TEMP/TEMP/ljlive.app'
+    project_dp = '/Users/avc/work/ljlive222'
+
+    verson_info = getVersionInfo(
+        '{}/ljobs/base/cversion_mac.cpp'.format(project_dp))
+    dmg_name = 'ljlive{}'.format(verson_info.fullVersion())
+    # plist_fp = '/Users/avc/work/ljlive/ljobs/ljlive.plist'
+    plist_fp = '/Users/avc/work/ljlive222/ljobs/XuanLive.plist'
+
+    # updatePlistVersion(plist_fp, verson_info)
+    entitlements_fp = '/Users/avc/work/ljlive222/ljobs/xuanlive.entitlements'
+    app_dp2 = '/Users/avc/Documents/TEMP/temp/XuanLive.app'
+    run_lj_obs_archive2()
+    codesignApp(app_dp2, entitlements_fp)
+    # changLibId('/Users/avc/work/ljlive222/vendor/obs/mac/lib/release')
+    # codesignApp(app_dp)
+
+    # res = zwutil.run_cmd("/Users/avc/Qt5.7.1/5.7/clang_64/bin/macdeployqt")
+    # print(res)
+    print('app_dp={}'.format(app_dp))
+    print('verson_info={}'.format(verson_info))
+    print('dmg_name={}'.format(dmg_name))
+    print('plist_fp={}'.format(plist_fp))
 
 
-app_dp = '/Users/avc/Documents/TEMP/TEMP/ljlive.app'
-project_dp = '/Users/avc/work/ljlive222'
-verson_info = getVersionInfo(
-    '{}/ljobs/base/cversion_mac.cpp'.format(project_dp))
-dmg_name = 'ljlive{}'.format(verson_info.fullVersion())
-# plist_fp = '/Users/avc/work/ljlive/ljobs/ljlive.plist'
-plist_fp = '/Users/avc/work/ljlive222/ljobs/XuanLive.plist'
-updatePlistVersion(plist_fp, verson_info)
-# run_lj_obs_archive()
-# codesignApp(app_dp)
-# createDmg(app_dp, '/Users/avc/work/release/ljlive-release.dmg',
-#   '/Users/avc/Documents/TEMP', dmg_name)
-# res = zwutil.run_cmd("/Users/avc/Qt5.7.1/5.7/clang_64/bin/macdeployqt")
-# print(res)
-print('app_dp={}'.format(app_dp))
-print('verson_info={}'.format(verson_info))
-print('dmg_name={}'.format(dmg_name))
-print('plist_fp={}'.format(plist_fp))
-
-# os.system("which macdeployqt")
-# test2()
-
-# os.system("install_name_tool -id \"@rpath/{}\" \"{}\"".format(
-#             'libfreetype.6.dylib', '/Users/avc/work/ljlive/vendor/obs/mac/lib/release/libfreetype.6.dylib'))
+test1()

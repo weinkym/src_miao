@@ -493,7 +493,10 @@ def doUpdate(pro_fp, source_ts_fp, source_excel_fp, lupdate_fp, lrelease_fp):
 
         for message in content.message_list:
             #todo 待完善
-            if '../obs/UI' in message.filename and 'OBSBasic.ui' not in message.filename:
+            filename = message.filename
+            # if '1' in '21':
+            #     continue
+            if '../obs/UI' in filename and 'OBSBasic.ui' not in filename:
                 continue
             if message.source in g_excep_source_id_list:
                 continue
@@ -546,13 +549,17 @@ def doUpdateReleasenote(fp, excel_fp):
 
 
 if __name__ == "__main__":
-    # excel_fp = '/Users/avc/Documents/TEMP/all.xlsx'
-    excel_fp = '/Users/avc/work/ljlive222/ljobs/translations/all.xlsx'
+    project_dp = '/Users/avc/work/ljlive'
+    qt_bin_dp = '/Users/avc/Qt5.7.1/5.7/clang_64/bin'
+
+    excel_fp = os.path.join(project_dp, 'ljobs/translations/all.xlsx')
     # ts_fp = '/Users/avc/Documents/TEMP/ljlive_zh_CN.ts'
-    pro_fp = '/Users/avc/work/ljlive222/ljobs/ljobs.pro'
-    check_ts_fp = '/Users/avc/work/ljlive222/ljobs/translations/ljlive_zh_CN.ts'
-    releasenote_fp = '/Users/avc/work/ljlive222/ljobs/translations/releasenote.txt'
-    lupdate_fp = '/Users/avc/Qt5.7.1/5.7/clang_64/bin/lupdate'
-    lrelease_fp = '/Users/avc/Qt5.7.1/5.7/clang_64/bin/lrelease'
-    doUpdate(pro_fp, check_ts_fp, excel_fp, lupdate_fp, lrelease_fp)
-    # doUpdateReleasenote(releasenote_fp, excel_fp)
+    pro_fp = os.path.join(project_dp, 'ljobs/ljobs.pro')
+    check_ts_fp = os.path.join(project_dp,
+                               'ljobs/translations/ljlive_zh_CN.ts')
+    releasenote_fp = os.path.join(project_dp,
+                                  'ljobs/translations/releasenote.txt')
+    lupdate_fp = os.path.join(qt_bin_dp, 'lupdate')
+    lrelease_fp = os.path.join(qt_bin_dp, 'lrelease')
+    # doUpdate(pro_fp, check_ts_fp, excel_fp, lupdate_fp, lrelease_fp)
+    doUpdateReleasenote(releasenote_fp, excel_fp)
