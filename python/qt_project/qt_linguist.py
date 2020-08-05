@@ -183,7 +183,7 @@ def parseContent(obj):
         message = parseMessage(tg_message)
         if '!DOCTYPE HTML PUBLIC' in message.source:
             continue
-        content.message_list.append(message)
+        content.message_list.append(TSMessage(message))
     return content
 
 
@@ -335,6 +335,8 @@ def parseSpecialTable(tb):
         if not obj.checkValid(True):
             continue
         if obj.source_id in tb_dict.keys():
+            doLog(LogLevel.warning,
+                  '{} at row({}),cn={}'.format(obj.source_id, obj.row, obj.cn))
             doLog(
                 LogLevel.warning,
                 '{} at row({},{})'.format(obj.source_id, obj.row,
@@ -398,6 +400,57 @@ def parseTsExcelFile(fp, summary_table_name, source_table_name,
     return result_tb_dict
 
 
+def parseOBSINILineStr(line):
+    line = line.strip("\n")
+    line = line.strip("")
+    # print('line={}'.format(line))
+    if line.startswith('#'):
+        return []
+    if len(line) == 0:
+        return []
+    index = line.find('=')
+    if index < 0:
+        return []
+    key = line[0:index]
+    value = line[index + 1:]
+    value = value.strip("\"")
+    return [key, value]
+
+
+def parseOBSINI(dp):
+    cn_fp = UTils.joinPathWithRaise(dp, 'zh-CN.ini')
+    eg_fp = UTils.joinPathWithRaise(dp, 'en-US.ini')
+    tb_dict = {}
+    with open(cn_fp, 'r') as f:
+        line = f.readline()
+        row = 0
+        while line:
+            res = parseOBSINILineStr(line)
+            if len(res) == 2:
+                obj = ETSData('obsini', row)
+                obj.source_id = res[0]
+                obj.cn = res[1]
+                tb_dict[obj.source_id] = obj
+            line = f.readline()
+            row = row + 1
+
+    with open(eg_fp, 'r') as f:
+        line = f.readline()
+        row = 0
+        while line:
+            res = parseOBSINILineStr(line)
+            if len(res) == 2:
+                key = res[0]
+                value = res[1]
+                if key in tb_dict:
+                    tb_dict[key].eg_short = value
+                else:
+                    print("egini:row={},key={} not in cnini".format(row, key))
+            line = f.readline()
+            row = row + 1
+    return tb_dict
+
+
 def fileTime(file):
     return [
         time.ctime(os.path.getatime(file)),
@@ -420,6 +473,7 @@ def updateTs(pro_fp, check_ts_fp, lupdate_fp):
     old_time = 0
     if os.path.exists(check_ts_fp):
         old_time = os.path.getmtime(check_ts_fp)
+        os.system("rm -f \"{}\"".format(check_ts_fp))
 
     res = UTils.run_cmd('\"{}\" \"{}\"'.format(lupdate_fp, pro_fp))
     doLog(LogLevel.info, res)
@@ -448,7 +502,8 @@ def update(ts_data_obj, pro_name, lrelease_fp, out_dp):
     doLog(LogLevel.info, res)
 
 
-def doUpdate(pro_fp, source_ts_fp, source_excel_fp, lupdate_fp, lrelease_fp):
+def doUpdate(pro_fp, source_ts_fp, source_excel_fp, lupdate_fp, lrelease_fp,
+             obs_ini_dict):
     if not os.path.exists(lrelease_fp):
         doLog(LogLevel.error, '{} is not exists'.format(lrelease_fp))
         return False
@@ -493,17 +548,24 @@ def doUpdate(pro_fp, source_ts_fp, source_excel_fp, lupdate_fp, lrelease_fp):
 
         for message in content.message_list:
             #todo 待完善
-            filename = message.filename
+            # filename = message.filename
             # if '1' in '21':
             #     continue
-            if '../obs/UI' in filename and 'OBSBasic.ui' not in filename:
-                continue
+            # if '../obs/UI' in filename:
+            # continue
+            # if '../obs/UI' in filename and 'OBSBasic.ui' not in filename:
+            # continue
             if message.source in g_excep_source_id_list:
                 continue
-            if message.source not in result_tb_dict:
+
+            ts_data = None
+            if message.source in result_tb_dict:
+                ts_data = result_tb_dict[message.source]
+            elif message.source in obs_ini_dict:
+                ts_data = obs_ini_dict[message.source]
+            else:
                 doLog(LogLevel.error, 'source not found {}'.format(message))
                 continue
-            ts_data = result_tb_dict[message.source]
 
             message.translation = ts_data.getEG()
             content_eg.message_list.append(TSMessage(message))
@@ -549,7 +611,7 @@ def doUpdateReleasenote(fp, excel_fp):
 
 
 if __name__ == "__main__":
-    project_dp = '/Users/avc/work/ljlive'
+    project_dp = '/Users/avc/work/ljlive222'
     qt_bin_dp = '/Users/avc/Qt5.7.1/5.7/clang_64/bin'
 
     excel_fp = os.path.join(project_dp, 'ljobs/translations/all.xlsx')
@@ -561,5 +623,10 @@ if __name__ == "__main__":
                                   'ljobs/translations/releasenote.txt')
     lupdate_fp = os.path.join(qt_bin_dp, 'lupdate')
     lrelease_fp = os.path.join(qt_bin_dp, 'lrelease')
-    # doUpdate(pro_fp, check_ts_fp, excel_fp, lupdate_fp, lrelease_fp)
-    doUpdateReleasenote(releasenote_fp, excel_fp)
+
+    obs_ini_dp = UTils.joinPathWithRaise(
+        project_dp, 'vendor/obs/mac/data/obs-studio/locale')
+    obs_ini_dict = parseOBSINI(obs_ini_dp)
+    doUpdate(pro_fp, check_ts_fp, excel_fp, lupdate_fp, lrelease_fp,
+             obs_ini_dict)
+    # doUpdateReleasenote(releasenote_fp, excel_fp)
