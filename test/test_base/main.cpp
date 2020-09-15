@@ -3,38 +3,59 @@
 #include "ctestwidget.h"
 #include "mainwindow.h"
 #include <QApplication>
+#include <QSettings>
+
+#include <iostream>
+#include <stdio.h>
+#include <string>
+using namespace std;
+
+#include <objbase.h>
+
+GUID CreateGuid()
+{
+    GUID guid;
+#ifdef WIN32
+    CoCreateGuid(&guid);
+#else
+    uuid_generate(reinterpret_cast<unsigned char *>(&guid));
+#endif
+    return guid;
+}
+
+std::string GuidToString(const GUID &guid)
+{
+    char buf[64] = { 0 };
+#ifdef __GNUC__
+    snprintf(
+#else // MSVC
+    _snprintf_s(
+#endif
+        buf,
+        sizeof(buf),
+        "{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
+        guid.Data1, guid.Data2, guid.Data3,
+        guid.Data4[0], guid.Data4[1],
+        guid.Data4[2], guid.Data4[3],
+        guid.Data4[4], guid.Data4[5],
+        guid.Data4[6], guid.Data4[7]);
+    return std::string(buf);
+}
+
+void test()
+{
+    QSettings settings("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography", QSettings::NativeFormat);
+    QString value = settings.value("MachineGuid", "").toString(); //读
+    qDebug() << "  -----------  ";
+    qDebug() << "" << value;
+    std::string uuid = GuidToString(CreateGuid());
+    qDebug() << "uuid" << uuid.c_str();
+}
 
 int main(int argc, char *argv[])
 {
+    test();
+    return 1;
     QApplication a(argc, argv);
-    CLogEngine::getInstance()->setFieldTypes(C_LOG::FieldTypeFlags(C_LOG::FIELD_TYPE_LINE | C_LOG::FIELD_TYPE_FUN));
-    //    FIELD_TYPE_DATE = 0x00000001,
-    //    FIELD_TYPE_DATETIME = 0x00000002,
-    //    FIELD_TYPE_LINE = 0x00000004,
-    //    FIELD_TYPE_FILE = 0x00000008,
-    //    FIELD_TYPE_LEVEL = 0x00080010,
-    //    FIELD_TYPE_FUN = 0x00080020,
-    //    FIELD_TYPE_THREADID = 0x00080040,
-    MainWindow w;
-    w.show();
-    //    CTestWidget tw;
-    //    tw.show();
-    //    QWidget w;
-    //    w.show();
-
-    //    QSize size(400, 400);
-    //    CWidget *cw = new CWidget(&w);
-    //    cw->setStyleSheet("QWidget{ background:red}");
-    //    //    cw->setBaseSize(size);
-    //    //    cw->setGeometry(0, 0, 400, 400);
-    //    cw->setGeometry(QRect(200, 50, 120, 80));
-    //    cw->raise();
-
-    //    w.hide();
-    //    w.show();
-
-    //    CDialog dlg(CDialog::SHOW_TYPE_NORMAL);
-    //    dlg.show();
-
     return a.exec();
 }
