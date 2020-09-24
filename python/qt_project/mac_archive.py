@@ -84,8 +84,14 @@ def run_lj_obs_archive_xcode2(project_dp, app_dp):
 
     cef_dp = OTL.joinPathWithRaise(
         vendor_dp,
-        'additional_install_files/Chromium Embedded Framework.framework')
+        'additional_install_files/cef/mac/Release/Chromium Embedded Framework.framework'
+    )
     OTL.copyD2D(cef_dp, frameworks_dp)
+
+    #声网动态库
+    agora_dp = OTL.joinPathWithRaise(vendor_dp,
+                                     'agora/libs/mac/AgoraRtcKit.framework')
+    OTL.copyD2D(agora_dp, frameworks_dp)
 
     name_list = OTL.adjuestLibs(frameworks_dp)
     new_plugins_dp = OTL.joinPathWithRaise(contens_dp,
@@ -169,14 +175,4 @@ def test():
     os.system('open {}'.format(app_dp))
 
 
-# test()
-
 doStart()
-# src_dp = '‘/Users/avc/Documents/src_test/test_xcode_app’'
-# split_key = '‘'
-# if src_dp.startswith(split_key):
-#     src_dp = src_dp[len(split_key):-1]
-
-# if src_dp.endswith(split_key):
-#     src_dp = src_dp[0:-2]
-# print("src_dp======={}".format(src_dp))

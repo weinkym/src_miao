@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 
 
 def getFilePaths(path, suffix):
@@ -51,6 +52,7 @@ def run_cmd(cmd):
     sub = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     sub.wait()
     content = sub.stdout.read().decode("utf-8")
+    print("content={}".format(content))
     return content
 
 
@@ -65,3 +67,8 @@ def joinPathWithRaise(parent_dp, child_dp):
     dp = os.path.join(parent_dp, child_dp)
     checkPathWithRaise(dp)
     return dp
+
+
+def printDateTime(str=""):
+    current_time = time.strftime('%Y%m%d%H%M', time.localtime(time.time()))
+    print('{} {}'.format(current_time, str))

@@ -6,6 +6,10 @@ from zwpy import zwutil
 
 g_check_line_valid_list = ["/System/Library/Frameworks/", "/usr/lib/"]
 
+G_DeveloperIDApplication = "Developer ID Application: Jiangsu Yunxuetang Network Technology  Co.,Ltd (6F8YPTA92C)"
+G_DeveloperIDInstaller = "Developer ID Installer: Jiangsu Yunxuetang Network Technology  Co.,Ltd (6F8YPTA92C)"
+G_SIGN_PW = "vtzr-qsjn-ewfd-eqco"
+
 
 class LineInfo:
     def __init__(self):
@@ -156,6 +160,21 @@ def copyDFS2D(dp, to_dp):
     return True
 
 
+def rename(dp, old_name, new_name):
+    check_p = joinPathWithRaise(dp, old_name)
+    cmd = 'cd \'{}\';mv \'{}\' \'{}\''.format(dp, old_name, new_name)
+    zwutil.run_cmd(cmd)
+    check_p = joinPathWithRaise(dp, new_name)
+
+
+def deleteDP(dp, check=False):
+    if os.path.exists(dp):
+        cmd = "rm -rf \'{}\'".format(dp)
+        zwutil.run_cmd(cmd)
+    if check and os.path.exists(dp):
+        raise Exception("remove {} is error ".format(dp))
+
+
 def copyF2D(fp, to_dp):
     if not os.path.islink(fp):
         if not os.path.exists(fp):
@@ -218,6 +237,8 @@ def adjuestLibToRpath(fp, exists_name_list):
 
         if '@rpath/Qt' in obj.lib_path:
             continue
+        if '@rpath/AgoraRtcKit.framework/AgoraRtcKit' in obj.lib_path:
+            continue
         if isSystemPath(obj.lib_path):
             continue
         new = '@rpath/{}'.format(obj.lib_name)
@@ -243,16 +264,26 @@ def adjuestLibs(dp):
         adjuestRapth(fp, ['@loader_path/'])
 
 
-def getCmdFilePath(cmd):
+def getCmdFilePath(cmd, check=False):
     res = zwutil.run_cmd('which {}'.format(cmd))
-    return res.split('\n')[0]
+    fp = res.split('\n')[0]
+    if check:
+        checkPathWithRaise(fp)
+    return fp
 
 
 def checkPathWithRaise(fp):
     if not os.path.exists(fp):
-        error_string = 'path not exists ({})'.format(fp)
+        error_string = 'path not exists \'{}\''.format(fp)
         print('error_string={}'.format(error_string))
-        raise Exception('error_string')
+        raise Exception(error_string)
+
+
+def joinPath(parent_dp, child_dp, check=False):
+    dp = os.path.join(parent_dp, child_dp)
+    if check:
+        checkPathWithRaise(dp)
+    return dp
 
 
 def joinPathWithRaise(parent_dp, child_dp):

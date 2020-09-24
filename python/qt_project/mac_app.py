@@ -345,43 +345,24 @@ def changLibId(dp):
 
         lib_deps = OTL.getLibDeps(fp)
         for obj in lib_deps:
-            if obj.lib_name in name_dict:
+            if obj.lib_name in name_dict or obj.lib_name == obj.lib_path:
                 OTL.changeDPath(fp, obj.lib_path,
                                 '@rpath/{}'.format(obj.lib_name))
+
         os.system('codesign -f -s \"{}\" \"{}\"'.format(G_IDENT_APP, fp))
 
 
+def changAppFp(fp):
+    # OTL.adjuestRapth(fp, ['@executable_path/../Frameworks'])
+    OTL.addRpath(fp, '@executable_path/../Frameworks')
+    OTL.adjuestLibToRpath(fp, "")
+    # os.system('zrp {}'.format(fp))
+
+
 def test1():
-    app_root = '/Users/avc/Documents/TEMP/TEMP'
-    cn_name = '绚星直播'
-    eg_name = 'ljlive'
-    app_dp = '{}/{}.app'.format(app_root, eg_name)
-    app_cn_dp = '{}/{}.app'.format(app_root, cn_name)
-
-    project_dp = '/Users/avc/work/ljlive'
-    verson_info = getVersionInfo(
-        '{}/ljobs/base/cversion_mac.cpp'.format(project_dp))
-    dmg_name = 'ljlive{}'.format(verson_info.fullVersion())
-    plist_fp = '/{}/ljobs/ljlive.plist'.format(project_dp)
-    entitlements_fp = '/Users/avc/work/ljlive/ljobs/ljlive.entitlements'
-    print('app_dp={}'.format(app_dp))
-    print('verson_info={}'.format(verson_info))
-    print('dmg_name={}'.format(dmg_name))
-    print('plist_fp={}'.format(plist_fp))
-
-    # updatePlistVersion(plist_fp, verson_info)
-
-    # if os.path.exists(app_dp):
-    #     os.system('rm -rf \"{}\"'.format(app_dp))
-    # if os.path.exists(app_cn_dp):
-    #     os.system('rm -rf \"{}\"'.format(app_cn_dp))
-    # run_lj_obs_archive()
-    # os.system('cd \"{}\";mv {}.app {}.app'.format(app_root, eg_name, cn_name))
-
-    # codesignApp(app_cn_dp, entitlements_fp)
-
-    # createDmg(app_cn_dp, '/Users/avc/work/release/xuanlive-release.dmg',
-    #   '/Users/avc/Documents/TEMP', dmg_name, cn_name)
+    fp = '/Users/avc/work/ljlive222/bin/mac/release/XuanLive.app/Contents/MacOS/XuanLive'
+    changAppFp(fp)
+    OTL.copyF2D(fp, '/Users/avc/Documents/TEMP/TEST')
 
 
 def test2():
@@ -408,6 +389,8 @@ def test2():
     print('verson_info={}'.format(verson_info))
     print('dmg_name={}'.format(dmg_name))
     print('plist_fp={}'.format(plist_fp))
+    # changLibId('/Users/avc/work/ljlive222/vendor/ffmpeg/mac/lib')
+    # changLibId('/Users/avc/work/ljlive222/vendor/obs/mac/lib/release')
 
 
-test2()
+test1()

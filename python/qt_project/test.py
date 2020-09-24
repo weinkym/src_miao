@@ -464,7 +464,9 @@ def doStart():
     # os.system('open \"{}\"'.format(app_dp))
 
 
-doStart()
+dp = '/Users/avc/work/ljlive222/vendor/additional_install_files/ljlive.pro'
+print(os.path.basename(dp))
+# doStart()
 # test2()
 # run_lj_obs_archive_xcode('/Users/avc/work/ljlive',
 #  '/Users/avc/Documents/TEMP/ljlive.app')
