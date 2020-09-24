@@ -75,4 +75,5 @@ def copy_build_lib(build_dp,to_root_dp,lib_subffix_list,isX64=True):
 print ("Python Version {}".format(str(sys.version).replace('\n', '')))
 # exit(0)
 copy_build_lib(r"F:\TEMP\build64",r"F:\wook_root\project\ljlive2\bin\win",[".dll",".lib",'obs-browser-page.exe'],True)
-# copy_build_lib(r"F:\TEMP\build32",r"F:\wook_root\project\ljlive2\bin\win",[".dll",".lib",'obs-browser-page.exe'],False)
+copy_build_lib(r"F:\TEMP\build32",r"F:\wook_root\project\ljlive2\bin\win",[".dll",".lib",'obs-browser-page.exe'],False)
+# copy_build_lib(r"E:\build-lj2.x-2015x64",r"F:\wook_root\project\ljlive2\bin\win",[".dll",".lib",'obs-browser-page.exe'],True)
