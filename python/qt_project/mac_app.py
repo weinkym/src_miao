@@ -295,6 +295,7 @@ def run_lj_obs_archive2():
     # version_fp = os.path.join(project_dp, 'ljobs/base/cversion_mac.cpp')
     frameworks_dp_list = []
     cef_framworks_dp = '/Users/avc/work/cef/cef_3538/Release/Chromium Embedded Framework.framework'
+    cef_framworks_dp = '/Users/avc/work/ljlive222/vendor/agora/libs/mac/AgoraRtcKit.framework'
     frameworks_dp_list.append(cef_framworks_dp)
 
     vendor_dp = os.path.join(project_dp, 'vendor')
@@ -393,4 +394,5 @@ def test2():
     # changLibId('/Users/avc/work/ljlive222/vendor/obs/mac/lib/release')
 
 
-test1()
+test2()
+# run_lj_obs_archive2()

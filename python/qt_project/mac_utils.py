@@ -8,7 +8,7 @@ g_check_line_valid_list = ["/System/Library/Frameworks/", "/usr/lib/"]
 
 G_DeveloperIDApplication = "Developer ID Application: Jiangsu Yunxuetang Network Technology  Co.,Ltd (6F8YPTA92C)"
 G_DeveloperIDInstaller = "Developer ID Installer: Jiangsu Yunxuetang Network Technology  Co.,Ltd (6F8YPTA92C)"
-G_SIGN_PW = "vtzr-qsjn-ewfd-eqco"
+G_SIGN_PW = "qyeh-djkd-kgbx-ooip"
 
 
 class LineInfo:

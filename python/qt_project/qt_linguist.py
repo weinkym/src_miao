@@ -557,6 +557,8 @@ def doUpdate(pro_fp, source_ts_fp, source_excel_fp, lupdate_fp, lrelease_fp,
             # continue
             if message.source in g_excep_source_id_list:
                 continue
+            # if ".ui" in message.filename and "obs/UI/forms" in message.filename:
+            # continue
 
             ts_data = None
             if message.source in result_tb_dict:
@@ -629,4 +631,4 @@ if __name__ == "__main__":
     obs_ini_dict = parseOBSINI(obs_ini_dp)
     doUpdate(pro_fp, check_ts_fp, excel_fp, lupdate_fp, lrelease_fp,
              obs_ini_dict)
-    # doUpdateReleasenote(releasenote_fp, excel_fp)
+    doUpdateReleasenote(releasenote_fp, excel_fp)

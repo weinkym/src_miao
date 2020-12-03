@@ -88,10 +88,10 @@ def run_lj_obs_archive_xcode2(project_dp, app_dp):
     )
     OTL.copyD2D(cef_dp, frameworks_dp)
 
-    #声网动态库
-    agora_dp = OTL.joinPathWithRaise(vendor_dp,
-                                     'agora/libs/mac/AgoraRtcKit.framework')
-    OTL.copyD2D(agora_dp, frameworks_dp)
+    # #声网动态库
+    # agora_dp = OTL.joinPathWithRaise(vendor_dp,
+    #                                  'agora/libs/mac/AgoraRtcKit.framework')
+    # OTL.copyD2D(agora_dp, frameworks_dp)
 
     name_list = OTL.adjuestLibs(frameworks_dp)
     new_plugins_dp = OTL.joinPathWithRaise(contens_dp,
