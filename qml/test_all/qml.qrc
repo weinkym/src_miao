@@ -2,5 +2,9 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>ZTrain.qml</file>
+        <file>ZJson.qml</file>
+        <file>heart/CircleHeart.qml</file>
+        <file>heart/HollowHeart.qml</file>
+        <file>heart/SolidHeart.qml</file>
     </qresource>
 </RCC>
