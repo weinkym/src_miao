@@ -10,9 +10,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = test_mac
 TEMPLATE = app
+CONFIG += C++ 11
 
-
-include(QtAV.pri)
+#include(QtAV.pri)
 
 
 #LIBS += -F/Users/miaozw/work/build-QtAV-Desktop_Qt_5_7_1_clang_64bit-Release/lib_osx_x86_64_llvm

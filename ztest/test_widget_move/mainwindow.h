@@ -1,11 +1,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
 #include "zmovedialog.h"
 #include <QDebug>
+#include <QMainWindow>
 
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
 
@@ -19,6 +20,8 @@ public:
 
 protected:
     bool event(QEvent *event);
+    void moveEvent(QMoveEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 
 private slots:
     void on_pushButton_clicked();
