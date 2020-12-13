@@ -3,5 +3,14 @@
         <file>images/train1.png</file>
         <file>heart/images/heart_1.png</file>
         <file>heart/images/heart_2.png</file>
+        <file>login/images/check_checked.png</file>
+        <file>login/images/close_hover.png</file>
+        <file>login/images/close_normal.png</file>
+        <file>login/images/ljlive_icon.png</file>
+        <file>login/images/ljlive_text.png</file>
+        <file>login/images/password.png</file>
+        <file>login/images/roomid.png</file>
+        <file>login/images/user.png</file>
+        <file>login/images/lm_login.png</file>
     </qresource>
 </RCC>

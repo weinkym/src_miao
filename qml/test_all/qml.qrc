@@ -6,5 +6,8 @@
         <file>heart/CircleHeart.qml</file>
         <file>heart/HollowHeart.qml</file>
         <file>heart/SolidHeart.qml</file>
+        <file>login/ZLoginView.qml</file>
+        <file>ZTestView.qml</file>
+        <file>login/ZLoginLineContent.qml</file>
     </qresource>
 </RCC>
