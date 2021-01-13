@@ -5,10 +5,10 @@
 #pragma endregion std_headers
 
 #pragma region qt_headers
-#include <QObject>
-#include <QWidget>
-#include <QThread>
 #include <QCoreApplication>
+#include <QObject>
+#include <QThread>
+#include <QWidget>
 #pragma endregion qt_headers
 
 #include "CefViewBrowserApp/QCefViewBrowserApp.h"
@@ -18,65 +18,65 @@
 /// </summary>
 class CCefManager : public QObject
 {
-  Q_OBJECT
+    Q_OBJECT
 
 protected:
-  /// <summary>
-  ///
-  /// </summary>
-  CCefManager();
+    /// <summary>
+    ///
+    /// </summary>
+    CCefManager();
 
-  /// <summary>
-  ///
-  /// </summary>
-  ~CCefManager(){};
+    /// <summary>
+    ///
+    /// </summary>
+    ~CCefManager() {};
 
 public:
-  /// <summary>
-  ///
-  /// </summary>
-  /// <returns></returns>
-  static CCefManager& getInstance();
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns></returns>
+    static CCefManager &getInstance();
 
-  /// <summary>
-  ///
-  /// </summary>
-  void initializeCef();
+    /// <summary>
+    ///
+    /// </summary>
+    void initializeCef();
 
-  /// <summary>
-  ///
-  /// </summary>
-  /// <param name="name"></param>
-  /// <param name="value"></param>
-  /// <param name="domain"></param>
-  /// <param name="url"></param>
-  /// <returns></returns>
-  bool addCookie(const std::string& name, const std::string& value, const std::string& domain, const std::string& url);
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="value"></param>
+    /// <param name="domain"></param>
+    /// <param name="url"></param>
+    /// <returns></returns>
+    bool addCookie(const std::string &name, const std::string &value, const std::string &domain, const std::string &url);
 
-  /// <summary>
-  ///
-  /// </summary>
-  void uninitializeCef();
+    /// <summary>
+    ///
+    /// </summary>
+    void uninitializeCef();
 
 protected slots:
-  /// <summary>
-  ///
-  /// </summary>
-  void releaseCef();
+    /// <summary>
+    ///
+    /// </summary>
+    void releaseCef();
 
 private:
-  /// <summary>
-  ///
-  /// </summary>
-  CefRefPtr<QCefViewBrowserApp> app_;
+    /// <summary>
+    ///
+    /// </summary>
+    CefRefPtr<QCefViewBrowserApp> app_;
 
-  /// <summary>
-  ///
-  /// </summary>
-  CefSettings cef_settings_;
+    /// <summary>
+    ///
+    /// </summary>
+    CefSettings cef_settings_;
 
-  /// <summary>
-  ///
-  /// </summary>
-  int64_t nBrowserRefCount_;
+    /// <summary>
+    ///
+    /// </summary>
+    int64_t nBrowserRefCount_;
 };

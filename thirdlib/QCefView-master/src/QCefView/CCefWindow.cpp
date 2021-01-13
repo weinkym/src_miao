@@ -1,77 +1,73 @@
 #pragma region qt_headers
 #include <QCoreApplication>
-#include <QResizeEvent>
+#include <QDebug>
 #include <QPaintDevice>
 #include <QPainter>
-#include <QDebug>
+#include <QResizeEvent>
 #pragma endregion qt_headers
 
-#include "CCefWindow.h"
 #include "CCefManager.h"
+#include "CCefWindow.h"
 
 #define CEF_BROWSER_WINDOW_CLASS_NAME_A "CefBrowserWindow"
 
-QHash<CefWindowHandle, CCefWindow*> CCefWindow::instanceMap_;
+QHash<CefWindowHandle, CCefWindow *> CCefWindow::instanceMap_;
 
 QMutex CCefWindow::instanceMtx_;
 
-CCefWindow*
+CCefWindow *
 CCefWindow::lookupInstance(CefWindowHandle wnd)
 {
-  QMutexLocker locker(&instanceMtx_);
-  return instanceMap_[wnd];
+    QMutexLocker locker(&instanceMtx_);
+    return instanceMap_[wnd];
 }
 
-CCefWindow::CCefWindow(QWindow* parent /*= 0*/)
-  : QWindow(parent)
-  , hwndCefBrowser_(nullptr)
+CCefWindow::CCefWindow(QWindow *parent /*= 0*/)
+    : QWindow(parent)
+    , hwndCefBrowser_(nullptr)
 {
-  setFlags(Qt::FramelessWindowHint);
+    setFlags(Qt::FramelessWindowHint);
 
-  CCefManager::getInstance().initializeCef();
+    CCefManager::getInstance().initializeCef();
 }
 
 CCefWindow::~CCefWindow()
 {
-  if (hwndCefBrowser_)
-    hwndCefBrowser_ = nullptr;
+    if(hwndCefBrowser_)
+        hwndCefBrowser_ = nullptr;
 
-  CCefManager::getInstance().uninitializeCef();
+    CCefManager::getInstance().uninitializeCef();
 }
 
-void
-CCefWindow::setCefBrowserWindow(CefWindowHandle wnd)
+void CCefWindow::setCefBrowserWindow(CefWindowHandle wnd)
 {
-  hwndCefBrowser_ = wnd;
-  syncCefBrowserWindow();
+    hwndCefBrowser_ = wnd;
+    syncCefBrowserWindow();
 
-  {
-    QMutexLocker locker(&instanceMtx_);
-    instanceMap_[wnd] = this;
-  }
+    {
+        QMutexLocker locker(&instanceMtx_);
+        instanceMap_[wnd] = this;
+    }
 }
 
-void
-CCefWindow::syncCefBrowserWindow()
+void CCefWindow::syncCefBrowserWindow()
 {
-  double w = width() * devicePixelRatio();
-  double h = height() * devicePixelRatio();
-  if (hwndCefBrowser_)
-    ::SetWindowPos(hwndCefBrowser_, NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOSENDCHANGING | SWP_DEFERERASE);
+    double w = width() * devicePixelRatio();
+    double h = height() * devicePixelRatio();
+    if(hwndCefBrowser_)
+        ::SetWindowPos(hwndCefBrowser_, NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOSENDCHANGING | SWP_DEFERERASE);
 }
 
-void
-CCefWindow::exposeEvent(QExposeEvent* e)
+void CCefWindow::exposeEvent(QExposeEvent *e)
 {
-  syncCefBrowserWindow();
-  return __super::exposeEvent(e);
+    syncCefBrowserWindow();
+    return __super::exposeEvent(e);
 }
 
-void
-CCefWindow::resizeEvent(QResizeEvent* e)
+void CCefWindow::resizeEvent(QResizeEvent *e)
 {
-  syncCefBrowserWindow();
-  __super::resizeEvent(e);
+    syncCefBrowserWindow();
+    __super::resizeEvent(e);
 
-  return;
+    return;
 }

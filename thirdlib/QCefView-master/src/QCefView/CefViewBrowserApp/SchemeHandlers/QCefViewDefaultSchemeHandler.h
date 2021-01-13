@@ -19,61 +19,60 @@
 
 #include "../../CCefWindow.h"
 
-namespace QCefViewDefaultSchemeHandler {
-static char* scheme_name = QCEF_SCHEMA;
+namespace QCefViewDefaultSchemeHandler
+{
+static char *scheme_name = QCEF_SCHEMA;
 
-bool
-RegisterSchemeHandlerFactory();
+bool RegisterSchemeHandlerFactory();
 
-bool
-RegisterScheme(CefRawPtr<CefSchemeRegistrar> registrar);
+bool RegisterScheme(CefRawPtr<CefSchemeRegistrar> registrar);
 
 class SchemeHandler : public CefResourceHandler
 {
 public:
-  SchemeHandler(CCefWindow* pQCefWin);
+    SchemeHandler(CCefWindow *pQCefWin);
 
-  virtual bool Open(CefRefPtr<CefRequest> request, bool& handle_request, CefRefPtr<CefCallback> callback) override;
+    virtual bool Open(CefRefPtr<CefRequest> request, bool &handle_request, CefRefPtr<CefCallback> callback) override;
 
-  virtual bool ProcessRequest(CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback) override;
+    virtual bool ProcessRequest(CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback) override;
 
-  virtual void GetResponseHeaders(CefRefPtr<CefResponse> response,
-                                  int64& response_length,
-                                  CefString& redirectUrl) override;
+    virtual void GetResponseHeaders(CefRefPtr<CefResponse> response,
+        int64 &response_length,
+        CefString &redirectUrl) override;
 
-  virtual bool Skip(int64 bytes_to_skip, int64& bytes_skipped, CefRefPtr<CefResourceSkipCallback> callback) override;
+    virtual bool Skip(int64 bytes_to_skip, int64 &bytes_skipped, CefRefPtr<CefResourceSkipCallback> callback) override;
 
-  virtual bool Read(void* data_out,
-                    int bytes_to_read,
-                    int& bytes_read,
-                    CefRefPtr<CefResourceReadCallback> callback) override;
-  virtual bool ReadResponse(void* data_out,
-                            int bytes_to_read,
-                            int& bytes_read,
-                            CefRefPtr<CefCallback> callback) override;
+    virtual bool Read(void *data_out,
+        int bytes_to_read,
+        int &bytes_read,
+        CefRefPtr<CefResourceReadCallback> callback) override;
+    virtual bool ReadResponse(void *data_out,
+        int bytes_to_read,
+        int &bytes_read,
+        CefRefPtr<CefCallback> callback) override;
 
-  virtual void Cancel() override;
-
-private:
-  QPointer<CCefWindow> pQCefWindow_;
-  std::string data_;
-  std::string mime_type_;
-  int offset_;
+    virtual void Cancel() override;
 
 private:
-  IMPLEMENT_REFCOUNTING(SchemeHandler);
+    QPointer<CCefWindow> pQCefWindow_;
+    std::string data_;
+    std::string mime_type_;
+    int offset_;
+
+private:
+    IMPLEMENT_REFCOUNTING(SchemeHandler);
 };
 
 class SchemeHandlerFactory : public CefSchemeHandlerFactory
 {
 
-  // Return a new scheme handler instance to handle the request.
-  virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser,
-                                               CefRefPtr<CefFrame> frame,
-                                               const CefString& scheme_name,
-                                               CefRefPtr<CefRequest> request);
+    // Return a new scheme handler instance to handle the request.
+    virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser,
+        CefRefPtr<CefFrame> frame,
+        const CefString &scheme_name,
+        CefRefPtr<CefRequest> request);
 
 private:
-  IMPLEMENT_REFCOUNTING(SchemeHandlerFactory);
+    IMPLEMENT_REFCOUNTING(SchemeHandlerFactory);
 };
 }

@@ -7,25 +7,22 @@
 #include <include/cef_command_line.h>
 #pragma endregion cef_headers
 
-#include "QCefViewBrowserApp.h"
 #include "BrowserDelegates/QCefViewDefaultBrowserDelegate.h"
+#include "QCefViewBrowserApp.h"
 #include "SchemeHandlers/QCefViewDefaultSchemeHandler.h"
 
-void
-QCefViewBrowserApp::CreateBrowserDelegates(BrowserDelegateSet& delegates)
+void QCefViewBrowserApp::CreateBrowserDelegates(BrowserDelegateSet &delegates)
 {
-  QCefViewDefaultBrowserDelegate::CreateBrowserDelegate(delegates);
-  // add more browser delegates here
+    QCefViewDefaultBrowserDelegate::CreateBrowserDelegate(delegates);
+    // add more browser delegates here
 }
 
-void
-QCefViewBrowserApp::RegisterCustomSchemesHandlerFactories()
+void QCefViewBrowserApp::RegisterCustomSchemesHandlerFactories()
 {
-  QCefViewDefaultSchemeHandler::RegisterSchemeHandlerFactory();
+    QCefViewDefaultSchemeHandler::RegisterSchemeHandlerFactory();
 }
 
-void
-QCefViewBrowserApp::RegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
+void QCefViewBrowserApp::RegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
 {
-  QCefViewDefaultSchemeHandler::RegisterScheme(registrar);
+    QCefViewDefaultSchemeHandler::RegisterScheme(registrar);
 }

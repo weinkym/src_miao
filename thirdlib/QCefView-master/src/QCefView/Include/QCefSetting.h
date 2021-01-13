@@ -3,9 +3,9 @@
 #pragma once
 
 #pragma region qt_headers
-#include <QtCore/qglobal.h>
-#include <QString>
 #include <QMetaType>
+#include <QString>
+#include <QtCore/qglobal.h>
 #pragma endregion qt_headers
 
 #ifdef QCEFVIEW_LIB
@@ -17,12 +17,13 @@
 #endif
 #endif
 
-namespace QCefSetting {
+namespace QCefSetting
+{
 /// <summary>
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
-setBrowserSubProcessPath(const QString& path);
+setBrowserSubProcessPath(const QString &path);
 
 /// <summary>
 ///
@@ -34,7 +35,7 @@ browserSubProcessPath();
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
-setResourceDirectoryPath(const QString& path);
+setResourceDirectoryPath(const QString &path);
 
 /// <summary>
 ///
@@ -46,7 +47,7 @@ resourceDirectoryPath();
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
-setLocalesDirectoryPath(const QString& path);
+setLocalesDirectoryPath(const QString &path);
 
 /// <summary>
 ///
@@ -58,7 +59,7 @@ localesDirectoryPath();
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
-setUserAgent(const QString& agent);
+setUserAgent(const QString &agent);
 
 /// <summary>
 ///
@@ -70,7 +71,7 @@ userAgent();
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
-setCachePath(const QString& path);
+setCachePath(const QString &path);
 
 /// <summary>
 ///
@@ -82,7 +83,7 @@ cachePath();
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
-setUserDataPath(const QString& path);
+setUserDataPath(const QString &path);
 
 /// <summary>
 ///
@@ -94,7 +95,7 @@ userDataPath();
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
-setBridgeObjectName(const QString& name);
+setBridgeObjectName(const QString &name);
 
 /// <summary>
 ///
@@ -130,7 +131,7 @@ persistUserPreferences();
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
-setLocale(const QString& locale);
+setLocale(const QString &locale);
 
 /// <summary>
 ///
@@ -154,7 +155,7 @@ remoteDebuggingPort();
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
-setBackgroundColor(const QColor& color);
+setBackgroundColor(const QColor &color);
 
 /// <summary>
 ///
@@ -166,7 +167,7 @@ backgroundColor();
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
-setAcceptLanguageList(const QString& languages);
+setAcceptLanguageList(const QString &languages);
 
 /// <summary>
 ///
@@ -178,7 +179,7 @@ acceptLanguageList();
 ///
 /// </summary>
 void QCEFVIEW_EXPORT
-setGlobalCookie(const QString& name, const QString& value, const QString& domain, const QString& url);
+setGlobalCookie(const QString &name, const QString &value, const QString &domain, const QString &url);
 
 };
 

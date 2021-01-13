@@ -10,45 +10,41 @@
 #include "Include/QCefEvent.h"
 
 QCefEvent::QCefEvent()
-  : QObject(nullptr)
-{}
-
-QCefEvent::QCefEvent(const QString& name)
-  : QObject()
+    : QObject(nullptr)
 {
-  setObjectName(name);
 }
 
-void
-QCefEvent::setEventName(const QString& name)
+QCefEvent::QCefEvent(const QString &name)
+    : QObject()
 {
-  setObjectName(name);
+    setObjectName(name);
 }
 
-void
-QCefEvent::setIntProperty(const QString& key, int value)
+void QCefEvent::setEventName(const QString &name)
 {
-  Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
-  setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
+    setObjectName(name);
 }
 
-void
-QCefEvent::setDoubleProperty(const QString& key, double value)
+void QCefEvent::setIntProperty(const QString &key, int value)
 {
-  Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
-  setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
+    Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
+    setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
 }
 
-void
-QCefEvent::setStringProperty(const QString& key, const QString& value)
+void QCefEvent::setDoubleProperty(const QString &key, double value)
 {
-  Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
-  setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
+    Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
+    setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
 }
 
-void
-QCefEvent::setBoolProperty(const QString& key, bool value)
+void QCefEvent::setStringProperty(const QString &key, const QString &value)
 {
-  Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
-  setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
+    Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
+    setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
+}
+
+void QCefEvent::setBoolProperty(const QString &key, bool value)
+{
+    Q_ASSERT(0 != QString::compare(key, "name", Qt::CaseInsensitive));
+    setProperty(key.toUtf8().constData(), QVariant::fromValue(value));
 }
