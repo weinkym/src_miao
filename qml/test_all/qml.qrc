@@ -9,5 +9,7 @@
         <file>login/ZLoginView.qml</file>
         <file>ZTestView.qml</file>
         <file>login/ZLoginLineContent.qml</file>
+        <file>login/ZShaderEffectView.qml</file>
+        <file>ZShaderEffectView.qml</file>
     </qresource>
 </RCC>

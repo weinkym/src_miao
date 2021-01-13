@@ -16,6 +16,9 @@ ApplicationWindow {
         id: bar
         width: parent.width
         TabButton {
+            text: qsTr("TestView")
+        }
+        TabButton {
             text: qsTr("ZTrain")
         }
         TabButton {
@@ -33,6 +36,11 @@ ApplicationWindow {
         //        width: parent.width
         currentIndex: bar.currentIndex
         anchors.fill: parent
+
+        ZTestView{
+            width: 100
+            height: 200
+        }
 
         ZTrain{
             x:100
@@ -79,6 +87,16 @@ ApplicationWindow {
                 ZHeart.CircleHeart{
 
                 }
+                //进度条
+                    ZShaderEffectView{
+                        id: progress
+                        width: 100
+                        height: progress.width
+                        anchors.centerIn: parent
+                        value:30
+                    }
+
+
             }
         }
     }
