@@ -520,7 +520,9 @@ void QCefViewBrowserHandler::CloseAllBrowsers(bool force_close)
     {
         for(auto it = popup_browser_list_.begin(); it != popup_browser_list_.end(); ++it)
         {
+#ifdef ZW_OS_WIN
             ::SetParent((*it)->GetHost()->GetWindowHandle(), NULL);
+#endif
             (*it)->GetHost()->CloseBrowser(force_close);
             //::PostMessage((*it)->GetHost()->GetWindowHandle(), WM_CLOSE, 0, 0);
         }
@@ -528,8 +530,10 @@ void QCefViewBrowserHandler::CloseAllBrowsers(bool force_close)
 
     if(main_browser_)
     {
+#ifdef ZW_OS_WIN
         // Request that the main browser close.
         ::SetParent(main_browser_->GetHost()->GetWindowHandle(), NULL);
+#endif
         main_browser_->GetHost()->CloseBrowser(force_close);
         //::PostMessage(main_browser_->GetHost()->GetWindowHandle(), WM_CLOSE, 0, 0);
     }
@@ -603,7 +607,13 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
                         if(CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
                         {
 #if defined(CEF_STRING_TYPE_UTF16)
+
+#ifdef ZW_OS_WIN
                             method = QString::fromWCharArray(messageArguments->GetString(idx++).c_str());
+#else
+                            method = QString::fromWCharArray(messageArguments->GetString(idx++).ToWString().c_str());
+#endif
+
 #elif defined(CEF_STRING_TYPE_UTF8)
                             method = QString::fromUtf8(messageArguments->GetString(idx++).c_str());
 #elif defined(CEF_STRING_TYPE_WIDE)
@@ -626,7 +636,13 @@ bool QCefViewBrowserHandler::DispatchNotifyRequest(CefRefPtr<CefBrowser> browser
                             else if(CefValueType::VTYPE_STRING == messageArguments->GetType(idx))
                             {
 #if defined(CEF_STRING_TYPE_UTF16)
+
+#ifdef ZW_OS_WIN
                                 qStr = QString::fromWCharArray(messageArguments->GetString(idx).c_str());
+#else
+                                qStr = QString::fromWCharArray(messageArguments->GetString(idx).ToWString().c_str());
+#endif
+
 #elif defined(CEF_STRING_TYPE_UTF8)
                                 qStr = QString::fromUtf8(messageArguments->GetString(idx).c_str());
 #elif defined(CEF_STRING_TYPE_WIDE)

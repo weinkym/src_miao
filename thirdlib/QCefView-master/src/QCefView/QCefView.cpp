@@ -10,7 +10,13 @@
 #include <include/cef_browser.h>
 #include <include/cef_frame.h>
 #include <include/cef_parser.h>
+#ifdef ZW_OS_MAC
+#include <exception>
+#include <include/cef_sandbox_mac.h>
+#include <memory>
+#else
 #include <include/cef_sandbox_win.h>
+#endif
 #pragma endregion cef_headers
 
 #include <QCefProtocol.h>
@@ -37,9 +43,12 @@ public:
 
         // Set window info
         CefWindowInfo window_info;
+#ifdef ZW_OS_MAC
+        window_info.SetAsChild((void *)pCefWindow_->winId(), 0, 0, 100, 100);
+#else
         RECT rc = { 0 };
         window_info.SetAsChild((HWND)pCefWindow_->winId(), rc);
-
+#endif
         for(auto cookieItem : CCefSetting::global_cookie_list)
         {
             CCefManager::getInstance().addCookie(cookieItem.name, cookieItem.value, cookieItem.domain, cookieItem.url);
@@ -73,7 +82,13 @@ public:
                nullptr,
                CefRequestContext::GetGlobalContext()))
         {
+#ifdef ZW_OS_MAC
+            //TODO
+            //            throw std::exception("Failed to create browser.");
+            throw std::exception();
+#else
             throw std::exception("Failed to create browser.");
+#endif
         }
     }
 
@@ -344,8 +359,11 @@ QCefView::QCefView(const QString url, QWidget *parent /*= 0*/)
     : QWidget(parent)
     , pImpl_(nullptr)
 {
+#ifdef ZW_OS_MAC
+    pImpl_ = std::unique_ptr<Implementation>(new Implementation(url, windowHandle()));
+#else
     pImpl_ = std::make_unique<Implementation>(url, windowHandle());
-
+#endif
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     setLayout(layout);

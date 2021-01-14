@@ -1,5 +1,11 @@
 #pragma region cef_headers
+
+#ifdef ZW_OS_WIN
 #include <include/cef_sandbox_win.h>
+#else
+#include <include/cef_sandbox_mac.h>
+#endif
+
 #pragma endregion cef_headers
 
 #include "CCefManager.h"
@@ -55,8 +61,12 @@ void CCefManager::initializeCef()
 
     app_ = new QCefViewBrowserApp(CCefSetting::bridge_object_name);
 
+#ifdef ZW_OS_WIN
     HINSTANCE hInstance = ::GetModuleHandle(nullptr);
     CefMainArgs main_args(hInstance);
+#else
+    CefMainArgs main_args;
+#endif
 
     // Initialize CEF.
     void *sandboxInfo = nullptr;

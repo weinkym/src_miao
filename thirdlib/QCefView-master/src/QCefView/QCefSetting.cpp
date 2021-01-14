@@ -3,6 +3,11 @@
 
 #include <QColor.h>
 
+#ifdef ZW_OS_MAC
+#define TRUE 1
+#define FALSE 0
+#endif
+
 void QCefSetting::setBrowserSubProcessPath(const QString &path)
 {
     CCefSetting::initializeInstance();

@@ -54,20 +54,31 @@ void CCefWindow::syncCefBrowserWindow()
 {
     double w = width() * devicePixelRatio();
     double h = height() * devicePixelRatio();
+
+#ifdef ZW_OS_WIN
     if(hwndCefBrowser_)
         ::SetWindowPos(hwndCefBrowser_, NULL, 0, 0, w, h, SWP_NOZORDER | SWP_NOSENDCHANGING | SWP_DEFERERASE);
+#else
+#endif
 }
 
 void CCefWindow::exposeEvent(QExposeEvent *e)
 {
     syncCefBrowserWindow();
+#ifdef ZW_OS_WIN
     return __super::exposeEvent(e);
+#else
+#endif
 }
 
 void CCefWindow::resizeEvent(QResizeEvent *e)
 {
+
     syncCefBrowserWindow();
+#ifdef ZW_OS_WIN
     __super::resizeEvent(e);
+#else
+#endif
 
     return;
 }
