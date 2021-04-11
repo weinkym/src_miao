@@ -66,9 +66,8 @@ void ZTestViwerAll::quickSort(int a[], int l, int r)
             {
                 a[j--] = a[i];
             }
-            a[i]=x;
         }
-
+        a[i]=x;
         quickSort(a,l,i-1);
         quickSort(a,i+1,r);
     }

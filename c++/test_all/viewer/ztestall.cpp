@@ -56,10 +56,10 @@ void ZTestAll::testCopy()
 void ZTestAll::testSort()
 {
 //    int a[10];
-    int n = QTime::currentTime().msec() % 100 + 100;
+    int n = QTime::currentTime().msec() % 5 + 5;
     for(int i = 0; i < n;++i)
     {
-        int n = qrand() % 10 + 115;
+        int n = qrand() % 10 + 9;
         int *a = createIntList(n,50);
         outIntList(a,n);
         ZTestViwerAll::quickSort(a,0,n-1);
