@@ -2,10 +2,13 @@
 
 #include <QApplication>
 #include "ztestall.h"
+#include "ztestviwerall.h"
+#include "zproduceconsumer.h"
 
 int main(int argc, char *argv[])
 {
-    ZTestAll::testSort();
+//    ZTestAll::testAll();
+    ZProduceConsumer::test();
     return 0;
 //    QApplication a(argc, argv);
 //    MainWindow w;

@@ -19,6 +19,7 @@ SOURCES += \
     mac/zplatformmac.mm \
     main.cpp \
     mainwindow.cpp \
+    viewer/zproduceconsumer.cpp \
     viewer/ztestall.cpp \
     viewer/ztestviwerall.cpp \
     ztestutils.cpp
@@ -26,6 +27,7 @@ SOURCES += \
 HEADERS += \
     mac/zplatformmac.h \
     mainwindow.h \
+    viewer/zproduceconsumer.h \
     viewer/ztestall.h \
     viewer/ztestviwerall.h \
     ztestutils.h

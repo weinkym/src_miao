@@ -5,6 +5,7 @@
 #include "zwlog.h"
 #include <memory>
 
+
 ZTestAll::ZTestAll()
 {
 
@@ -86,5 +87,20 @@ void ZTestAll::testSort()
 //            exit(111);
 //            break;
 //        }
-//    }
+    //    }
+}
+
+void ZTestAll::testAll()
+{
+//    std::thread produce1(produce);
+//    std::thread produce2(produce);
+//    std::thread consumer1(consumer);
+//    std::thread consumer2(consumer);
+//    std::thread consumer3(consumer);
+
+//    produce1.join();
+//    produce2.join();
+//    consumer1.join();
+//    consumer2.join();
+//    consumer3.join();
 }

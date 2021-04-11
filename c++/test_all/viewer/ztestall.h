@@ -10,6 +10,7 @@ public:
     static int* createIntList(int n,int max = 1000);
     static void testCopy();
     static void testSort();
+    static void testAll();
 };
 
 #endif // ZTESTALL_H
