@@ -13,6 +13,7 @@
 #if defined(Q_OS_MAC)
 #include "zplatformmac.h"
 #endif
+#include "ztestviwerall.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

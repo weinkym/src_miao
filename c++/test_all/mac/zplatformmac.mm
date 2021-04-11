@@ -12,6 +12,7 @@ void ZPlatformMac::setWidgetLevel(QWidget *w)
     NSView *view = reinterpret_cast<NSView*>(w->winId());
     view.window.level = kCGStatusWindowLevel;//这个等级是snipaste截图钉图的等级
 //    view.window.hasShadow = false;
+    view.window.level = kCGMaximumWindowLevel;
 }
 
 void ZPlatformMac::setWidgetShadow(QWidget *w, bool hasShadow)

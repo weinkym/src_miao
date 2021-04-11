@@ -19,11 +19,15 @@ SOURCES += \
     mac/zplatformmac.mm \
     main.cpp \
     mainwindow.cpp \
+    viewer/ztestall.cpp \
+    viewer/ztestviwerall.cpp \
     ztestutils.cpp
 
 HEADERS += \
     mac/zplatformmac.h \
     mainwindow.h \
+    viewer/ztestall.h \
+    viewer/ztestviwerall.h \
     ztestutils.h
 
 FORMS += \
@@ -33,6 +37,8 @@ include($${PWD}/../../zwcore/zwcore.pri)
 mac{
 INCLUDEPATH += $${PWD}/mac
 }
+INCLUDEPATH += $${PWD}/viewer
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
