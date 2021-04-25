@@ -14,183 +14,78 @@
 #include <QString>
 #include <QImage>
 #include <QPixmap>
+#include <QDebug>
 
-template<typename T>
+template <typename T>
+QString ZWDebugString(T &t)
+{
+    QString ret;
+    QDebug(&ret).noquote() << t;
+    return ret;
+}
+
+template <typename T>
 class ZWLogCreate
 {
 public:
     static QString createValue(const T &value)
     {
-      return QString("%1").arg(value);
+        return LJDebugString(value);
     };
 
 private:
-
 };
 
-template<>
-class ZWLogCreate<QLine>
+template <>
+class ZWLogCreate<QColor>
 {
 public:
-    static QString createValue(const QLine &value)
+    static QString createValue(const QColor &value)
     {
-        return QString("(pos1=%1,%2,pos2=%3,%4)").arg(value.x1()).arg(value.y1()).arg(value.x2()).arg(value.y2());
+        return QString("(name=%1,r=%2,g=%3,b=%4")
+            .arg(value.name())
+            .arg(value.red())
+            .arg(value.green())
+            .arg(value.blue());
     };
 
 private:
 };
 
-template<>
-class ZWLogCreate<QLineF>
-{
-public:
-    static QString createValue(const QLineF &value)
-    {
-        return QString("(pos1=%1,%2,pos2=%3,%4)").arg(value.x1()).arg(value.y1()).arg(value.x2()).arg(value.y2());
-    };
-
-private:
-};
-
-template<>
-class ZWLogCreate<QPoint>
-{
-public:
-    static QString createValue(const QPoint &value)
-    {
-        return QString("(x=%1,y=%2)").arg(value.x()).arg(value.y());
-    };
-
-private:
-};
-
-template<>
-class ZWLogCreate<QPointF>
-{
-public:
-    static QString createValue(const QPointF &value)
-    {
-        return QString("(x=%1,y=%2)").arg(value.x()).arg(value.y());
-    };
-
-private:
-};
-
-template<>
-class ZWLogCreate<QSize>
-{
-public:
-    static QString createValue(const QSize &value)
-    {
-        return QString("(w=%1,h=%2)").arg(value.width()).arg(value.height());
-    };
-
-private:
-};
-
-template<>
-class ZWLogCreate<QSizeF>
-{
-public:
-    static QString createValue(const QSizeF &value)
-    {
-        return QString("(w=%1,h=%2)").arg(value.width()).arg(value.height());
-    };
-
-private:
-};
-
-template<>
-class ZWLogCreate<QRect>
-{
-public:
-    static QString createValue(const QRect &value)
-    {
-        return QString("(x=%1,y=%2,w=%3,h=%4)").arg(value.x()).arg(value.y()).arg(value.width()).arg(value.height());
-    };
-
-private:
-};
-
-template<>
-class ZWLogCreate<QRectF>
-{
-public:
-    static QString createValue(const QRectF &value)
-    {
-        return QString("(x=%1,y=%2,w=%3,h=%4)").arg(value.x()).arg(value.y()).arg(value.width()).arg(value.height());
-    };
-
-private:
-};
-
-template<>
+template <>
 class ZWLogCreate<QTime>
 {
 public:
     static QString createValue(const QTime &value)
     {
-        return QString("(%1)").arg(value.toString("hh:mm:ss"));
+        return QString("(%1")
+            .arg(value.toString("hh:mm:ss:zzz"));
     };
 
 private:
 };
 
-template<>
+template <>
 class ZWLogCreate<QDateTime>
 {
 public:
     static QString createValue(const QDateTime &value)
     {
-        return QString("(%1)").arg(value.toString("yyyy-MM-dd hh:mm:ss"));
+        return QString("(%1")
+            .arg(value.toString("yyyyMMdd hh:mm:ss:zzz"));
     };
 
 private:
 };
 
-template<>
-class ZWLogCreate<bool>
+template <>
+class ZWLogCreate<std::string>
 {
 public:
-    static QString createValue(const bool &value)
+    static QString createValue(const std::string &value)
     {
-        return QString("(%1)").arg(value ? "T":"F");
-    };
-
-private:
-};
-
-template<>
-class ZWLogCreate<QByteArray>
-{
-public:
-    static QString createValue(const QByteArray &value)
-    {
-        return QString(value);
-    };
-
-private:
-};
-
-template<>
-class ZWLogCreate<QImage>
-{
-public:
-    static QString createValue(const QImage &value)
-    {
-        return QString("(w=%1,h=%2,f=%3").arg(value.width()).arg(value.format());
-    };
-
-private:
-};
-
-template<>
-class ZWLogCreate<QPixmap>
-{
-public:
-    static QString createValue(const QPixmap &value)
-    {
-        return QString("(w=%1,h=%2").arg(value.width());
+        return QString("(%1")
+            .arg(value.c_str());
     };
 
 private:
