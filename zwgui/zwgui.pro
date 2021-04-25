@@ -33,14 +33,18 @@ SOURCES += src/zwgui.cpp \
     src/zwgui_mac.cpp \
     src/zwgui_linux.cpp \
     src/zwlabeltext.cpp \
-    src/zwframelesswidget.cpp
+    src/zwframelesswidget.cpp \
+    src/zwmovewidget.cpp \
+    src/zwmovewidgethandler.cpp
 
 INCLUDEPATH += $${PWD}/include
 HEADERS += include/zwgui.h\
         include/zwgui_global.h \
     include/zwfilterlistwidget.h \
     include/zwlabeltext.h \
-    include/zwframelesswidget.h
+    include/zwframelesswidget.h \
+    include/zwmovewidget.h \
+    include/zwmovewidgethandler.h
 
 unix {
     target.path = /usr/lib
