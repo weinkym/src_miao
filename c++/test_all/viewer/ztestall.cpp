@@ -92,15 +92,7 @@ void ZTestAll::testSort()
 
 void ZTestAll::testAll()
 {
-//    std::thread produce1(produce);
-//    std::thread produce2(produce);
-//    std::thread consumer1(consumer);
-//    std::thread consumer2(consumer);
-//    std::thread consumer3(consumer);
-
-//    produce1.join();
-//    produce2.join();
-//    consumer1.join();
-//    consumer2.join();
-//    consumer3.join();
+//    auto obj = ZTestViwerAll::cn2Num("壹佰贰拾叁亿肆仟伍佰陆拾柒万捌仟玖佰零壹");
+    auto obj = ZTestViwerAll::cn2Num("肆拾伍兆陆仟柒佰捌拾玖万亿零壹佰贰拾叁亿肆仟伍佰陆拾柒万捌仟玖佰零壹");
+    ZW_LOG(ZW_LOG_P(obj),LOG_LEVEL_WARNING);
 }

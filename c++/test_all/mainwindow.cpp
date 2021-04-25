@@ -22,10 +22,12 @@ void MainWindow::on_pushButton_clicked()
     w->move(100,3);
     btn->move(30,30);
     connect(btn,SIGNAL(clicked(bool)),w,SLOT(close()));
-    w->setWindowFlags(Qt::FramelessWindowHint);
+//    w->setWindowFlags(Qt::FramelessWindowHint);
+//    w->setWindowFlags(w->windowFlags() | Qt::CustomizeWindowHint);
+    w->setWindowFlags(Qt::CustomizeWindowHint);
 
     w->setAttribute(Qt::WA_DeleteOnClose);
-    ZPlatformMac::setWidgetLevel(w);
-    ZPlatformMac::setWidgetShadow(w,false);
+//    ZPlatformMac::setWidgetLevel(w);
+//    ZPlatformMac::setWidgetShadow(w,false);
     w->show();
 }
