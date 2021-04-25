@@ -29,6 +29,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += src/zwgui.cpp \
+    src/zwclickedwidget.cpp \
     src/zwgui_win.cpp \
     src/zwgui_mac.cpp \
     src/zwgui_linux.cpp \
@@ -39,6 +40,7 @@ SOURCES += src/zwgui.cpp \
 
 INCLUDEPATH += $${PWD}/include
 HEADERS += include/zwgui.h\
+    include/zwclickedwidget.h \
         include/zwgui_global.h \
     include/zwfilterlistwidget.h \
     include/zwlabeltext.h \
