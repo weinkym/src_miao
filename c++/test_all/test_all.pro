@@ -19,7 +19,6 @@ SOURCES += \
     mac/zplatformmac.mm \
     main.cpp \
     mainwindow.cpp \
-    viewer/imrpc.cpp \
     viewer/zproduceconsumer.cpp \
     viewer/ztestall.cpp \
     viewer/ztestviwerall.cpp \
@@ -28,8 +27,6 @@ SOURCES += \
 HEADERS += \
     mac/zplatformmac.h \
     mainwindow.h \
-    viewer/imrpc.h \
-    viewer/publicdefines.h \
     viewer/zproduceconsumer.h \
     viewer/ztestall.h \
     viewer/ztestviwerall.h \

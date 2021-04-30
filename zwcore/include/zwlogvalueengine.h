@@ -30,7 +30,7 @@ class ZWLogCreate
 public:
     static QString createValue(const T &value)
     {
-        return LJDebugString(value);
+        return ZWDebugString(value);
     };
 
 private:
@@ -42,11 +42,11 @@ class ZWLogCreate<QColor>
 public:
     static QString createValue(const QColor &value)
     {
-        return QString("(name=%1,r=%2,g=%3,b=%4")
-            .arg(value.name())
-            .arg(value.red())
-            .arg(value.green())
-            .arg(value.blue());
+        return QString("(name=%1,r=%2,g=%3,b=%4,a=%5)")
+                .arg(value.name(QColor::HexArgb))
+                .arg(value.red())
+                .arg(value.green())
+                .arg(value.blue()).arg(value.alpha());
     };
 
 private:

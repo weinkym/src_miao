@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QPainter>
+#include "mac/zwplatformmac.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -37,6 +38,7 @@ void MainWindow::on_pushButton_clicked()
 //    ZW_LOG_FUNCTION;
     //    ZW_LOG_INFO(ZWCore::convertToPinyin("缪正伟DFADSF"));
     updatePoints();
+
 }
 
 void MainWindow::updatePoints()

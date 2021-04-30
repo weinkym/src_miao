@@ -24,3 +24,9 @@ void ZPlatformMac::setWidgetShadow(QWidget *w, bool hasShadow)
     NSView *view = reinterpret_cast<NSView*>(w->winId());
     view.window.hasShadow = hasShadow;
 }
+
+void ZPlatformMac::doTest()
+{
+   [NSApplication sharedApplication];
+   [NSApp activateIgnoringOtherApps:YES];
+}

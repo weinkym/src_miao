@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include "zwlog.h"
 #include "zwcore.h"
+#include <QDebug>
+#include <QColor>
 
 namespace Ui {
 class MainWindow;

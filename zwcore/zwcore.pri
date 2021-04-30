@@ -16,6 +16,6 @@ C_LIB_PATH=$$PWD/lib/$${PLATEFORM_NAME}/$${DEBUG_RELEASE_NAME}
 LIBS += -L$${C_LIB_PATH} -l$${C_LIB_NAME}
 
 INCLUDEPATH += $$PWD/include
+INCLUDEPATH += $$PWD
 message( "C_LIB_NAME=$${C_LIB_NAME}" )
 message( "C_LIB_PATH=$${C_LIB_PATH}" )
-

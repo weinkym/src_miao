@@ -5,7 +5,7 @@
 ZWClickedWidget::ZWClickedWidget(QWidget *parent, Qt::WindowFlags f)
     :QWidget(parent,f)
     ,m_id(0)
-    ,m_uuid(QUuid::createUuid()))
+    ,m_uuid(QUuid::createUuid())
 {
 
 }

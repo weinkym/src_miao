@@ -9,11 +9,17 @@
 #include <QTime>
 #include <QTimer>
 #include <QDateTime>
+#include <QDebug>
+#include <QTimer>
+#include <QPixmap>
+#include <QScreen>
+#include <QPushButton>
 
 #if defined(Q_OS_MAC)
 #include "zplatformmac.h"
 #endif
 #include "ztestviwerall.h"
+#include "zwlog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

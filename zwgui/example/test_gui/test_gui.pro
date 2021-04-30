@@ -35,3 +35,23 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     testzwlabeldialog.ui
+macx{
+    LIBS += -framework  CoreAudio
+    LIBS += -framework  CoreWLAN
+    LIBS += -framework  CoreMedia
+    LIBS += -framework  AudioToolbox
+    LIBS += -framework  AVFoundation
+    LIBS += -framework  Foundation
+    LIBS += -framework  AppKit
+    LIBS += -framework  CFNetwork
+    LIBS += -framework  CoreFoundation
+    LIBS += -framework  CoreGraphics
+    LIBS += -framework  CoreVideo
+    LIBS += -framework  IOKit
+    LIBS += -framework  OpenGL
+    LIBS += -framework  VideoToolbox
+    LIBS += -framework  SystemConfiguration
+    LIBS += -framework  CoreTelephony
+    LIBS += -framework  Accelerate
+    LIBS += -framework  CFNetwork
+}

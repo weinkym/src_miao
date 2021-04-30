@@ -30,9 +30,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += src/zwgui.cpp \
     src/zwclickedwidget.cpp \
-    src/zwgui_win.cpp \
-    src/zwgui_mac.cpp \
-    src/zwgui_linux.cpp \
     src/zwlabeltext.cpp \
     src/zwframelesswidget.cpp \
     src/zwmovewidget.cpp \
@@ -51,4 +48,11 @@ HEADERS += include/zwgui.h\
 unix {
     target.path = /usr/lib
     INSTALLS += target
+}
+
+macx{
+INCLUDEPATH += $${PWD}/mac
+HEADERS += mac/zwplatformmac.h
+SOURCES += mac/zwplatformmac.mm
+SOURCES += mac/zwgui_mac.mm
 }
