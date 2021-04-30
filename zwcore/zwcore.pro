@@ -33,7 +33,8 @@ HEADERS += include/zwcore_global.h \
     include/zwcore.h \
     include/zwpublic.h \
     include/zwlog.h \
-    include/zwlogvalueengine.h
+    include/zwlogvalueengine.h \
+    include/zwsingleton.h
 
 unix {
     target.path = /usr/lib

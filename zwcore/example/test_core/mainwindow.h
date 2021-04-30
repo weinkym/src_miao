@@ -6,6 +6,7 @@
 #include "zwcore.h"
 #include <QDebug>
 #include <QColor>
+#include "zstestsingleton.h"
 
 namespace Ui {
 class MainWindow;

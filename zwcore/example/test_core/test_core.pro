@@ -26,8 +26,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+        zstestsingleton.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    zstestsingleton.h
 
 FORMS    += mainwindow.ui
