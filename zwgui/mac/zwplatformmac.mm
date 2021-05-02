@@ -1,4 +1,4 @@
-#include "ZWPlatformMac.h"
+#include "zwplatformmac.h"
 #include <AppKit/AppKit.h>
 #include "zwlog.h"
 
@@ -25,7 +25,9 @@ static void setWidgetNSWindowStyleMask(QWidget *w,NSWindowStyleMask mask,bool en
         {
             mask_new = mask_new & (mask_new ^ mask);
         }
-        ZW_LOG_INFO(QString("styleMask %1 - > %2").arg([wnd styleMask]).arg(mask_new));
+        ZW_LOG_INFO(QString("styleMask %1 - > %2  bit%3 - > %4").arg([wnd styleMask]).arg(mask_new)
+                .arg(QString("%1").arg([wnd styleMask],0,2))
+                    .arg(QString("%1").arg(mask_new,0,2)));
         [wnd setStyleMask:mask_new];
 
     }while(0);

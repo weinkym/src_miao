@@ -8,11 +8,11 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    //    MainWindow w;
+        MainWindow w;
     //    TestZWLabelDialog w;
 //    ZWFramelessWidget w;
 //    w.SetResizeable(false);
-    ZWMoveWidget w;
+//    ZWMoveWidget w;
 //    w.SetResizeable(true);
 //    w.SetRadius(5);
     w.show();
