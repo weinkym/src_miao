@@ -3,6 +3,7 @@ sys.path.append(os.getcwd())
 import subprocess
 # import public_defines as PB
 from zwpy import zwutil
+import re
 
 g_check_line_valid_list = ["/System/Library/Frameworks/", "/usr/lib/"]
 
@@ -290,3 +291,32 @@ def joinPathWithRaise(parent_dp, child_dp):
     dp = os.path.join(parent_dp, child_dp)
     checkPathWithRaise(dp)
     return dp
+
+def get_file_name(path_string):
+    pattern = re.compile(r'([^<>/\\\|:""\*\?]+)\.\w+$')
+    data = pattern.findall(path_string)
+    if data:
+        return data[0]
+
+def createICNS(fp,out_dp):
+    checkPathWithRaise(fp)
+    # fn = getDirname(fp)
+    fn = get_file_name(fp)
+    name = "{}.iconset".format(fn)
+    temp_dp = createDs(out_dp,name)
+    checkPathWithRaise(temp_dp)
+    # copyF2D(fp,temp_dp)
+    size = 16
+    while size <= 1024:
+        cmd = ("cd \"{0}\";sips -z {1} {1} \"{2}\" --out \"{3}/icon_{1}x{1}.png\"".format(out_dp,size,fp,temp_dp))
+        zwutil.run_cmd(cmd)
+        cmd = ("cd \"{0}\";sips -z {1} {1} \"{2}\" --out \"{3}/icon_{1}x{1}@2x.png\"".format(out_dp,size,fp,temp_dp))
+        zwutil.run_cmd(cmd)
+        size = size * 2
+
+    cmd = ("cd \"{0}\";iconutil -c icns {1} -o {2}.icns".format(out_dp,name,fn))
+    zwutil.run_cmd(cmd)
+    deleteDP(temp_dp)
+
+if __name__ == "__main__":
+    createICNS('/Users/miao/Pictures/1024.png',"/Users/miao/Pictures")
