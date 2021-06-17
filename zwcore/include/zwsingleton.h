@@ -24,6 +24,7 @@ public:
     ZWSingleton(const ZWSingleton&)=delete;
     ZWSingleton& operator =(const ZWSingleton&)=delete;
     ~ZWSingleton(){};
+    virtual void uninitialize(){};
 
 protected:
     ZWSingleton(){};
