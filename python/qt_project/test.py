@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 import sys
 import os
-import biplist
+# import biplist
 # import subprocess
 g_fp_path = os.path.abspath(os.path.dirname(__file__))
 # print(os.getcwd())
@@ -438,43 +438,6 @@ def test1():
 
 
 def test2():
-    project_dp = '/Users/avc/work/ljlive'
-    app_dp = '/Users/avc/Documents/TEMP/ljlive.app'
-    os.system('rm -rf \"{}\"'.format(app_dp))
-    OTL.copyD2D('/Users/avc/work/ljlive/bin/mac/release/ljlive.app',
-                '/Users/avc/Documents/TEMP')
-    run_lj_obs_archive_xcode(project_dp,
-                             '/Users/avc/Documents/TEMP/ljlive.app')
-    os.system('open \"{}\"'.format(app_dp))
+    OTL.createICNS('/Users/miao/Pictures/1024.jpeg',"/Users/miao/Pictures")
 
-
-def doStart():
-    if len(sys.argv) < 3:
-        print(sys.argv)
-        print("=======param is invalid")
-        return
-    src_dp = sys.argv[1]
-    project_dp = os.path.abspath(os.path.dirname(src_dp))
-    app_dp = sys.argv[2]
-    print("project_dp={}".format(project_dp))
-    print("app_dp={}".format(app_dp))
-    os.system('open \"{}\"'.format(project_dp))
-    run_lj_obs_archive_xcode(project_dp, app_dp)
-    #  '/Users/avc/Documents/TEMP/ljlive.app')
-    # os.system('open \"{}\"'.format(app_dp))
-
-
-dp = '/Users/avc/work/ljlive222/vendor/additional_install_files/ljlive.pro'
-print(os.path.basename(dp))
-# doStart()
-# test2()
-# run_lj_obs_archive_xcode('/Users/avc/work/ljlive',
-#  '/Users/avc/Documents/TEMP/ljlive.app')
-
-# project_dp = '/Users/avc/work/ljlive'
-# entitlements_fp = os.path.join(project_dp, 'ljobs/ljlive.entitlements')
-# root_dp = '/Users/avc/Library/Developer/Xcode/Archives/2020-06-05/ljlive 2020-6-5, 4.14 PM.xcarchive/Products/Applications'
-# app_dp = '{}/ljlive.app'.format(root_dp)
-# codesignFile(
-#     '{}/ljlive.app/Contents/data/obs-plugins/obs-ffmpeg/ffmpeg-mux'.format(
-#         root_dp), entitlements_fp, True)
+test2()

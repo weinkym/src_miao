@@ -13,6 +13,8 @@ import json
 from zwpy import zwutil
 from zwpy import zwlog
 
+from pdf2docx import Converter
+
 
 def test(dp, fp):
     cmd = 'cd \"{}\";clang-format -i \"{}\" -style=file '.format(dp, fp)
@@ -44,13 +46,12 @@ def outLine(line):
 
 
 def test3():
-    with open('/Users/avc/Documents/code.txt', 'r') as f:
-        # while 1:
-        line = f.readline()
-        while line != "":
-            outLine(line)
-            line = f.readline()
+    fp_pdf='/Users/miao/Documents/WinDbg中文手册.pdf'
+    fp_word='/Users/miao/Documents/WinDbg中文手册.docx'
+    cv = Converter(fp_pdf)
+    cv.convert(fp_word, start=0, end=None)
+    cv.close()
 
 
 # fp = '/Users/avc/work/ljlive222/ljobs/document/cwebclouddocitemwidget.cpp'
-test2()
+test3()
